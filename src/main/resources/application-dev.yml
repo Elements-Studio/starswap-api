@@ -1,0 +1,35 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          # auto: create # 开发阶段使用
+          auto: update
+  flyway:
+    enabled: false # 启用或禁用 flyway
+
+starswap:
+  token-price-service:
+    base-url: http://k8s-default-starcoin-cbf39ae390-308376289.ap-northeast-1.elb.amazonaws.com/barnard/v1
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+        cache: TRACE
+      hibernate:
+        tool:
+          hbm2ddl: DEBUG
+          # 输出数据库模型（开发阶段）
+
+      starcoin:
+        starswap:
+          api: DEBUG
+          subscribe:
+            handler: DEBUG
+
+

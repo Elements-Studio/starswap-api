@@ -1,0 +1,120 @@
+server:
+  port: 8600
+  max-http-header-size: 102400
+  compression:
+    enabled: true
+    min-response-size: 20480  #20K 以上开启gzip
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
+  servlet:
+    context-path: "/${STARCOIN_NETWORK}"
+
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${STARCOIN_MYSQL_URL}
+    username: ${STARCOIN_MYSQL_USER}
+    password: ${STARCOIN_MYSQL_PWD}
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      # 不配置默认与maximum-pool-size相同
+      minimum-idle: 5 #minimum number of idle connections maintained by HikariCP in a connection pool
+      # 连接池最大连接数，默认是10
+      maximum-pool-size: 20
+      connection-test-query: SELECT 1
+      idle-timeout: 500000 #maximum idle time for connection
+      connection-timeout: 20000 #maximum number of milliseconds that a client will wait for a connection
+      max-lifetime: 1800000 # maximum lifetime in milliseconds of a connection in the pool after it is closed.
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: none
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: false
+
+
+  flyway:
+    baselineOnMigrate: true
+    # 如果指定 schema 包含了其他表但没有 flyway schema history 表的话，在执行 flyway migrate 命令之前须先执行 flyway baseline 命令。
+    # 设置 spring.flyway.baseline-on-migrate 为 true 后，flyway 将在需要 baseline 的时候, 自动执行一次 baseline。
+    baselineVersion: 0.0.0
+    cleanDisabled: true # flyway 的 clean 命令会删除指定 schema 下的所有 table，应该禁掉
+    enabled: true # 启用或禁用 flyway
+    locations: classpath:db/migration # 设定 SQL 脚本的目录，比如取值为 classpath:db/migration,filesystem:/sql-migrations
+    outOfOrder: false # 生产环境关闭 outOfOrder
+    #spring.flyway.encoding=
+    # Encoding of SQL migrations (default: UTF-8)
+    #spring.flyway.schemas=
+    # 需要 flyway 管控的 schema list，缺省的使用 dbsource.connection 直连上的那个 schema，
+    # 可以指定多个schema，但仅会在第一个 schema 下建立 metadata 表，也仅在第一个 schema 应用 migration sql 脚本，
+    # 但 flyway clean 命令会依次在这些 schema 下都执行一遍。
+
+
+jasypt:
+  encryptor:
+    bean: encryptorBean
+    password: ${STARCOIN_ES_PWD}
+
+starcoin:
+  seeds: ${STARCOIN_SEEDS}
+  network: ${STARCOIN_NETWORK}
+  json-rpc-url: ${STARCOIN_JSON_RPC_URL}
+  event-filter:
+    from-address: "0x598b8cbfd4536ecbe88aa1cfaffa7a62"
+    add-liquidity-event-type-tag: "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent"
+    add-farm-event-type-tag: "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent"
+    stake-event-type-tag: "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent"
+
+
+starswap:
+#  token-price-service:
+#    base-url: https://price-api.starcoin.org/main/v1
+#    get-pair-price-url: ${starswap.token-price-service.base-url}/priceFeeds/{pairId}
+  #  to-usd-pair-id-mappings:
+  #    STC: "STCUSD"
+  lp-token-farming:
+    default-reward-token-id: "TBD"
+  default-usd-equivalent-token-id: "BX_USDT"
+  lp-token-farm-refresh-task-service:
+    fixed-delay: 30000
+  pulling-event-task-execute:
+    fixed-delay: 20000
+  pulling-event-task-auto-add:
+    fixed-delay: 60000
+  liquidity-pool-refresh-task-service:
+    fixed-delay: 30000
+
+
+#elasticsearch:
+#  host: ${STARCOIN_ES_URL}
+#  protocol: ${STARCOIN_ES_PROTOCOL}
+#  port: ${STARCOIN_ES_PORT}
+#  username: ${STARCOIN_ES_USER}
+#  connTimeout: 10000
+#  socketTimeout: 10000
+#  connectionRequestTimeout: 2000
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+
+      # 输出数据库模型（开发阶段）
+      hibernate:
+        tool:
+          hbm2ddl: DEBUG
+
+      starcoin:
+        starswap:
+          api: DEBUG
+          subscribe:
+            handler: DEBUG
+
+

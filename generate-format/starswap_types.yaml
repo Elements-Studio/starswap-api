@@ -1,0 +1,36 @@
+---
+# import types from:
+# starcoin_types.yml
+# onchain_events.yml
+AddLiquidityEvent:
+  STRUCT:
+    - liquidity: U128
+    - x_token_code:
+        TYPENAME: TokenCode
+    - y_token_code:
+        TYPENAME: TokenCode
+    - signer:
+        TYPENAME: AccountAddress
+
+AddFarmEvent:
+  STRUCT:
+    - x_token_code:
+        TYPENAME: TokenCode
+    - y_token_code:
+        TYPENAME: TokenCode
+    - signer:
+        TYPENAME: AccountAddress
+    - admin:
+        TYPENAME: AccountAddress
+
+StakeEvent:
+  STRUCT:
+    - x_token_code:
+        TYPENAME: TokenCode
+    - y_token_code:
+        TYPENAME: TokenCode
+    - signer:
+        TYPENAME: AccountAddress
+    - amount: U128
+    - admin:
+        TYPENAME: AccountAddress

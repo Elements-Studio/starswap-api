@@ -1,0 +1,26 @@
+starswap:
+  token-price-service:
+    base-url: http://k8s-default-starcoin-cbf39ae390-308376289.ap-northeast-1.elb.amazonaws.com/main/v1
+    #https://price-api.starcoin.org/main/v1
+#    get-pair-price-url: http://ac5e9dd967389445e809defadcba5242-1908387560.ap-northeast-1.elb.amazonaws.com/barnard/v1/priceFeeds/{pairId}
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: INFO
+
+      # 输出数据库模型（开发阶段）
+      hibernate:
+        tool:
+          hbm2ddl: INFO
+
+      starcoin:
+        starswap:
+          api: INFO
+          subscribe:
+            handler: INFO
+
+

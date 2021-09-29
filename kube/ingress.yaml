@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "starswap-api-ingress"
+#  namespace: "default"
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+  labels:
+    app: starswap-api
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /main/*
+            backend:
+              serviceName: "starswap-api"
+              servicePort: 80
+          - path: /barnard/*
+            backend:
+              serviceName: "starswap-api-barnard"
+              servicePort: 80
