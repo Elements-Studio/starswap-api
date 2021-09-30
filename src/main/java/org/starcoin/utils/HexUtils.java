@@ -2,7 +2,7 @@ package org.starcoin.utils;
 
 import java.util.List;
 
-public class CommonUtils {
+public class HexUtils {
 
     public static byte hexToByte(String inHex) {
         return (byte) Integer.parseInt(inHex, 16);

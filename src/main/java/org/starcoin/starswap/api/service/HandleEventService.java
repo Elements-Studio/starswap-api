@@ -11,7 +11,7 @@ import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.types.AddFarmEvent;
 import org.starcoin.starswap.types.AddLiquidityEvent;
 import org.starcoin.starswap.types.StakeEvent;
-import org.starcoin.utils.CommonUtils;
+import org.starcoin.utils.HexUtils;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -83,10 +83,10 @@ public class HandleEventService {
         String moduleName = m.get("module_name").toString();
         String name = m.get("name").toString();
         if (moduleName.startsWith("0x")) {
-            moduleName = new String(CommonUtils.hexToByteArray(moduleName), StandardCharsets.UTF_8);
+            moduleName = new String(HexUtils.hexToByteArray(moduleName), StandardCharsets.UTF_8);
         }
         if (name.startsWith("0x")) {
-            name = new String(CommonUtils.hexToByteArray(name), StandardCharsets.UTF_8);
+            name = new String(HexUtils.hexToByteArray(name), StandardCharsets.UTF_8);
         }
         return new StructType(addr, moduleName, name);
     }
@@ -150,17 +150,17 @@ public class HandleEventService {
         String eventData = event.getData();
         StakeEvent stakeEvent;
         try {
-            stakeEvent = StakeEvent.bcsDeserialize(CommonUtils.hexToByteArray(eventData));
+            stakeEvent = StakeEvent.bcsDeserialize(HexUtils.hexToByteArray(eventData));
         } catch (DeserializationError deserializationError) {
             throw new RuntimeException("StakeEvent.bcsDeserialize error.", deserializationError);
         }
-        String xTokenTypeAddress = CommonUtils.byteListToHexWithPrefix(stakeEvent.x_token_code.address.value);
+        String xTokenTypeAddress = HexUtils.byteListToHexWithPrefix(stakeEvent.x_token_code.address.value);
         String xTokenTypeModule = stakeEvent.x_token_code.module;
         String xTokenTypeName = stakeEvent.x_token_code.name;
-        String yTokenTypeAddress = CommonUtils.byteListToHexWithPrefix(stakeEvent.y_token_code.address.value);
+        String yTokenTypeAddress = HexUtils.byteListToHexWithPrefix(stakeEvent.y_token_code.address.value);
         String yTokenTypeModule = stakeEvent.y_token_code.module;
         String yTokenTypeName = stakeEvent.y_token_code.name;
-        String accountAddress = CommonUtils.byteListToHexWithPrefix(stakeEvent.signer.value);
+        String accountAddress = HexUtils.byteListToHexWithPrefix(stakeEvent.signer.value);
 
         Token xToken = tokenService.getTokenByStructType(xTokenTypeAddress, xTokenTypeModule, xTokenTypeName);
         if (xToken == null) {
@@ -212,15 +212,15 @@ public class HandleEventService {
         String eventData = event.getData();
         AddFarmEvent addFarmEvent;
         try {
-            addFarmEvent = AddFarmEvent.bcsDeserialize(CommonUtils.hexToByteArray(eventData));
+            addFarmEvent = AddFarmEvent.bcsDeserialize(HexUtils.hexToByteArray(eventData));
         } catch (DeserializationError deserializationError) {
             throw new RuntimeException("AddFarmEvent.bcsDeserialize error.", deserializationError);
         }
         //System.out.println(addLiquidityEvent);
-        String xTokenTypeAddress = CommonUtils.byteListToHexWithPrefix(addFarmEvent.x_token_code.address.value);
+        String xTokenTypeAddress = HexUtils.byteListToHexWithPrefix(addFarmEvent.x_token_code.address.value);
         String xTokenTypeModule = addFarmEvent.x_token_code.module;
         String xTokenTypeName = addFarmEvent.x_token_code.name;
-        String yTokenTypeAddress = CommonUtils.byteListToHexWithPrefix(addFarmEvent.y_token_code.address.value);
+        String yTokenTypeAddress = HexUtils.byteListToHexWithPrefix(addFarmEvent.y_token_code.address.value);
         String yTokenTypeModule = addFarmEvent.y_token_code.module;
         String yTokenTypeName = addFarmEvent.y_token_code.name;
         //String accountAddress = CommonUtils.byteListToHexWithPrefix(addFarmEvent.signer.value);
@@ -254,17 +254,17 @@ public class HandleEventService {
         String eventData = event.getData();
         AddLiquidityEvent addLiquidityEvent;
         try {
-            addLiquidityEvent = AddLiquidityEvent.bcsDeserialize(CommonUtils.hexToByteArray(eventData));
+            addLiquidityEvent = AddLiquidityEvent.bcsDeserialize(HexUtils.hexToByteArray(eventData));
         } catch (DeserializationError deserializationError) {
             throw new RuntimeException("AddLiquidityEvent.bcsDeserialize error.", deserializationError);
         }
-        String xTokenTypeAddress = CommonUtils.byteListToHexWithPrefix(addLiquidityEvent.x_token_code.address.value);
+        String xTokenTypeAddress = HexUtils.byteListToHexWithPrefix(addLiquidityEvent.x_token_code.address.value);
         String xTokenTypeModule = addLiquidityEvent.x_token_code.module;
         String xTokenTypeName = addLiquidityEvent.x_token_code.name;
-        String yTokenTypeAddress = CommonUtils.byteListToHexWithPrefix(addLiquidityEvent.y_token_code.address.value);
+        String yTokenTypeAddress = HexUtils.byteListToHexWithPrefix(addLiquidityEvent.y_token_code.address.value);
         String yTokenTypeModule = addLiquidityEvent.y_token_code.module;
         String yTokenTypeName = addLiquidityEvent.y_token_code.name;
-        String accountAddress = CommonUtils.byteListToHexWithPrefix(addLiquidityEvent.signer.value);
+        String accountAddress = HexUtils.byteListToHexWithPrefix(addLiquidityEvent.signer.value);
         BigInteger liquidity = addLiquidityEvent.liquidity;
 
         // /////////////////////////////////////
