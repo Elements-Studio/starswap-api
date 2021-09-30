@@ -4,6 +4,7 @@ import com.novi.serde.DeserializationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.bean.Event;
 import org.starcoin.starswap.api.data.model.*;
@@ -33,6 +34,13 @@ public class HandleEventService {
     private final LiquidityTokenFarmService liquidityTokenFarmService;
 
     private final NodeHeartbeatService nodeHeartbeatService;
+
+    @Value("${starcoin.event-filter.add-liquidity-event-type-tag}")
+    private String addLiquidityEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent";
+    @Value("${starcoin.event-filter.add-farm-event-type-tag}")
+    private String addFarmEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent";
+    @Value("${starcoin.event-filter.stake-event-type-tag}")
+    private String stakeEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent";
 
     public HandleEventService(@Autowired LiquidityAccountService liquidityAccountService,
                               @Autowired TokenService tokenService,
@@ -90,11 +98,14 @@ public class HandleEventService {
         }
         boolean eventHandled;
         try {
-            if ("TokenSwap".equals(eventTypeTagStruct.getModule()) && "AddLiquidityEvent".equals(eventTypeTagStruct.getName())) {
+            if (this.addLiquidityEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
+                //("TokenSwap".equals(eventTypeTagStruct.getModule()) && "AddLiquidityEvent".equals(eventTypeTagStruct.getName())) {
                 handleAddLiquidityEvent(event, eventFromAddress, eventTypeTagStruct);
-            } else if ("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "AddFarmEvent".equals(eventTypeTagStruct.getName())) {
+            } else if (this.addFarmEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
+                //("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "AddFarmEvent".equals(eventTypeTagStruct.getName())) {
                 handleAddFarmEvent(event, eventFromAddress, eventTypeTagStruct);
-            } else if ("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "StakeEvent".equals(eventTypeTagStruct.getName())) {
+            } else if (this.stakeEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
+                //("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "StakeEvent".equals(eventTypeTagStruct.getName())) {
                 handleStakeEvent(event, eventFromAddress, eventTypeTagStruct);
             } else {
                 throw new RuntimeException("Unknown event type.");
