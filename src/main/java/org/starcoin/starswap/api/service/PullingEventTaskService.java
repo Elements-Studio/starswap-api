@@ -31,7 +31,7 @@ public class PullingEventTaskService {
             targetEventTask.setCreatedBy("ADMIN");
             targetEventTask.setUpdatedAt(targetEventTask.getCreatedAt());
             targetEventTask.setUpdatedBy(targetEventTask.getCreatedBy());
-        } else {
+        } else if (PullingEventTask.STATUS_DONE.equalsIgnoreCase(targetEventTask.getStatus())) {
             targetEventTask.setUpdatedAt(System.currentTimeMillis());
             targetEventTask.setUpdatedBy("ADMIN");
             targetEventTask.resetStatus();
@@ -52,7 +52,7 @@ public class PullingEventTaskService {
             targetEventTask.setCreatedBy("ADMIN");
             targetEventTask.setUpdatedAt(targetEventTask.getCreatedAt());
             targetEventTask.setUpdatedBy(targetEventTask.getCreatedBy());
-        } else {
+        } else if (PullingEventTask.STATUS_DONE.equalsIgnoreCase(targetEventTask.getStatus())) {
             targetEventTask.setToBlockNumber(toBlockNumber);
             targetEventTask.setUpdatedAt(System.currentTimeMillis());
             targetEventTask.setUpdatedBy("ADMIN");
@@ -69,9 +69,15 @@ public class PullingEventTaskService {
         pullingEventTaskRepository.save(t);
     }
 
-
+    @Transactional
     public List<PullingEventTask> getPullingEventTaskToProcess() {
-        return pullingEventTaskRepository.findByStatusEquals(PullingEventTask.STATUS_CREATED);
+        List<PullingEventTask> tasks = pullingEventTaskRepository.findByStatusEquals(PullingEventTask.STATUS_CREATED);
+        for (PullingEventTask t : tasks) {
+            t.processing();
+            pullingEventTaskRepository.save(t);
+            pullingEventTaskRepository.flush();
+        }
+        return tasks;
     }
 
 }
