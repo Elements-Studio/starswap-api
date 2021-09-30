@@ -8,8 +8,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.LiquidityToken;
 import org.starcoin.starswap.api.data.model.LiquidityTokenId;
+import org.starcoin.starswap.api.data.model.Token;
 import org.starcoin.starswap.api.data.model.TokenIdPair;
 import org.starcoin.starswap.api.data.repo.LiquidityTokenRepository;
+import org.starcoin.starswap.api.data.repo.TokenRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,21 +24,28 @@ public class LiquidityTokenService {
 
     private final LiquidityTokenRepository liquidityTokenRepository;
 
+    private final TokenRepository tokenRepository;
+
     @Autowired
-    public LiquidityTokenService(LiquidityTokenRepository liquidityTokenRepository) {
+    public LiquidityTokenService(LiquidityTokenRepository liquidityTokenRepository, TokenRepository tokenRepository) {
         this.liquidityTokenRepository = liquidityTokenRepository;
+        this.tokenRepository = tokenRepository;
     }
 
     @Cacheable(cacheNames = "allLiquidityTokensCache", key = "'NO_KEY'", unless = "#result == null")
     public List<LiquidityToken> findByDeactivedIsFalse() {
-        return liquidityTokenRepository.findByDeactivedIsFalse();
+        List<LiquidityToken> liquidityTokens = liquidityTokenRepository.findByDeactivedIsFalse();
+        setTokenStructTypes(liquidityTokens);
+        return liquidityTokens;
     }
 
     public LiquidityToken getLiquidityToken(LiquidityTokenId liquidityTokenId) {
-        return liquidityTokenRepository.findById(liquidityTokenId).orElse(null);
+        LiquidityToken liquidityToken = liquidityTokenRepository.findById(liquidityTokenId).orElse(null);
+        setTokenStructTypes(liquidityToken);
+        return liquidityToken;
     }
 
-    @Cacheable(cacheNames = "oneLiquidityTokenByTokenIdPairCache", key = "#tokenXId + ' / ' + #tokenYId", unless="#result == null")
+    @Cacheable(cacheNames = "oneLiquidityTokenByTokenIdPairCache", key = "#tokenXId + ' / ' + #tokenYId", unless = "#result == null")
     public LiquidityToken findOneByTokenIdPair(String tokenXId, String tokenYId) {
         TokenIdPair tokenIdPair = new TokenIdPair(tokenXId, tokenYId);
         List<LiquidityToken> liquidityTokens = liquidityTokenRepository.findByLiquidityTokenIdTokenXIdAndLiquidityTokenIdTokenYId(
@@ -47,15 +56,17 @@ public class LiquidityTokenService {
         if (liquidityTokens.size() > 1) {
             throw new RuntimeException("Find more than one LiquidityToken by: " + tokenXId + " / " + tokenYId);
         }
+        setTokenStructTypes(liquidityTokens.get(0));
         return liquidityTokens.get(0);
     }
 
-    @Cacheable(cacheNames = "oneLiquidityTokenByTokenIdPairCache", key = "#tokenXId + ' / ' + #tokenYId", unless="#result == null")
+    @Cacheable(cacheNames = "oneLiquidityTokenByTokenIdPairCache", key = "#tokenXId + ' / ' + #tokenYId", unless = "#result == null")
     public LiquidityToken findOneByTokenIdPairOrElseThrow(String tokenXId, String tokenYId) {
         LiquidityToken liquidityToken = findOneByTokenIdPair(tokenXId, tokenYId);
         if (liquidityToken == null) {
             throw new RuntimeException("Cannot find LiquidityToken by: " + tokenXId + " / " + tokenYId);
         }
+        setTokenStructTypes(liquidityToken);
         return liquidityToken;
     }
 
@@ -88,6 +99,21 @@ public class LiquidityTokenService {
             }
         }
         return tokenIdList;
+    }
+
+    private void setTokenStructTypes(List<LiquidityToken> liquidityTokens) {
+        liquidityTokens.forEach(this::setTokenStructTypes);
+    }
+
+    private void setTokenStructTypes(LiquidityToken liquidityToken) {
+        Token tokenX = tokenRepository.findById(liquidityToken.getLiquidityTokenId().getTokenXId()).orElse(null);
+        if (tokenX != null) {
+            liquidityToken.setTokenXStructType(tokenX.getTokenStructType());
+        }
+        Token tokenY = tokenRepository.findById(liquidityToken.getLiquidityTokenId().getTokenYId()).orElse(null);
+        if (tokenY != null) {
+            liquidityToken.setTokenYStructType(tokenY.getTokenStructType());
+        }
     }
 
 }

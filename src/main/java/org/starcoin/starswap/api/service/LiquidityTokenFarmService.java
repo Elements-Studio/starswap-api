@@ -19,10 +19,10 @@ import java.util.List;
 @Service
 public class LiquidityTokenFarmService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(LiquidityTokenFarmService.class);
+
     @Value("${starswap.lp-token-farming.default-reward-token-id}")
     private String defaultRewardTokenId;
-
-    private static final Logger LOG = LoggerFactory.getLogger(LiquidityTokenFarmService.class);
 
     @Autowired
     private LiquidityTokenFarmRepository liquidityTokenFarmRepository;
@@ -32,7 +32,7 @@ public class LiquidityTokenFarmService {
         return liquidityTokenFarmRepository.findByDeactivedIsFalse();
     }
 
-    @Cacheable(cacheNames = "oneLiquidityTokenFarmByTokenIdPairCache", key = "#tokenXId + ' / ' + #tokenYId", unless="#result == null")
+    @Cacheable(cacheNames = "oneLiquidityTokenFarmByTokenIdPairCache", key = "#tokenXId + ' / ' + #tokenYId", unless = "#result == null")
     public LiquidityTokenFarm findOneByTokenIdPair(String tokenXId, String tokenYId) {
         TokenIdPair tokenIdPair = new TokenIdPair(tokenXId, tokenYId);
         List<LiquidityTokenFarm> liquidityTokenFarms = liquidityTokenFarmRepository.findByLiquidityTokenFarmIdTokenXIdAndLiquidityTokenFarmIdTokenYId(
@@ -46,7 +46,7 @@ public class LiquidityTokenFarmService {
         return liquidityTokenFarms.get(0);
     }
 
-    @Cacheable(cacheNames = "farmingTvlInUsdCache", key = "'NO_KEY'", unless="#result == null")
+    @Cacheable(cacheNames = "farmingTvlInUsdCache", key = "'NO_KEY'", unless = "#result == null")
     public BigDecimal getTotalValueLockedInUsd() {
         final BigDecimal[] tvl = {BigDecimal.ZERO};
         liquidityTokenFarmRepository.findAll().forEach((f) -> {

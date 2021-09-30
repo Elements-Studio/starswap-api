@@ -16,17 +16,10 @@ public class LiquidityToken {
     @EmbeddedId
     private LiquidityTokenId liquidityTokenId;
 
-    @Embedded
-    @AttributeOverride(name = "address", column = @Column(name = "token_x_struct_address", length = 34, nullable = false))
-    @AttributeOverride(name = "module", column = @Column(name = "token_x_struct_module", nullable = false))
-    @AttributeOverride(name = "name", column = @Column(name = "token_x_struct_name", nullable = false))
+    @Transient
     private StructType tokenXStructType;
 
-
-    @Embedded
-    @AttributeOverride(name = "address", column = @Column(name = "token_y_struct_address", length = 34, nullable = false))
-    @AttributeOverride(name = "module", column = @Column(name = "token_y_struct_module", nullable = false))
-    @AttributeOverride(name = "name", column = @Column(name = "token_y_struct_name", nullable = false))
+    @Transient
     private StructType tokenYStructType;
 
     @Column(length = 1000, nullable = true)
