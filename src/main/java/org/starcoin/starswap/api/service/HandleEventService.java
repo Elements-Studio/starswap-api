@@ -111,8 +111,12 @@ public class HandleEventService {
                 throw new RuntimeException("Unknown event type.");
             }
             eventHandled = true;
+        } catch (org.springframework.dao.DataIntegrityViolationException
+                | org.springframework.orm.ObjectOptimisticLockingFailureException e) {
+            LOG.info("Handle event encountered known exception.", e);
+            eventHandled = true;
         } catch (RuntimeException runtimeException) {
-            LOG.error("Handle event error. event: " + event, runtimeException);
+            LOG.error("Handle event error, event: " + event, runtimeException);
             eventHandled = false;
         }
 
