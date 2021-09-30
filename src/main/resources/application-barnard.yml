@@ -7,11 +7,20 @@ spring:
     cleanDisabled: true # flyway 的 clean 命令会删除指定 schema 下的所有 table，应该禁掉
     enabled: true # 启用或禁用 flyway
 
+
+starcoin:
+  event-filter:
+    from-address: "0x3db7a2da7444995338a2413b151ee437"
+    add-liquidity-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwap::AddLiquidityEvent"
+    add-farm-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwapFarm::AddFarmEvent"
+    stake-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwapFarm::StakeEvent"
+
+
 starswap:
   token-price-service:
     base-url: http://k8s-default-starcoin-cbf39ae390-308376289.ap-northeast-1.elb.amazonaws.com/barnard/v1
     #https://price-api.starcoin.org/barnard/v1
-#    get-pair-price-url: http://ac5e9dd967389445e809defadcba5242-1908387560.ap-northeast-1.elb.amazonaws.com/barnard/v1/priceFeeds/{pairId}
+
 
 logging:
   level:

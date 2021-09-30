@@ -65,7 +65,7 @@ public class StarcoinEventSubscribeHandler implements Runnable {
                     continue;
                 }
                 Event event = notification.getParams().getResult();
-                LOG.debug("Received event: " + event);
+                if (LOG.isDebugEnabled()) LOG.debug("Received event: " + event);
                 handleEventService.handleEvent(event, Event.getFromAddressFromEventKey(event.getEventKey()));
                 //note： 目前是从 eventKey 中获取地址
             }

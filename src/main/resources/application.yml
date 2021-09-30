@@ -64,18 +64,13 @@ starcoin:
   network: ${STARCOIN_NETWORK}
   json-rpc-url: ${STARCOIN_JSON_RPC_URL}
   event-filter:
-    from-address: "0x598b8cbfd4536ecbe88aa1cfaffa7a62"
-    add-liquidity-event-type-tag: "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent"
-    add-farm-event-type-tag: "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent"
-    stake-event-type-tag: "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent"
+    from-address: "0x3db7a2da7444995338a2413b151ee437"
+    add-liquidity-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwap::AddLiquidityEvent"
+    add-farm-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwapFarm::AddFarmEvent"
+    stake-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwapFarm::StakeEvent"
 
 
 starswap:
-#  token-price-service:
-#    base-url: https://price-api.starcoin.org/main/v1
-#    get-pair-price-url: ${starswap.token-price-service.base-url}/priceFeeds/{pairId}
-  #  to-usd-pair-id-mappings:
-  #    STC: "STCUSD"
   lp-token-farming:
     default-reward-token-id: "TBD"
   default-usd-equivalent-token-id: "BX_USDT"
@@ -87,7 +82,11 @@ starswap:
     fixed-delay: 60000
   liquidity-pool-refresh-task-service:
     fixed-delay: 30000
-
+#  token-price-service:
+#    base-url: https://price-api.starcoin.org/main/v1
+#    get-pair-price-url: ${starswap.token-price-service.base-url}/priceFeeds/{pairId}
+#  to-usd-pair-id-mappings:
+#    STC: "STCUSD"
 
 #elasticsearch:
 #  host: ${STARCOIN_ES_URL}
@@ -116,5 +115,3 @@ logging:
           api: DEBUG
           subscribe:
             handler: DEBUG
-
-
