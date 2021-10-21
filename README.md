@@ -1,10 +1,8 @@
-# starswap-api
+# Statswap API
 
-## 文件说明
+## API 说明
 
-以下举例说明的 URL 在使用时候请将 `http://localhost:8600/barnard` 替换为正确的 `BASE_URL`。
-
-## API 示例说明
+以下说明的 URL 示例的 `BASE_URL` 为 `http://localhost:8600/barnard`，在使用时请将其替换为实际的 `BASE_URL`。
 
 取 Token 的列表：
 
@@ -150,9 +148,11 @@ http://localhost:8600/barnard/v1/price-api/getAnyProximateToUsdExchangeRate?t=0x
 http://localhost:8600/barnard/swagger-ui/index.html
 ```
 
-## 数据结构的序列化/反序列化
+## 代码说明
 
-相关链接：
+### 数据结构的序列化/反序列化
+
+参考链接：
 
 * https://crates.io/crates/serde-generate/0.9.0
 * https://lib.rs/crates/bcs
