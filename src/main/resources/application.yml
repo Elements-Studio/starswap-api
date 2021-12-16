@@ -64,10 +64,10 @@ starcoin:
   network: ${STARCOIN_NETWORK}
   json-rpc-url: ${STARCOIN_JSON_RPC_URL}
   event-filter:
-    from-address: "0x3db7a2da7444995338a2413b151ee437"
-    add-liquidity-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwap::AddLiquidityEvent"
-    add-farm-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwapFarm::AddFarmEvent"
-    stake-event-type-tag: "0x3db7a2da7444995338a2413b151ee437::TokenSwapFarm::StakeEvent"
+    from-address: "0x4783d08fb16990bd35d83f3e23bf93b8"
+    add-liquidity-event-type-tag: "0x4783d08fb16990bd35d83f3e23bf93b8::TokenSwap::AddLiquidityEvent"
+    add-farm-event-type-tag: "0x4783d08fb16990bd35d83f3e23bf93b8::TokenSwapFarm::AddFarmEvent"
+    stake-event-type-tag: "0x4783d08fb16990bd35d83f3e23bf93b8::TokenSwapFarm::StakeEvent"
 
 
 starswap:
