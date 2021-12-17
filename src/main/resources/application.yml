@@ -72,8 +72,8 @@ starcoin:
 
 starswap:
   lp-token-farming:
-    default-reward-token-id: "TBD"
-  default-usd-equivalent-token-id: "BX_USDT"
+    default-reward-token-id: "STAR"
+  default-usd-equivalent-token-id: "XUSDT"
   lp-token-farm-refresh-task-service:
     fixed-delay: 30000
   pulling-event-task-execute:
