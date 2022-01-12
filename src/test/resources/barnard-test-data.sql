@@ -562,4 +562,25 @@ UNIX_TIMESTAMP() * 1000,
 
 -- update STAR to USD exchange rate path:
 update token t set t.to_usd_exchange_rate_path = 'STC,FAI' where t.token_id = 'STAR';
+update token t set t.to_usd_exchange_rate_path = 'FAI' where t.token_id = 'STC';
+update token t set t.to_usd_exchange_rate_path = 'STC,FAI' where t.token_id = 'XETH';
 
+
+INSERT INTO `token_to_usd_price_pair_mapping`
+(`token_id`,
+`created_at`,
+`created_by`,
+`is_usd_equivalent_token`,
+`pair_id`,
+`updated_at`,
+`updated_by`,
+`version`)
+VALUES
+('FAI',
+UNIX_TIMESTAMP() * 1000,
+'admin',
+1,
+'FAI_USD',
+UNIX_TIMESTAMP() * 1000,
+'admin',
+0);
