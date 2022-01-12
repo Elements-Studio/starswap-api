@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
 public class JsonRpcClient {
@@ -60,15 +61,23 @@ public class JsonRpcClient {
             key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY + ',' + #tokenXScalingFactor + '/' + #tokenYScalingFactor", unless = "#result == null")
     public BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY,
                                       BigInteger tokenXScalingFactor, BigInteger tokenYScalingFactor) {
+        // use tokenSwapRouterGetReserves and tokenSwapRouterGetAmountOut to calculate exchange rate:
         Pair<BigInteger, BigInteger> reserves = JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
         BigInteger amountX = reserves.getItem1().divide(BigInteger.valueOf(100L));//try to swap tokenX of 1 percent reserve
         BigInteger amountY = JsonRpcUtils.tokenSwapRouterGetAmountOut(jsonRpcSession, lpTokenAddress, amountX, reserves.getItem1(), reserves.getItem2());
-        //System.out.println("tokenX:" + tokenX + ", ----- amountX ------" + amountX);
-        //System.out.println("tokenY:" + tokenY + ", ----- amountY ------" + amountY);
+//        System.out.println("----- tokenX: " + tokenX + ", ----- amountX: " + amountX);
+//        System.out.println("----- tokenY: " + tokenY + ", ----- amountY: " + amountY);
         int scale = Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
         return new BigDecimal(amountY).divide(new BigDecimal(tokenYScalingFactor), scale, RoundingMode.HALF_UP)
                 .divide(new BigDecimal(amountX).divide(new BigDecimal(tokenXScalingFactor), scale, RoundingMode.HALF_UP),
                         scale, RoundingMode.HALF_UP);
+
+//        // use another method?
+//        List<Object> results = JsonRpcUtils.tokenSwapOracleLibraryCurrentCumulativePrices(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
+//        BigInteger cumulativePriceX = new BigInteger(results.get(0).toString());
+//        BigInteger cumulativePriceY = new BigInteger(results.get(1).toString());
+
+
     }
 
     public Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY) {
@@ -84,4 +93,9 @@ public class JsonRpcClient {
         Pair<BigInteger, BigInteger> reserves = JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenIn, tokenOut);
         return JsonRpcUtils.tokenSwapRouterGetAmountIn(jsonRpcSession, lpTokenAddress, amountOut, reserves.getItem1(), reserves.getItem2());
     }
+
+    public List<Object> tokenSwapOracleLibraryCurrentCumulativePrices(String lpTokenAddress, String tokenX, String tokenY) {
+        return JsonRpcUtils.tokenSwapOracleLibraryCurrentCumulativePrices(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
+    }
+
 }

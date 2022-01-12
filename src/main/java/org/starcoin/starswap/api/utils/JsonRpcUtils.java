@@ -117,6 +117,13 @@ public class JsonRpcUtils {
         return new BigInteger(resultFields.get(0));
     }
 
+    public static List<Object> tokenSwapOracleLibraryCurrentCumulativePrices(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::TokenSwapOracleLibrary::current_cumulative_prices",
+                Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
+                });
+        return resultFields;
+    }
+
     /**
      * JSON RPC call method 'contract.call_v2'.
      *
