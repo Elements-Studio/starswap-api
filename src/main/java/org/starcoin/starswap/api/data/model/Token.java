@@ -41,6 +41,9 @@ public class Token {
     @Column(precision = 21, scale = 0)
     private BigInteger scalingFactor;
 
+    @Column(length = 50)
+    private String toUsdExchangeRatePath;
+
     /**
      * 是否已禁用。
      */
@@ -166,6 +169,14 @@ public class Token {
         this.scalingFactor = scalingFactor;
     }
 
+    public String getToUsdExchangeRatePath() {
+        return toUsdExchangeRatePath;
+    }
+
+    public void setToUsdExchangeRatePath(String toUsdExchangeRatePath) {
+        this.toUsdExchangeRatePath = toUsdExchangeRatePath;
+    }
+
     @Override
     public String toString() {
         return "Token{" +
@@ -175,6 +186,7 @@ public class Token {
                 ", description='" + description + '\'' +
                 ", sequenceNumber=" + sequenceNumber +
                 ", scalingFactor=" + scalingFactor +
+                ", toUsdExchangeRatePath='" + toUsdExchangeRatePath + '\'' +
                 ", deactived=" + deactived +
                 ", createdBy='" + createdBy + '\'' +
                 ", updatedBy='" + updatedBy + '\'' +

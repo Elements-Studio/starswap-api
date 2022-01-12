@@ -24,6 +24,9 @@ public class JsonRpcUtils {
     private static final String SWAP_FARM_QUERY_TOTAL_STAKE_FUNCTION_MODULE_NAME = "TokenSwapFarmScript";
     private static final String SWAP_FARM_QUERY_RELEASE_PER_SECOND_FUNCTION_MODULE_NAME = "TokenSwapFarmScript";
 
+    private static final String SWAP_FEE_NUMERATOR = "3u64";
+    private static final String SWAP_FEE_DENUMERATOR = "1000u64";
+
     private static final Logger LOG = LoggerFactory.getLogger(LiquidityPoolService.class);
 
 
@@ -80,7 +83,8 @@ public class JsonRpcUtils {
                 Collections.emptyList(), Arrays.asList(
                         amountIn.toString() + "u128",
                         reserveIn.toString() + "u128",
-                        reserveOut.toString() + "u128"
+                        reserveOut.toString() + "u128",
+                        SWAP_FEE_NUMERATOR, SWAP_FEE_DENUMERATOR
                 ), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
@@ -91,7 +95,8 @@ public class JsonRpcUtils {
                 Collections.emptyList(), Arrays.asList(
                         amountOut.toString() + "u128",
                         reserveIn.toString() + "u128",
-                        reserveOut.toString() + "u128"
+                        reserveOut.toString() + "u128",
+                        SWAP_FEE_NUMERATOR, SWAP_FEE_DENUMERATOR
                 ), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));

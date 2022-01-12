@@ -1,0 +1,1 @@
+alter table token add column to_usd_exchange_rate_path varchar(50);

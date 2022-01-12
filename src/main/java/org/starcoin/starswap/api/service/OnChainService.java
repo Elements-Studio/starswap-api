@@ -301,6 +301,18 @@ public class OnChainService {
         return getToUsdExchangeRate(token);
     }
 
+    public BigDecimal getExchangeRate(String tokenTypeTag, String toTokenTypeTag) {
+        Token token = tokenService.getTokenByStructType(StructType.parse(tokenTypeTag));
+        if (token == null) {
+            throw new IllegalArgumentException("tokenTypeTag");
+        }
+        Token toToken = tokenService.getTokenByStructType(StructType.parse(toTokenTypeTag));
+        if (toToken == null) {
+            throw new IllegalArgumentException("toTokenTypeTag");
+        }
+        return getExchangeRate(token, toToken);
+    }
+
     public Map<String, BigDecimal> getAnyToUsdExchangeRateOffChainFirst(List<String> tokenTypeTags) {
         Map<String, BigDecimal> m = new HashMap<>();
         for (String t : tokenTypeTags) {
@@ -342,7 +354,7 @@ public class OnChainService {
     }
 
     /**
-     * Get token-to-USD price based on swap pool.
+     * Get 'THE_TOKEN'-to-USD price based on swap pool.
      *
      * @param token token
      * @return to USD price.
@@ -351,22 +363,61 @@ public class OnChainService {
         if (tokenPriceService.isUsdEquivalentToken(token)) {
             return BigDecimal.ONE;
         }
-        Token usdEquivalentToken = tokenService.getTokenOrElseThrow(tokenPriceService.getDefaultUsdEquivalentTokenId(), () -> new RuntimeException("Cannot find USD equivalent token."));
-        LiquidityToken liquidityToken = liquidityTokenService.findOneByTokenIdPair(token.getTokenId(), usdEquivalentToken.getTokenId());
-        if (liquidityToken == null) {
-            throw new RuntimeException("Cannot find LiquidityToken by tokenId pair: " + token.getTokenId() + " / " + usdEquivalentToken.getTokenId());
+        String[] path = new String[0];
+        if (token.getToUsdExchangeRatePath() != null) {
+            path = token.getToUsdExchangeRatePath().trim().split(",");
         }
-        //String usdEquivalentTokenTypeTag = usdEquivalentToken.getTokenStructType().toTypeTagString();
-        //return jsonRpcClient.getExchangeRate(liquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
-        //        token.getTokenStructType().toTypeTagString(), usdEquivalentTokenTypeTag);
-        return jsonRpcClient.getExchangeRate(liquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
-                token.getTokenStructType().toTypeTagString(), usdEquivalentToken.getTokenStructType().toTypeTagString(),
-                getTokenScalingFactorOffChainFirst(token), getTokenScalingFactorOffChainFirst(usdEquivalentToken));
+        if (path.length == 0) {
+            String usdTokenId = tokenPriceService.getDefaultUsdEquivalentTokenId();
+            path = new String[]{usdTokenId};
+        }
+        BigDecimal r = null;
+        Token fromToken = token;
+        for (int i = 0; i < path.length; i++) {
+            String toTokenId = path[i].trim();
+            if (toTokenId.isEmpty()) {
+                continue;
+            }
+            Token toToken = tokenService.getTokenOrElseThrow(toTokenId, () -> new RuntimeException("Cannot find token by Id. : " + toTokenId));
+            BigDecimal er = getExchangeRate(fromToken, toToken);
+            r = i == 0 ? er : r.multiply(er);
+            fromToken = toToken;
+        }
+        if (r == null) {
+            throw new RuntimeException("token.getToUsdExchangeRatePath() is empty. Token Id.: " + token.getTokenId());
+        }
+        return r;
     }
 
-//    private String getUsdEquivalentTokenId() {
-//        return tokenPriceService.getUsdEquivalentTokenId();
-//    }
+    /**
+     * Get 'FROM_TOKEN'-to-'TO_TOKEN' price based on swap pool.
+     * @param fromToken from Token
+     * @param toToken to Token
+     * @return exchange rate
+     */
+    private BigDecimal getExchangeRate(Token fromToken, Token toToken) {
+        TokenIdPair tokenIdPair = new TokenIdPair(fromToken.getTokenId(), toToken.getTokenId());
+        LiquidityToken liquidityToken = liquidityTokenService.findOneByTokenIdPair(tokenIdPair.tokenXId(), tokenIdPair.tokenYId());
+        if (liquidityToken == null) {
+            throw new RuntimeException("Cannot find LiquidityToken by tokenId pair: " + tokenIdPair.tokenXId() + " / " + tokenIdPair.tokenYId());
+        }
+        Token src, trg;
+        if (fromToken.getTokenId().equals(tokenIdPair.tokenXId())) {
+            src = fromToken;
+            trg = toToken;
+        } else {
+            src = toToken;
+            trg = fromToken;
+        }
+        BigDecimal r = jsonRpcClient.getExchangeRate(liquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
+                src.getTokenStructType().toTypeTagString(), trg.getTokenStructType().toTypeTagString(),
+                getTokenScalingFactorOffChainFirst(src), getTokenScalingFactorOffChainFirst(trg));
+        if (fromToken.getTokenId().equals(tokenIdPair.tokenXId())) {
+            return r;
+        } else {
+            return BigDecimal.ONE.divide(r, r.scale(), RoundingMode.HALF_UP);
+        }
+    }
 
     /**
      * refresh token scaling factors in database.

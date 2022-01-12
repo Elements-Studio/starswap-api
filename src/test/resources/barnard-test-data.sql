@@ -465,6 +465,101 @@ UNIX_TIMESTAMP() * 1000,
 -- update liquidity_token_farm set description = 'XUSDT / STC' where token_x_id = 'XUSDT' and token_y_id = 'STC';
 
 
+-- --------------- 2022-01-12 -----------------
 
 
+INSERT INTO `starswap_barnard`.`liquidity_token`
+(`liquidity_token_address`,
+`token_x_id`,
+`token_y_id`,
+`created_at`,
+`created_by`,
+`deactived`,
+`description`,
+`sequence_number`,
+`updated_at`,
+`updated_by`,
+`version`)
+VALUES
+('0x4783d08fb16990bd35d83f3e23bf93b8',
+'STAR',
+'STC',
+UNIX_TIMESTAMP() * 1000,
+'admin',
+false,
+'STC / STAR',
+1,
+UNIX_TIMESTAMP() * 1000,
+'admin',
+0);
+
+
+INSERT INTO `starswap_barnard`.`liquidity_pool`
+(`liquidity_token_address`,
+`token_x_id`,
+`token_y_id`,
+`pool_address`,
+`created_at`,
+`created_by`,
+`deactived`,
+`description`,
+`sequence_number`,
+`total_liquidity`,
+`updated_at`,
+`updated_by`,
+`version`)
+VALUES
+('0x4783d08fb16990bd35d83f3e23bf93b8',
+'STAR',
+'STC',
+'0x4783d08fb16990bd35d83f3e23bf93b8',
+UNIX_TIMESTAMP() * 1000,
+'admin',
+false,
+'STC / STAR',
+1,
+0,
+UNIX_TIMESTAMP() * 1000,
+'admin',
+0);
+
+
+INSERT INTO `starswap_barnard`.`liquidity_token_farm`
+(`farm_address`,
+`liquidity_token_address`,
+`token_x_id`,
+`token_y_id`,
+`created_at`,
+`created_by`,
+`deactived`,
+`description`,
+`estimated_apy`,
+`sequence_number`,
+`total_stake_amount`,
+`updated_at`,
+`updated_by`,
+`version`,
+`reward_token_id`,
+`tvl_in_usd`)
+VALUES
+('0x4783d08fb16990bd35d83f3e23bf93b8',
+'0x4783d08fb16990bd35d83f3e23bf93b8',
+'STAR',
+'STC',
+UNIX_TIMESTAMP() * 1000,
+'admin',
+false,
+'STC / STAR',
+100,
+1,
+100000000000000000,
+UNIX_TIMESTAMP() * 1000,
+'admin',
+0,
+'STAR',
+1000000000000000);
+
+
+-- update STAR to USD exchange rate path:
+update token t set t.to_usd_exchange_rate_path = 'STC,FAI' where t.token_id = 'STAR';
 

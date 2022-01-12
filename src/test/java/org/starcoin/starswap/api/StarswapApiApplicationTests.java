@@ -67,8 +67,21 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
+        BigDecimal exchangeRate1 = onChainService.getExchangeRate(
+                "0x00000000000000000000000000000001::STC::STC",
+                "0xfe125d419811297dfab03c61efec0bc9::FAI::FAI");
+        System.out.println("STC / FAI: " + exchangeRate1);
+        BigDecimal exchangeRate2 = onChainService.getExchangeRate(
+                "0x4783d08fb16990bd35d83f3e23bf93b8::STAR::STAR",
+                "0x00000000000000000000000000000001::STC::STC");
+        System.out.println("STAR / STC: " + exchangeRate2);
+
+        BigDecimal exchangeRate3 = onChainService.getToUsdExchangeRate("0x4783d08fb16990bd35d83f3e23bf93b8::STAR::STAR");
+        System.out.println("STAR / USD: " + exchangeRate3);
+        if (true) return;
+
         BigDecimal exchangeRateStcToUsd2 = onChainService.getToUsdExchangeRate("0x00000000000000000000000000000001::STC::STC");
-        BigDecimal exchangeRateStcToUsd3 = onChainService.getToUsdExchangeRate("0x00000000000000000000000000000001::STC::STC");
+        //BigDecimal exchangeRateStcToUsd3 = onChainService.getToUsdExchangeRate("0x00000000000000000000000000000001::STC::STC");
         System.out.println("STC / USD: " + exchangeRateStcToUsd2);
         if (true) return;
         BigDecimal stcUsd = tokenPriceService.getToUsdExchangeRateByTokenId("STC");
