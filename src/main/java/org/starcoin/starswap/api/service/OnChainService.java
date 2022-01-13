@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.util.*;
+import java.util.function.Function;
 
 @Service
 public class OnChainService {
@@ -277,7 +278,7 @@ public class OnChainService {
 
     public BigDecimal getTokenAmountInUsd(Token token, BigInteger tokenAmount) {
         BigInteger tokenScalingFactor = getTokenScalingFactorOffChainFirst(token);
-        BigDecimal tokenToUsdRate = getToUsdExchangeRate(token);
+        BigDecimal tokenToUsdRate = getToUsdExchangeRate(token, defaultTokenToUsdExchangeRateShortCircuitFun());
         return new BigDecimal(tokenAmount)
                 .divide(new BigDecimal(tokenScalingFactor), tokenScalingFactor.toString().length() - 1, RoundingMode.HALF_UP)
                 .multiply(tokenToUsdRate);
@@ -298,7 +299,7 @@ public class OnChainService {
     public BigDecimal getToUsdExchangeRate(String tokenTypeTag) {
         StructType tokenStructType = StructType.parse(tokenTypeTag);
         Token token = tokenService.getTokenByStructType(tokenStructType);
-        return getToUsdExchangeRate(token);
+        return getToUsdExchangeRate(token, defaultTokenToUsdExchangeRateShortCircuitFun());
     }
 
     public BigDecimal getExchangeRate(String tokenTypeTag, String toTokenTypeTag) {
@@ -333,24 +334,37 @@ public class OnChainService {
 
     public BigDecimal getToUsdExchangeRateByTokenId(String tokenId) {
         Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
-        return getToUsdExchangeRate(token);
+        return getToUsdExchangeRate(token, defaultTokenToUsdExchangeRateShortCircuitFun());
     }
 
     private BigDecimal getToUsdExchangeRateOffChainFirst(Token token) {
-        BigDecimal rate;
-        try {
+        return getToUsdExchangeRate(token, offChainTokenToUsdExchangeRateShortCircuitFun());
+    }
+
+    private Function<Token, BigDecimal> offChainTokenToUsdExchangeRateShortCircuitFun() {
+        return token -> {
+            BigDecimal rate;
+            try {
+                if (tokenPriceService.isUsdEquivalentToken(token)) {
+                    return BigDecimal.ONE;
+                }
+                rate = tokenPriceService.getToUsdExchangeRateByTokenId(token.getTokenId());
+            } catch (RuntimeException runtimeException) {
+                LOG.info("Get token to USD price from off-chain service error.", runtimeException);
+                rate = null;
+            }
+            return rate;
+        };
+    }
+
+    private Function<Token, BigDecimal> defaultTokenToUsdExchangeRateShortCircuitFun() {
+        return token -> {
             if (tokenPriceService.isUsdEquivalentToken(token)) {
                 return BigDecimal.ONE;
+            } else {
+                return null;
             }
-            rate = tokenPriceService.getToUsdExchangeRateByTokenId(token.getTokenId());
-        } catch (RuntimeException runtimeException) {
-            LOG.info("Get token to USD price from off-chain service error.", runtimeException);
-            rate = null;
-        }
-        if (rate == null) {
-            rate = getToUsdExchangeRate(token);
-        }
-        return rate;
+        };
     }
 
     /**
@@ -359,10 +373,14 @@ public class OnChainService {
      * @param token token
      * @return to USD price.
      */
-    private BigDecimal getToUsdExchangeRate(Token token) {
-        if (tokenPriceService.isUsdEquivalentToken(token)) {
-            return BigDecimal.ONE;
+    private BigDecimal getToUsdExchangeRate(Token token, Function<Token, BigDecimal> shortCircuitFun) {
+        if (shortCircuitFun != null) {
+            BigDecimal r = shortCircuitFun.apply(token);
+            if (r != null) {
+                return r;
+            }
         }
+
         String[] path = new String[0];
         if (token.getToUsdExchangeRatePath() != null) {
             path = token.getToUsdExchangeRatePath().trim().split(",");
@@ -391,8 +409,9 @@ public class OnChainService {
 
     /**
      * Get 'FROM_TOKEN'-to-'TO_TOKEN' price based on swap pool.
+     *
      * @param fromToken from Token
-     * @param toToken to Token
+     * @param toToken   to Token
      * @return exchange rate
      */
     private BigDecimal getExchangeRate(Token fromToken, Token toToken) {
