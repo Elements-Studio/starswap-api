@@ -193,6 +193,15 @@ public class OnChainService {
                 tokenY.getTokenStructType().toTypeTagString());
     }
 
+    public Integer getFarmRewardMultiplier(LiquidityTokenFarm farm) {
+        LiquidityTokenFarmId liquidityTokenFarmId = farm.getLiquidityTokenFarmId();
+        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarmId.getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarmId.getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+        return jsonRpcClient.tokenSwapFarmGetRewardMultiplier(liquidityTokenFarmId.getFarmAddress(),
+                tokenX.getTokenStructType().toTypeTagString(),
+                tokenY.getTokenStructType().toTypeTagString());
+    }
+
     public BigDecimal getFarmEstimatedApy(LiquidityTokenFarm liquidityTokenFarm) {
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
@@ -451,4 +460,5 @@ public class OnChainService {
             }
         });
     }
+
 }

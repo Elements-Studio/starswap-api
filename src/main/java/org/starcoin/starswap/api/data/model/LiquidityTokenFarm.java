@@ -47,6 +47,9 @@ public class LiquidityTokenFarm {
     @Column(length = 15, nullable = false, unique = true)
     private String rewardTokenId;
 
+    @Column
+    private Integer rewardMultiplier;
+
     @Column(precision = 51, scale = 10)
     private BigDecimal tvlInUsd;
 
@@ -175,6 +178,14 @@ public class LiquidityTokenFarm {
         this.rewardTokenId = rewardTokenId;
     }
 
+    public Integer getRewardMultiplier() {
+        return rewardMultiplier;
+    }
+
+    public void setRewardMultiplier(Integer rewardMultiplier) {
+        this.rewardMultiplier = rewardMultiplier;
+    }
+
     public BigDecimal getTvlInUsd() {
         return tvlInUsd;
     }
@@ -182,4 +193,5 @@ public class LiquidityTokenFarm {
     public void setTvlInUsd(BigDecimal tvlInUsd) {
         this.tvlInUsd = tvlInUsd;
     }
+
 }

@@ -57,6 +57,9 @@ class StarswapApiApplicationTests {
     @Autowired
     TokenPriceService tokenPriceService;
 
+    @Autowired
+    LiquidityTokenFarmService liquidityTokenFarmService;
+
     public static void addNodeHeartbeat(NodeHeartbeatRepository nodeHeartbeatRepository, NodeHeartbeat b7) {
         b7.setCreatedAt(System.currentTimeMillis());
         b7.setCreatedBy("admin");
@@ -67,6 +70,11 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
+        LiquidityTokenFarm farm = liquidityTokenFarmService.findOneByTokenIdPair("FAI", "STC");
+        Integer farmMultiplier = onChainService.getFarmRewardMultiplier(farm);
+        System.out.println(farmMultiplier);
+
+        if (true) return;
         BigDecimal exchangeRate1 = onChainService.getExchangeRate(
                 "0x00000000000000000000000000000001::STC::STC",
                 "0xfe125d419811297dfab03c61efec0bc9::FAI::FAI");

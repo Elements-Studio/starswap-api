@@ -42,7 +42,7 @@ public class LiquidityTokenFarmRefreshTaskService {
                 farm.setTotalStakeAmount(onChainService.getFarmTotalStakeAmount(farm));
                 updated = true;
             } catch (RuntimeException e) {
-                LOG.error("Update farm total stake amount error. Farm Id: " + farm.getLiquidityTokenFarmId());
+                LOG.error("Update farm total stake amount error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
             }
             BigDecimal tvlInUsd = null;
             try {
@@ -50,7 +50,7 @@ public class LiquidityTokenFarmRefreshTaskService {
                 farm.setTvlInUsd(tvlInUsd);
                 updated = true;
             } catch (RuntimeException e) {
-                LOG.error("Update farm TVL in USD error. Farm Id: " + farm.getLiquidityTokenFarmId());
+                LOG.error("Update farm TVL in USD error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
             }
             if (tvlInUsd != null) {
                 try {
@@ -58,8 +58,15 @@ public class LiquidityTokenFarmRefreshTaskService {
                     farm.setEstimatedApy(estimatedApy);
                     updated = true;
                 } catch (RuntimeException e) {
-                    LOG.error("Update farm estimated APY error. Farm Id: " + farm.getLiquidityTokenFarmId());
+                    LOG.error("Update farm estimated APY error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
                 }
+            }
+            try {
+                Integer multiplier = onChainService.getFarmRewardMultiplier(farm);
+                farm.setRewardMultiplier(multiplier);
+                updated = true;
+            } catch (RuntimeException e) {
+                LOG.error("Update farm reward multiplier error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
             }
             if (updated) {
                 farm.setUpdatedAt(System.currentTimeMillis());
