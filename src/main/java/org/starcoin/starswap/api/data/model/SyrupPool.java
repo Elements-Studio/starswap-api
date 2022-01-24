@@ -8,29 +8,22 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-
 @Entity
-@Table(indexes = {@Index(name = "idx_token_x_y_id", columnList = "token_x_id, token_y_id")})
+@Table(indexes = {@Index(name = "idx_token_id", columnList = "token_id")})
 @DynamicInsert
 @DynamicUpdate
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler", "fieldHandler"})
-public class LiquidityTokenFarm {
-
+public class SyrupPool {
     /**
      * Farm Id（领域键）。
      */
     @EmbeddedId
-    @AttributeOverride(name = "tokenXId", column = @Column(name = "token_x_id", nullable = false))
-    @AttributeOverride(name = "tokenYId", column = @Column(name = "token_y_id", nullable = false))
-    @AttributeOverride(name = "liquidityTokenAddress", column = @Column(name = "liquidity_token_address", length = 34, nullable = false))
-    @AttributeOverride(name = "farmAddress", column = @Column(name = "farm_address", length = 34, nullable = false))
-    private LiquidityTokenFarmId liquidityTokenFarmId;
+    @AttributeOverride(name = "tokenId", column = @Column(name = "token_id", nullable = false))
+    @AttributeOverride(name = "poolAddress", column = @Column(name = "pool_address", length = 34, nullable = false))
+    private SyrupPoolId syrupPoolId;
 
     @Column(length = 1000, nullable = true)
     private String description;
-
-//    @Column(length = 1000, nullable = false)
-//    private String descriptionEn;
 
     @Column(nullable = false)
     private Integer sequenceNumber;
@@ -74,12 +67,12 @@ public class LiquidityTokenFarm {
     @Version
     private Long version;
 
-    public LiquidityTokenFarmId getLiquidityTokenFarmId() {
-        return liquidityTokenFarmId;
+    public SyrupPoolId getSyrupPoolId() {
+        return syrupPoolId;
     }
 
-    public void setLiquidityTokenFarmId(LiquidityTokenFarmId liquidityTokenFarmId) {
-        this.liquidityTokenFarmId = liquidityTokenFarmId;
+    public void setSyrupPoolId(SyrupPoolId syrupPoolId) {
+        this.syrupPoolId = syrupPoolId;
     }
 
     public String getDescription() {
@@ -90,20 +83,52 @@ public class LiquidityTokenFarm {
         this.description = description;
     }
 
-//    public String getDescriptionEn() {
-//        return descriptionEn;
-//    }
-//
-//    public void setDescriptionEn(String descriptionEn) {
-//        this.descriptionEn = descriptionEn;
-//    }
-
     public Integer getSequenceNumber() {
         return sequenceNumber;
     }
 
     public void setSequenceNumber(Integer sequenceNumber) {
         this.sequenceNumber = sequenceNumber;
+    }
+
+    public BigInteger getTotalStakeAmount() {
+        return totalStakeAmount;
+    }
+
+    public void setTotalStakeAmount(BigInteger totalStakeAmount) {
+        this.totalStakeAmount = totalStakeAmount;
+    }
+
+    public BigDecimal getEstimatedApy() {
+        return estimatedApy;
+    }
+
+    public void setEstimatedApy(BigDecimal estimatedApy) {
+        this.estimatedApy = estimatedApy;
+    }
+
+    public String getRewardTokenId() {
+        return rewardTokenId;
+    }
+
+    public void setRewardTokenId(String rewardTokenId) {
+        this.rewardTokenId = rewardTokenId;
+    }
+
+    public Integer getRewardMultiplier() {
+        return rewardMultiplier;
+    }
+
+    public void setRewardMultiplier(Integer rewardMultiplier) {
+        this.rewardMultiplier = rewardMultiplier;
+    }
+
+    public BigDecimal getTvlInUsd() {
+        return tvlInUsd;
+    }
+
+    public void setTvlInUsd(BigDecimal tvlInUsd) {
+        this.tvlInUsd = tvlInUsd;
     }
 
     public Boolean getDeactived() {
@@ -146,22 +171,6 @@ public class LiquidityTokenFarm {
         this.updatedAt = updatedAt;
     }
 
-    public BigInteger getTotalStakeAmount() {
-        return totalStakeAmount;
-    }
-
-    public void setTotalStakeAmount(BigInteger totalStakeAmount) {
-        this.totalStakeAmount = totalStakeAmount;
-    }
-
-    public BigDecimal getEstimatedApy() {
-        return estimatedApy;
-    }
-
-    public void setEstimatedApy(BigDecimal estimatedApy) {
-        this.estimatedApy = estimatedApy;
-    }
-
     public Long getVersion() {
         return version;
     }
@@ -169,29 +178,4 @@ public class LiquidityTokenFarm {
     public void setVersion(Long version) {
         this.version = version;
     }
-
-    public String getRewardTokenId() {
-        return rewardTokenId;
-    }
-
-    public void setRewardTokenId(String rewardTokenId) {
-        this.rewardTokenId = rewardTokenId;
-    }
-
-    public Integer getRewardMultiplier() {
-        return rewardMultiplier;
-    }
-
-    public void setRewardMultiplier(Integer rewardMultiplier) {
-        this.rewardMultiplier = rewardMultiplier;
-    }
-
-    public BigDecimal getTvlInUsd() {
-        return tvlInUsd;
-    }
-
-    public void setTvlInUsd(BigDecimal tvlInUsd) {
-        this.tvlInUsd = tvlInUsd;
-    }
-
 }

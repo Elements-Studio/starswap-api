@@ -82,6 +82,8 @@ starswap:
     fixed-delay: 60000
   liquidity-pool-refresh-task-service:
     fixed-delay: 30000
+  syrup-pool-refresh-task-service:
+    fixed-delay: 30000
 #  token-price-service:
 #    base-url: https://price-api.starcoin.org/main/v1
 #    get-pair-price-url: ${starswap.token-price-service.base-url}/priceFeeds/{pairId}

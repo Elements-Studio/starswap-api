@@ -46,6 +46,9 @@ public class StarswapController {
     private LiquidityTokenFarmAccountService liquidityTokenFarmAccountService;
 
     @Resource
+    private SyrupPoolService syrupPoolService;
+
+    @Resource
     private NodeHeartbeatService nodeHeartbeatService;
 
     @Resource
@@ -87,6 +90,12 @@ public class StarswapController {
         return liquidityPoolService.findOneByTokenIdPair(tokenXYId[0], tokenXYId[1]);
     }
 
+    @GetMapping(path = "liquidityAccounts")
+    public List<LiquidityAccount> getLiquidityAccounts(
+            @RequestParam(value = "accountAddress", required = true) String accountAddress) {
+        return liquidityAccountService.findByAccountAddress(accountAddress);
+    }
+
     @ApiOperation("Get LP Token farm list")
     @GetMapping(path = "lpTokenFarms")
     public List<LiquidityTokenFarm> getLiquidityTokenFarms() {
@@ -100,10 +109,10 @@ public class StarswapController {
         return liquidityTokenFarmService.findOneByTokenIdPair(tokenXYId[0], tokenXYId[1]);
     }
 
-    @GetMapping(path = "liquidityAccounts")
-    public List<LiquidityAccount> getLiquidityAccounts(
-            @RequestParam(value = "accountAddress", required = true) String accountAddress) {
-        return liquidityAccountService.findByAccountAddress(accountAddress);
+    @ApiOperation("Get Total Valued Locked in all farms")
+    @GetMapping(path = "farmingTvlInUsd")
+    public BigDecimal getFarmingTvlInUsd() {
+        return liquidityTokenFarmService.getTotalValueLockedInUsd();
     }
 
     @GetMapping(path = "lpTokenFarmAccounts")
@@ -112,26 +121,23 @@ public class StarswapController {
         return liquidityTokenFarmAccountService.findByAccountAddress(accountAddress);
     }
 
-    @GetMapping(path = "tokenToUsdPricePairMappings")
-    public List<TokenToUsdPricePairMapping> getTokenToUsdPricePairMappings() {
-        return tokenPriceService.getTokenToUsdPricePairMappings();
+
+    @GetMapping(path = "syrupPools")
+    public List<SyrupPool> getSyrupPools() {
+        return syrupPoolService.findByDeactivedIsFalse();
     }
 
-    @PostMapping(path = "pullingEventTasks")
-    public void postPullingEventTask(@RequestBody PullingEventTask pullingEventTask) {
-        pullingEventTaskService.createOrUpdatePullingEventTask(pullingEventTask);
+    @GetMapping(path = "syrupPools/{id}")
+    public SyrupPool getSyrupPool(@PathVariable(name = "id") String id) {
+        return syrupPoolService.findOneByTokenId(id);
     }
 
-    @GetMapping(path = "heartbeatBreakIntervals")
-    public List<Pair<BigInteger, BigInteger>> getBreakIntervals() {
-        return nodeHeartbeatService.findBreakIntervals();
+    @ApiOperation("Get Total Valued Locked in all syrup pools")
+    @GetMapping(path = "syrupPoolTvlInUsd")
+    public BigDecimal getSyrupPoolTvlInUsd() {
+        return syrupPoolService.getTotalValueLockedInUsd();
     }
 
-    @ApiOperation("Get Total Valued Locked in all farms")
-    @GetMapping(path = "farmingTvlInUsd")
-    public BigDecimal getFarmingTvlInUsd() {
-        return liquidityTokenFarmService.getTotalValueLockedInUsd();
-    }
 
     @GetMapping(path = "getBestSwapPath")
     public GetBestPathResult getBestSwapPath(@RequestParam("from") String tokenInId,
@@ -152,6 +158,21 @@ public class StarswapController {
     @GetMapping(path = "sumReservesGroupByToken")
     public List<Map<String, Object>> sumReservesGroupByToken() {
         return liquidityPoolService.sumReservesGroupByToken();
+    }
+
+    @GetMapping(path = "tokenToUsdPricePairMappings")
+    public List<TokenToUsdPricePairMapping> getTokenToUsdPricePairMappings() {
+        return tokenPriceService.getTokenToUsdPricePairMappings();
+    }
+
+    @PostMapping(path = "pullingEventTasks")
+    public void postPullingEventTask(@RequestBody PullingEventTask pullingEventTask) {
+        pullingEventTaskService.createOrUpdatePullingEventTask(pullingEventTask);
+    }
+
+    @GetMapping(path = "heartbeatBreakIntervals")
+    public List<Pair<BigInteger, BigInteger>> getBreakIntervals() {
+        return nodeHeartbeatService.findBreakIntervals();
     }
 
     @GetMapping(path = "price-api/getProximateToUsdPriceRound")

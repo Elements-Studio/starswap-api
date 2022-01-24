@@ -461,4 +461,19 @@ public class OnChainService {
         });
     }
 
+    public BigInteger getSyrupPoolTotalStakeAmount(SyrupPool pool) {
+        return null;//todo: ...
+    }
+
+    public BigDecimal getSyrupPoolTvlInUsd(SyrupPool pool) {
+        return null;//todo: ...
+    }
+
+    public BigDecimal getSyrupPoolEstimatedApy(SyrupPool pool, BigDecimal tvlInUsd) {
+        return null;//todo: ...
+    }
+
+    public Integer getSyrupPoolRewardMultiplier(SyrupPool pool) {
+        return null;//todo ...
+    }
 }
