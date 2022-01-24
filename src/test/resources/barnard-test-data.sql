@@ -769,7 +769,7 @@ UNIX_TIMESTAMP() * 1000,
 
 
 -- -----------------------------------
-INSERT INTO `syrup_pool`
+INSERT INTO `starswap_barnard`.`syrup_pool`
 (`pool_address`,
 `token_id`,
 `created_at`,

@@ -42,11 +42,13 @@ public class CacheConfig {
     @CacheEvict(allEntries = true, cacheNames = {
             "tokenToUsdExchangeRateCache",
             "farmingTvlInUsdCache",
+            "syrupPoolTvlInUsdCache",
             "shortestIndirectSwapPathCache",
             "allTokensCache",
             "allLiquidityTokensCache",
             "allLiquidityPoolsCache",
             "allLiquidityTokenFarmsCache",
+            "allSyrupPoolsCache",
             "tokenExchangeRateCache",
             "sumReservesGroupByTokenCache"
     })
