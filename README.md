@@ -94,6 +94,24 @@ http://localhost:8600/barnard/v1/lpTokenFarmAccounts?accountAddress=0x598b8cbfd4
 http://localhost:8600/barnard/v1/farmingTvlInUsd
 ```
 
+取得 syrup pool 的列表：
+
+```
+http://localhost:8600/barnard/v1/syrupPools
+```
+
+取得某个 syrup pool 的信息（目前一个 Token 只支持一个池子，故可以使用参数 `{TokenId}` 获取，比如获取 STAR 的 syrup pool）：
+
+```
+http://localhost:8600/barnard/v1/syrupPools/STAR
+```
+
+取得所有 syrup pool 的 TVL：
+
+```
+http://localhost:8600/barnard/v1/syrupPoolTvlInUsd
+```
+
 取得 Token 到其兑换美元的价格的 Pair 之间的映射信息（用于调用价格 API）：
 
 ```

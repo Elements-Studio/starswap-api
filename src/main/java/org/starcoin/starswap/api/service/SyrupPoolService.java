@@ -46,7 +46,9 @@ public class SyrupPoolService {
     public BigDecimal getTotalValueLockedInUsd() {
         final BigDecimal[] tvl = {BigDecimal.ZERO};
         syrupPoolRepository.findAll().forEach((f) -> {
-            tvl[0] = tvl[0].add(f.getTvlInUsd());
+            if (f.getTvlInUsd() != null) {
+                tvl[0] = tvl[0].add(f.getTvlInUsd());
+            }
         });
         return tvl[0];
     }

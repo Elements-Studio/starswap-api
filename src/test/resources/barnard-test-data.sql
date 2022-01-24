@@ -767,3 +767,38 @@ UNIX_TIMESTAMP() * 1000,
 'admin',
 0);
 
+
+-- -----------------------------------
+INSERT INTO `syrup_pool`
+(`pool_address`,
+`token_id`,
+`created_at`,
+`created_by`,
+`deactived`,
+`description`,
+`estimated_apy`,
+`reward_multiplier`,
+`reward_token_id`,
+`sequence_number`,
+`total_stake_amount`,
+`tvl_in_usd`,
+`updated_at`,
+`updated_by`,
+`version`)
+VALUES
+('0x4783d08fb16990bd35d83f3e23bf93b8',
+'STAR',
+UNIX_TIMESTAMP() * 1000,
+'admin',
+false,
+'STAR',
+100,
+1,
+'STAR',
+1,
+1,
+1,
+UNIX_TIMESTAMP() * 1000,
+'admin',
+0);
+
