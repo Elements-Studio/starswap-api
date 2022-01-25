@@ -14,6 +14,7 @@ import org.starcoin.starswap.api.vo.GetBestPathResult;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -145,6 +146,20 @@ public class StarswapController {
     public List<SyrupPoolAccount> getSyrupPoolAccounts(
             @RequestParam(value = "accountAddress", required = true) String accountAddress) {
         return syrupPoolAccountService.findByAccountAddress(accountAddress);
+    }
+
+    @GetMapping(path = "syrupStakes")
+    public List<SyrupStake> getSyrupStakes(
+            @RequestParam(value = "accountAddress", required = true) String accountAddress,
+            @RequestParam(value = "tokenId", required = true) String tokenId
+    ) {
+        //todo: just return fake data now...
+        SyrupStake s = new SyrupStake();
+        s.setId(1L);
+        s.setAmount(BigInteger.valueOf(100000000000000L));
+        s.setStartTime(System.currentTimeMillis() / 1000);
+        s.setEndTime(System.currentTimeMillis() / 1000);
+        return Arrays.asList(s);
     }
 
     @GetMapping(path = "getBestSwapPath")

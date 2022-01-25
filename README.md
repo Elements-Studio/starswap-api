@@ -119,6 +119,12 @@ http://localhost:8600/barnard/v1/syrupPoolTvlInUsd
 http://localhost:8600/barnard/v1/syrupPoolAccounts?accountAddress=0x4783d08fb16990bd35d83f3e23bf93b8
 ```
 
+取得某个账号某种代币在 syrup pool 的抵押列表：
+
+```
+http://localhost:8600/barnard/v1/syrupStakes?accountAddress=0x4783d08fb16990bd35d83f3e23bf93b8&tokenId=STAR
+```
+
 取得 Token 到其兑换美元的价格的 Pair 之间的映射信息（用于调用价格 API）：
 
 ```
