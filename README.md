@@ -82,7 +82,7 @@ http://localhost:8600/barnard/v1/lpTokenFarms
 http://localhost:8600/barnard/v1/lpTokenFarms/Bot:Ddd
 ```
 
-取得某个账号地址抵押的 Farm 的列表：
+取得某个账号地址参与抵押的 Farm 的列表：
 
 ```
 http://localhost:8600/barnard/v1/lpTokenFarmAccounts?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62
@@ -110,6 +110,13 @@ http://localhost:8600/barnard/v1/syrupPools/STAR
 
 ```
 http://localhost:8600/barnard/v1/syrupPoolTvlInUsd
+```
+
+
+取得某个账号地址参与抵押的 syrup pool 的列表：
+
+```
+http://localhost:8600/barnard/v1/syrupPoolAccounts?accountAddress=0x4783d08fb16990bd35d83f3e23bf93b8
 ```
 
 取得 Token 到其兑换美元的价格的 Pair 之间的映射信息（用于调用价格 API）：

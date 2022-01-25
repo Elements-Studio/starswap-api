@@ -49,6 +49,9 @@ public class StarswapController {
     private SyrupPoolService syrupPoolService;
 
     @Resource
+    private SyrupPoolAccountService syrupPoolAccountService;
+
+    @Resource
     private NodeHeartbeatService nodeHeartbeatService;
 
     @Resource
@@ -138,6 +141,11 @@ public class StarswapController {
         return syrupPoolService.getTotalValueLockedInUsd();
     }
 
+    @GetMapping(path = "syrupPoolAccounts")
+    public List<SyrupPoolAccount> getSyrupPoolAccounts(
+            @RequestParam(value = "accountAddress", required = true) String accountAddress) {
+        return syrupPoolAccountService.findByAccountAddress(accountAddress);
+    }
 
     @GetMapping(path = "getBestSwapPath")
     public GetBestPathResult getBestSwapPath(@RequestParam("from") String tokenInId,

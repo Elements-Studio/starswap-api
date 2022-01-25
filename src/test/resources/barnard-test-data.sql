@@ -802,3 +802,25 @@ UNIX_TIMESTAMP() * 1000,
 'admin',
 0);
 
+-- -----------------------
+INSERT INTO `starswap_barnard`.`syrup_pool_account`
+(`account_address`,
+`pool_address`,
+`token_id`,
+`created_at`,
+`created_by`,
+`deactived`,
+`updated_at`,
+`updated_by`,
+`version`)
+VALUES
+('0x4783d08fb16990bd35d83f3e23bf93b8',
+'0x4783d08fb16990bd35d83f3e23bf93b8',
+'STAR',
+UNIX_TIMESTAMP() * 1000,
+'admin',
+false,
+UNIX_TIMESTAMP() * 1000,
+'admin',
+0);
+
