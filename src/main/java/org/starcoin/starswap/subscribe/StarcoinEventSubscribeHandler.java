@@ -24,12 +24,15 @@ public class StarcoinEventSubscribeHandler implements Runnable {
     private final String addLiquidityEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent";
     private final String addFarmEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent";
     private final String stakeEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent";
+    private final String syrupPoolStakeEventTypeTag;
 
     public StarcoinEventSubscribeHandler(String seed, //String network,
                                          HandleEventService handleEventService,
                                          String fromAddress,
                                          String addLiquidityEventTypeTag,
-                                         String addFarmEventTypeTag, String stakeEventTypeTag) {
+                                         String addFarmEventTypeTag,
+                                         String stakeEventTypeTag,
+                                         String syrupPoolStakeEventTypeTag) {
         this.webSocketSeed = seed;
         //this.network = network;
         this.handleEventService = handleEventService;
@@ -37,6 +40,7 @@ public class StarcoinEventSubscribeHandler implements Runnable {
         this.addLiquidityEventTypeTag = addLiquidityEventTypeTag;
         this.addFarmEventTypeTag = addFarmEventTypeTag;
         this.stakeEventTypeTag = stakeEventTypeTag;
+        this.syrupPoolStakeEventTypeTag = syrupPoolStakeEventTypeTag;
     }
 
     private String getWebSocketSeed() {
@@ -57,7 +61,7 @@ public class StarcoinEventSubscribeHandler implements Runnable {
         try {
             WebSocketService service = new WebSocketService(getWebSocketSeed(), true);
             service.connect();
-            StarcoinEventSubscriber subscriber = new StarcoinEventSubscriber(service, fromAddress, addLiquidityEventTypeTag, addFarmEventTypeTag, stakeEventTypeTag);
+            StarcoinEventSubscriber subscriber = new StarcoinEventSubscriber(service, fromAddress, addLiquidityEventTypeTag, addFarmEventTypeTag, stakeEventTypeTag, syrupPoolStakeEventTypeTag);
             Flowable<EventNotification> flowableEvents = subscriber.eventNotificationFlowable();
 
             for (EventNotification notification : flowableEvents.blockingIterable()) {

@@ -33,7 +33,7 @@ public class PullingEventTaskExecuteTaskService {
     private final String addLiquidityEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent";
     private final String addFarmEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent";
     private final String stakeEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent";
-
+    private final String syrupPoolStakeEventTypeTag;
 
     public PullingEventTaskExecuteTaskService(
             @Autowired JsonRpcClient jsonRpcClient,
@@ -43,7 +43,8 @@ public class PullingEventTaskExecuteTaskService {
             @Value("${starcoin.event-filter.from-address}") String fromAddress,
             @Value("${starcoin.event-filter.add-liquidity-event-type-tag}") String addLiquidityEventTypeTag,
             @Value("${starcoin.event-filter.add-farm-event-type-tag}") String addFarmEventTypeTag,
-            @Value("${starcoin.event-filter.stake-event-type-tag}") String stakeEventTypeTag) throws MalformedURLException {
+            @Value("${starcoin.event-filter.stake-event-type-tag}") String stakeEventTypeTag,
+            @Value("${starcoin.event-filter.syrup-pool-stake-event-type-tag}") String syrupPoolStakeEventTypeTag) throws MalformedURLException {
         this.jsonRpcClient = jsonRpcClient;
         this.pullingEventTaskService = pullingEventTaskService;
         this.handleEventService = handleEventService;
@@ -52,6 +53,7 @@ public class PullingEventTaskExecuteTaskService {
         this.addLiquidityEventTypeTag = addLiquidityEventTypeTag;
         this.addFarmEventTypeTag = addFarmEventTypeTag;
         this.stakeEventTypeTag = stakeEventTypeTag;
+        this.syrupPoolStakeEventTypeTag = syrupPoolStakeEventTypeTag;
     }
 
     @Scheduled(fixedDelayString = "${starswap.pulling-event-task-execute.fixed-delay}")
@@ -100,7 +102,7 @@ public class PullingEventTaskExecuteTaskService {
         Map<String, Object> eventFilter = new HashMap<>();
         // params: `from_block`, `to_block`, `event_keys`, `addrs`, `type_tags`, `limit`.
         eventFilter.put("addrs", Collections.singletonList(fromAddress));
-        eventFilter.put("type_tags", Arrays.asList(addLiquidityEventTypeTag, addFarmEventTypeTag, stakeEventTypeTag));
+        eventFilter.put("type_tags", Arrays.asList(addLiquidityEventTypeTag, addFarmEventTypeTag, stakeEventTypeTag, syrupPoolStakeEventTypeTag));
         //eventFilter.put("decode", true);
         eventFilter.put("from_block", fromBlockNumber);
         eventFilter.put("to_block", toBlockNumber);

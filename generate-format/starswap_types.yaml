@@ -34,3 +34,13 @@ StakeEvent:
     - amount: U128
     - admin:
         TYPENAME: AccountAddress
+
+SyrupPoolStakeEvent:
+  STRUCT:
+    - token_code:
+        TYPENAME: TokenCode
+    - signer:
+        TYPENAME: AccountAddress
+    - amount: U128
+    - admin:
+        TYPENAME: AccountAddress

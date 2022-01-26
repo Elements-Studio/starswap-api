@@ -68,7 +68,7 @@ starcoin:
     add-liquidity-event-type-tag: "0x4783d08fb16990bd35d83f3e23bf93b8::TokenSwap::AddLiquidityEvent"
     add-farm-event-type-tag: "0x4783d08fb16990bd35d83f3e23bf93b8::TokenSwapFarm::AddFarmEvent"
     stake-event-type-tag: "0x4783d08fb16990bd35d83f3e23bf93b8::TokenSwapFarm::StakeEvent"
-
+    syrup-pool-stake-event-type-tag: "0x4783d08fb16990bd35d83f3e23bf93b8::TokenSwapSyrup::StakeEvent"
 
 starswap:
   lp-token-farming:

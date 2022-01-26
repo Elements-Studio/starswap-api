@@ -25,7 +25,7 @@ public class SyrupPoolAccountService {
     }
 
     @Transactional
-    public SyrupPoolAccount activeFarmAccount(SyrupPoolAccountId poolAccountId) {
+    public SyrupPoolAccount activeSyrupPoolAccount(SyrupPoolAccountId poolAccountId) {
         SyrupPoolAccount farmAccount = this.syrupPoolAccountRepository.findById(poolAccountId).orElse(null);
         if (farmAccount == null) {
             farmAccount = new SyrupPoolAccount();

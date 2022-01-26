@@ -17,22 +17,23 @@ public class StarcoinEventSubscriber {
     private final String addLiquidityEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent";
     private final String addFarmEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent";
     private final String stakeEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent";
-
+    private final String syrupPoolStakeEventTypeTag;
 
     private final Web3jService web3jService;
 
-    public StarcoinEventSubscriber(Web3jService web3jService, String fromAddress, String addLiquidityEventTypeTag, String addFarmEventTypeTag, String stakeEventTypeTag) {
+    public StarcoinEventSubscriber(Web3jService web3jService, String fromAddress, String addLiquidityEventTypeTag, String addFarmEventTypeTag, String stakeEventTypeTag, String syrupPoolStakeEventTypeTag) {
         this.fromAddress = fromAddress;
         this.addLiquidityEventTypeTag = addLiquidityEventTypeTag;
         this.addFarmEventTypeTag = addFarmEventTypeTag;
         this.stakeEventTypeTag = stakeEventTypeTag;
+        this.syrupPoolStakeEventTypeTag = syrupPoolStakeEventTypeTag;
         this.web3jService = web3jService;
     }
 
     private Map<String, Object> createEventFilterMap() {
         Map<String, Object> eventFilter = new HashMap<>();
         eventFilter.put("addr", fromAddress);
-        eventFilter.put("type_tags", Arrays.asList(addLiquidityEventTypeTag, addFarmEventTypeTag, stakeEventTypeTag));
+        eventFilter.put("type_tags", Arrays.asList(addLiquidityEventTypeTag, addFarmEventTypeTag, stakeEventTypeTag, syrupPoolStakeEventTypeTag));
         //eventFilter.put("decode", true);
         return eventFilter;
     }
@@ -49,16 +50,5 @@ public class StarcoinEventSubscriber {
                 EventNotification.class);
     }
 
-
-//    public Flowable<PendingTransactionNotification> newPendingTransactionsNotifications() {
-//        return web3jService.subscribe(
-//                new Request<>(
-//                        "starcoin_subscribe",
-//                        Arrays.asList(Kind.PendingTxn),
-//                        web3jService,
-//                        EthSubscribe.class),
-//                "starcoin_unsubscribe",
-//                PendingTransactionNotification.class);
-//    }
 
 }

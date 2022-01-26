@@ -11,6 +11,7 @@ import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.types.AddFarmEvent;
 import org.starcoin.starswap.types.AddLiquidityEvent;
 import org.starcoin.starswap.types.StakeEvent;
+import org.starcoin.starswap.types.SyrupPoolStakeEvent;
 import org.starcoin.utils.HexUtils;
 
 import java.math.BigInteger;
@@ -33,6 +34,10 @@ public class HandleEventService {
 
     private final LiquidityTokenFarmService liquidityTokenFarmService;
 
+    private final SyrupPoolService syrupPoolService;
+
+    private final SyrupPoolAccountService syrupPoolAccountService;
+
     private final NodeHeartbeatService nodeHeartbeatService;
 
     @Value("${starcoin.event-filter.add-liquidity-event-type-tag}")
@@ -41,18 +46,24 @@ public class HandleEventService {
     private String addFarmEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent";
     @Value("${starcoin.event-filter.stake-event-type-tag}")
     private String stakeEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent";
+    @Value("${starcoin.event-filter.syrup-pool-stake-event-type-tag}")
+    private String syrupPoolStakeEventTypeTag;
 
     public HandleEventService(@Autowired LiquidityAccountService liquidityAccountService,
                               @Autowired TokenService tokenService,
                               @Autowired LiquidityTokenService liquidityTokenService,
                               @Autowired LiquidityTokenFarmService liquidityTokenFarmService,
                               @Autowired LiquidityTokenFarmAccountService liquidityTokenFarmAccountService,
+                              @Autowired SyrupPoolService syrupPoolService,
+                              @Autowired SyrupPoolAccountService syrupPoolAccountService,
                               @Autowired NodeHeartbeatService nodeHeartbeatService) {
         this.liquidityAccountService = liquidityAccountService;
         this.tokenService = tokenService;
         this.liquidityTokenService = liquidityTokenService;
         this.liquidityTokenFarmService = liquidityTokenFarmService;
         this.liquidityTokenFarmAccountService = liquidityTokenFarmAccountService;
+        this.syrupPoolService = syrupPoolService;
+        this.syrupPoolAccountService = syrupPoolAccountService;
         this.nodeHeartbeatService = nodeHeartbeatService;
     }
 
@@ -107,6 +118,9 @@ public class HandleEventService {
             } else if (this.stakeEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
                 //("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "StakeEvent".equals(eventTypeTagStruct.getName())) {
                 handleStakeEvent(event, eventFromAddress, eventTypeTagStruct);
+            } else if (this.syrupPoolStakeEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
+                //("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "StakeEvent".equals(eventTypeTagStruct.getName())) {
+                handleSyrupPoolStakeEvent(event, eventFromAddress, eventTypeTagStruct);
             } else {
                 throw new RuntimeException("Unknown event type.");
             }
@@ -193,6 +207,38 @@ public class HandleEventService {
 //        }
         LiquidityTokenFarmAccountId farmAccountId = new LiquidityTokenFarmAccountId(accountAddress, liquidityTokenFarmId);
         liquidityTokenFarmAccountService.activeFarmAccount(farmAccountId);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private void handleSyrupPoolStakeEvent(Event event, String eventFromAddress, TypeTagStruct eventTypeTagStruct) {
+
+        // /////////////////////////////////////
+        String eventData = event.getData();
+        SyrupPoolStakeEvent stakeEvent;
+        try {
+            stakeEvent = SyrupPoolStakeEvent.bcsDeserialize(HexUtils.hexToByteArray(eventData));
+        } catch (DeserializationError deserializationError) {
+            throw new RuntimeException("StakeEvent.bcsDeserialize error.", deserializationError);
+        }
+        String xTokenTypeAddress = HexUtils.byteListToHexWithPrefix(stakeEvent.token_code.address.value);
+        String xTokenTypeModule = stakeEvent.token_code.module;
+        String xTokenTypeName = stakeEvent.token_code.name;
+        String accountAddress = HexUtils.byteListToHexWithPrefix(stakeEvent.signer.value);
+
+        Token xToken = tokenService.getTokenByStructType(xTokenTypeAddress, xTokenTypeModule, xTokenTypeName);
+        if (xToken == null) {
+            throw new RuntimeException("Cannot get token by struct type: " + stakeEvent.token_code);
+        }
+
+        String tokenXId = xToken.getTokenId();
+        // 通过查询得到 Syrup Pool 的地址
+        SyrupPool syrupPool = syrupPoolService.findOneByTokenId(tokenXId);
+        if (syrupPool == null) {
+            throw new RuntimeException("Cannot find SyrupPool by tokenId: " + tokenXId);
+        }
+        SyrupPoolAccountId syrupPoolAccountId = new SyrupPoolAccountId(accountAddress, syrupPool.getSyrupPoolId());
+        syrupPoolAccountService.activeSyrupPoolAccount(syrupPoolAccountId);
     }
 
     @SuppressWarnings("unchecked")
