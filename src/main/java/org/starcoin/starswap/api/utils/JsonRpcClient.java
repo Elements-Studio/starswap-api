@@ -46,6 +46,20 @@ public class JsonRpcClient {
         return JsonRpcUtils.tokenSwapFarmGetRewardMultiplier(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 
+    // ------------------------
+    public BigInteger syrupPoolQueryTotalStake(String poolAddress, String token) {
+        return JsonRpcUtils.syrupPoolQueryTotalStake(this.jsonRpcSession, poolAddress, token);
+    }
+
+    public BigInteger syrupPoolQueryReleasePerSecond(String poolAddress, String token) {
+        return JsonRpcUtils.syrupPoolQueryReleasePerSecond(this.jsonRpcSession, poolAddress, token);
+    }
+
+    public Integer syrupPoolGetRewardMultiplier(String poolAddress, String token) {
+        return JsonRpcUtils.syrupPoolGetRewardMultiplier(this.jsonRpcSession, poolAddress, token);
+    }
+    // ------------------------
+
     public Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.getTokenSwapFarmStakedReserves(this.jsonRpcSession, farmAddress, lpTokenAddress, tokenX, tokenY);
     }

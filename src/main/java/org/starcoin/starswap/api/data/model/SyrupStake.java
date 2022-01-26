@@ -11,7 +11,11 @@ public class SyrupStake {
 
     private Long endTime;
 
+    private Long rewardReleasePerSecond;
+
     private Integer rewardMultiplier;
+
+    private Integer stepwiseMultiplier;
 
     public Long getId() {
         return id;
@@ -51,5 +55,21 @@ public class SyrupStake {
 
     public void setRewardMultiplier(Integer rewardMultiplier) {
         this.rewardMultiplier = rewardMultiplier;
+    }
+
+    public Long getRewardReleasePerSecond() {
+        return rewardReleasePerSecond;
+    }
+
+    public void setRewardReleasePerSecond(Long rewardReleasePerSecond) {
+        this.rewardReleasePerSecond = rewardReleasePerSecond;
+    }
+
+    public Integer getStepwiseMultiplier() {
+        return stepwiseMultiplier;
+    }
+
+    public void setStepwiseMultiplier(Integer stepwiseMultiplier) {
+        this.stepwiseMultiplier = stepwiseMultiplier;
     }
 }

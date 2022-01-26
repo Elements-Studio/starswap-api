@@ -246,7 +246,13 @@ public class OnChainService {
     private BigDecimal getFarmEstimatedApy(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
         BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsd(tokenX, tokenY, liquidityTokenFarm);
         int scale = 10;//Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
-        return rewardPerYearInUsd
+        Integer m = jsonRpcClient.tokenSwapFarmGetRewardMultiplier(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+                tokenX.getTokenStructType().toTypeTagString(),
+                tokenY.getTokenStructType().toTypeTagString());
+        if (m == null || m == 0) {
+            m = 1;
+        }
+        return rewardPerYearInUsd.multiply(BigDecimal.valueOf(m))
                 .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
     }
@@ -463,18 +469,48 @@ public class OnChainService {
     }
 
     public BigInteger getSyrupPoolTotalStakeAmount(SyrupPool pool) {
-        return null;//todo: ...
+        String tokenId = pool.getSyrupPoolId().getTokenId();
+        Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
+        return jsonRpcClient.syrupPoolQueryTotalStake(pool.getSyrupPoolId().getPoolAddress(),
+                token.getTokenStructType().toTypeTagString());
     }
 
     public BigDecimal getSyrupPoolTvlInUsd(SyrupPool pool) {
-        return null;//todo: ...
+        String tokenId = pool.getSyrupPoolId().getTokenId();
+        Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
+        BigInteger stakeAmount = jsonRpcClient.syrupPoolQueryTotalStake(pool.getSyrupPoolId().getPoolAddress(),
+                token.getTokenStructType().toTypeTagString());
+        return getTokenAmountInUsd(token, stakeAmount);
     }
 
     public BigDecimal getSyrupPoolEstimatedApy(SyrupPool pool, BigDecimal tvlInUsd) {
-        return null;//todo: ...
+        BigDecimal rewardPerYearInUsd = getSyrupPoolRewardPerYearInUsd(pool);
+        Token token = tokenService.getTokenOrElseThrow(pool.getSyrupPoolId().getTokenId(), () -> new RuntimeException("Cannot find Token by Id: " + pool.getSyrupPoolId().getTokenId()));
+        int scale = 10;//???
+        Integer m = jsonRpcClient.syrupPoolGetRewardMultiplier(pool.getSyrupPoolId().getPoolAddress(), token.getTokenStructType().toTypeTagString());
+        if (m == null || m == 0) {
+            m = 1;
+        }
+        return rewardPerYearInUsd.multiply(BigDecimal.valueOf(m))
+                .divide(tvlInUsd, scale, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+    }
+
+    private BigDecimal getSyrupPoolRewardPerYearInUsd(SyrupPool pool) {
+        String rewardTokenId = pool.getRewardTokenId();
+        Token rewardToken = tokenService.getTokenOrElseThrow(rewardTokenId, () -> new RuntimeException("Cannot find Token by Id: " + rewardTokenId));
+
+        BigInteger rewardReleasePerSecond = jsonRpcClient.syrupPoolQueryReleasePerSecond(pool.getSyrupPoolId().getPoolAddress(),
+                rewardToken.getTokenStructType().toTypeTagString());
+        BigInteger rewardPerYear = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_YEAR_SECONDS));
+
+        return getTokenAmountInUsd(rewardToken, rewardPerYear);
     }
 
     public Integer getSyrupPoolRewardMultiplier(SyrupPool pool) {
-        return null;//todo ...
+        String tokenId = pool.getSyrupPoolId().getTokenId();
+        Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
+        return jsonRpcClient.syrupPoolGetRewardMultiplier(pool.getSyrupPoolId().getPoolAddress(),
+                token.getTokenStructType().toTypeTagString());
     }
 }

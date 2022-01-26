@@ -125,12 +125,34 @@ public class JsonRpcUtils {
         return Integer.parseInt(resultFields.get(0).toString());
     }
 
+    // ------------------------
+    public static BigInteger syrupPoolQueryTotalStake(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
+        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_total_stake",
+                Arrays.asList(token), Collections.emptyList(), new TypeReference<List<String>>() {
+                });
+        return new BigInteger(resultFields.get(0));
+    }
+
+    public static BigInteger syrupPoolQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
+        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_release_per_second",
+                Arrays.asList(token), Collections.emptyList(), new TypeReference<List<String>>() {
+                });
+        return new BigInteger(resultFields.get(0));
+    }
+
+    public static Integer syrupPoolGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::get_pool_multiplier",//
+                Arrays.asList(token), Collections.emptyList(), new TypeReference<List<Object>>() {
+                });
+        return Integer.parseInt(resultFields.get(0).toString());
+    }
+    // ------------------------
+
+
     public static List<Object> tokenSwapOracleLibraryCurrentCumulativePrices(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
         List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::TokenSwapOracleLibrary::current_cumulative_prices",
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
         return resultFields;
     }
-
-
 }
