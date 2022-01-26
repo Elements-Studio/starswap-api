@@ -18,6 +18,7 @@ import java.util.function.Function;
 @Service
 public class OnChainService {
     public static final int MAX_SWAP_DEPTH = 3;
+    private static final long ONE_YEAR_SECONDS = 60L * 60 * 24 * 365;
 
     private static final Logger LOG = LoggerFactory.getLogger(OnChainService.class);
 
@@ -256,7 +257,7 @@ public class OnChainService {
         BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString());
-        BigInteger rewardPerYear = rewardReleasePerSecond.multiply(BigInteger.valueOf(60L * 60 * 24 * 365));
+        BigInteger rewardPerYear = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_YEAR_SECONDS));
 
         Token rewardToken = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getRewardTokenId(),
                 () -> new RuntimeException("Cannot find Token by Id: " + liquidityTokenFarm.getRewardTokenId()));
