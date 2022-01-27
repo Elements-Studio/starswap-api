@@ -65,7 +65,7 @@ public class StarcoinEventSubscribeHandler implements Runnable {
                 //note： 目前是从 eventKey 中获取地址
             }
         } catch (ConnectException e) {
-            LOG.info("handle subscribe exception", e);
+            LOG.info("WebSocketService connection exception", e);
         }
     }
 }
