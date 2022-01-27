@@ -4,7 +4,6 @@ import com.novi.serde.DeserializationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.bean.Event;
 import org.starcoin.starswap.api.data.model.*;
@@ -40,16 +39,10 @@ public class HandleEventService {
 
     private final NodeHeartbeatService nodeHeartbeatService;
 
-    @Value("${starcoin.event-filter.add-liquidity-event-type-tag}")
-    private String addLiquidityEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent";
-    @Value("${starcoin.event-filter.add-farm-event-type-tag}")
-    private String addFarmEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent";
-    @Value("${starcoin.event-filter.stake-event-type-tag}")
-    private String stakeEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent";
-    @Value("${starcoin.event-filter.syrup-pool-stake-event-type-tag}")
-    private String syrupPoolStakeEventTypeTag;
+    private final StarcoinEventFilter starcoinEventFilter;
 
-    public HandleEventService(@Autowired LiquidityAccountService liquidityAccountService,
+    public HandleEventService(@Autowired StarcoinEventFilter starcoinEventFilter,
+                              @Autowired LiquidityAccountService liquidityAccountService,
                               @Autowired TokenService tokenService,
                               @Autowired LiquidityTokenService liquidityTokenService,
                               @Autowired LiquidityTokenFarmService liquidityTokenFarmService,
@@ -57,6 +50,7 @@ public class HandleEventService {
                               @Autowired SyrupPoolService syrupPoolService,
                               @Autowired SyrupPoolAccountService syrupPoolAccountService,
                               @Autowired NodeHeartbeatService nodeHeartbeatService) {
+        this.starcoinEventFilter = starcoinEventFilter;
         this.liquidityAccountService = liquidityAccountService;
         this.tokenService = tokenService;
         this.liquidityTokenService = liquidityTokenService;
@@ -109,16 +103,16 @@ public class HandleEventService {
         }
         boolean eventHandled;
         try {
-            if (this.addLiquidityEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
+            if (this.starcoinEventFilter.getAddLiquidityEventTypeTag().equalsIgnoreCase(event.getTypeTag())) {
                 //("TokenSwap".equals(eventTypeTagStruct.getModule()) && "AddLiquidityEvent".equals(eventTypeTagStruct.getName())) {
                 handleAddLiquidityEvent(event, eventFromAddress, eventTypeTagStruct);
-            } else if (this.addFarmEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
+            } else if (this.starcoinEventFilter.getAddFarmEventTypeTag().equalsIgnoreCase(event.getTypeTag())) {
                 //("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "AddFarmEvent".equals(eventTypeTagStruct.getName())) {
                 handleAddFarmEvent(event, eventFromAddress, eventTypeTagStruct);
-            } else if (this.stakeEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
+            } else if (this.starcoinEventFilter.getStakeEventTypeTag().equalsIgnoreCase(event.getTypeTag())) {
                 //("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "StakeEvent".equals(eventTypeTagStruct.getName())) {
                 handleStakeEvent(event, eventFromAddress, eventTypeTagStruct);
-            } else if (this.syrupPoolStakeEventTypeTag.equalsIgnoreCase(event.getTypeTag())) {
+            } else if (this.starcoinEventFilter.getSyrupPoolStakeEventTypeTag().equalsIgnoreCase(event.getTypeTag())) {
                 //("TokenSwapFarm".equals(eventTypeTagStruct.getModule()) && "StakeEvent".equals(eventTypeTagStruct.getName())) {
                 handleSyrupPoolStakeEvent(event, eventFromAddress, eventTypeTagStruct);
             } else {

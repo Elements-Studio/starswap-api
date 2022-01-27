@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.starcoin.bean.Event;
 import org.starcoin.bean.EventNotification;
 import org.starcoin.starswap.api.service.HandleEventService;
+import org.starcoin.starswap.api.service.StarcoinEventFilter;
 import org.web3j.protocol.websocket.WebSocketService;
 
 import java.net.ConnectException;
@@ -20,36 +21,25 @@ public class StarcoinEventSubscribeHandler implements Runnable {
 
     private final HandleEventService handleEventService;
 
-    private final String fromAddress;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62";
-    private final String addLiquidityEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent";
-    private final String addFarmEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent";
-    private final String stakeEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent";
-    private final String syrupPoolStakeEventTypeTag;
+    private final StarcoinEventFilter starcoinEventFilter;
 
     public StarcoinEventSubscribeHandler(String seed, //String network,
                                          HandleEventService handleEventService,
-                                         String fromAddress,
-                                         String addLiquidityEventTypeTag,
-                                         String addFarmEventTypeTag,
-                                         String stakeEventTypeTag,
-                                         String syrupPoolStakeEventTypeTag) {
+                                         StarcoinEventFilter starcoinEventFilter) {
         this.webSocketSeed = seed;
         //this.network = network;
         this.handleEventService = handleEventService;
-        this.fromAddress = fromAddress;
-        this.addLiquidityEventTypeTag = addLiquidityEventTypeTag;
-        this.addFarmEventTypeTag = addFarmEventTypeTag;
-        this.stakeEventTypeTag = stakeEventTypeTag;
-        this.syrupPoolStakeEventTypeTag = syrupPoolStakeEventTypeTag;
+        this.starcoinEventFilter = starcoinEventFilter;
     }
 
     private String getWebSocketSeed() {
         String wsUrl = webSocketSeed;
-        String wsPrefix = "ws://";
-        if (!wsUrl.startsWith(wsPrefix)) {
-            wsUrl = wsPrefix + wsUrl;
+        String wsPrefix1 = "ws://";
+        String wsPrefix2 = "wss://";
+        if (!wsUrl.startsWith(wsPrefix1) && !wsUrl.startsWith(wsPrefix2)) {
+            wsUrl = wsPrefix1 + wsUrl;
         }
-        if (wsUrl.lastIndexOf(":") == wsUrl.indexOf(":")) {
+        if (wsUrl.lastIndexOf(":") == wsUrl.indexOf(":") && wsUrl.startsWith(wsPrefix1)) {
             wsUrl = wsUrl + ":9870";
         }
         LOG.debug("Get WebSocket URL: " + wsUrl);
@@ -61,7 +51,8 @@ public class StarcoinEventSubscribeHandler implements Runnable {
         try {
             WebSocketService service = new WebSocketService(getWebSocketSeed(), true);
             service.connect();
-            StarcoinEventSubscriber subscriber = new StarcoinEventSubscriber(service, fromAddress, addLiquidityEventTypeTag, addFarmEventTypeTag, stakeEventTypeTag, syrupPoolStakeEventTypeTag);
+            LOG.info("WebSocket connected. " + this.getWebSocketSeed());
+            StarcoinEventSubscriber subscriber = new StarcoinEventSubscriber(service, starcoinEventFilter);
             Flowable<EventNotification> flowableEvents = subscriber.eventNotificationFlowable();
 
             for (EventNotification notification : flowableEvents.blockingIterable()) {

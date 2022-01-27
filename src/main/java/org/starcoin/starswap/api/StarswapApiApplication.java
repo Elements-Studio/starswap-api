@@ -11,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.starcoin.starswap.api.service.HandleEventService;
 import org.starcoin.starswap.api.service.OnChainService;
+import org.starcoin.starswap.api.service.StarcoinEventFilter;
 import org.starcoin.starswap.api.service.TokenPriceService;
 import org.starcoin.starswap.subscribe.StarcoinEventSubscribeHandler;
 import springfox.documentation.oas.annotations.EnableOpenApi;
@@ -37,16 +38,8 @@ public class StarswapApiApplication {
     @Autowired
     private TokenPriceService tokenPriceService;
 
-    @Value("${starcoin.event-filter.from-address}")
-    private String starcoinEventFilterAddress;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62";
-    @Value("${starcoin.event-filter.add-liquidity-event-type-tag}")
-    private String addLiquidityEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwap::AddLiquidityEvent";
-    @Value("${starcoin.event-filter.add-farm-event-type-tag}")
-    private String addFarmEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::AddFarmEvent";
-    @Value("${starcoin.event-filter.stake-event-type-tag}")
-    private String stakeEventTypeTag;// = "0x598b8cbfd4536ecbe88aa1cfaffa7a62::TokenSwapFarm::StakeEvent";
-    @Value("${starcoin.event-filter.syrup-pool-stake-event-type-tag}")
-    private String syrupPoolStakeEventTypeTag;
+    @Autowired
+    private StarcoinEventFilter starcoinEventFilter;
 
     public static void main(String[] args) {
         SpringApplication.run(StarswapApiApplication.class, args);
@@ -58,7 +51,7 @@ public class StarswapApiApplication {
         //LOG.info("es url is " + esUrl);
         for (String seed : seeds) {
             Thread handlerThread = new Thread(new StarcoinEventSubscribeHandler(seed,
-                    handleEventService, starcoinEventFilterAddress, addLiquidityEventTypeTag, addFarmEventTypeTag, stakeEventTypeTag, syrupPoolStakeEventTypeTag));
+                    handleEventService, starcoinEventFilter));
             handlerThread.start();
         }
     }
