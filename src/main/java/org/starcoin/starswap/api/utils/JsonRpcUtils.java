@@ -134,10 +134,15 @@ public class JsonRpcUtils {
     }
 
     public static BigInteger syrupPoolQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_release_per_second",
+        // Move code:
+        // public fun query_info<TokenT: store>(): (u64, u128) acquires Syrup {
+        // //...
+        //   (syrup.multiplie, syrup.release_per_second)
+        // }
+        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_info", //query_release_per_second
                 Arrays.asList(token), Collections.emptyList(), new TypeReference<List<String>>() {
                 });
-        return new BigInteger(resultFields.get(0));
+        return new BigInteger(resultFields.get(1));
     }
 
     public static Integer syrupPoolGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
