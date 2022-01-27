@@ -162,6 +162,11 @@ public class StarswapController {
         return Arrays.asList(s);
     }
 
+    @PostMapping(path = "getTokenPairReservesList")
+    public List<BigInteger[]> getReservesListByTokenTypeTagPairs(@RequestBody String[][] tokenTypeTagPairs) {
+        return onChainService.getReservesListByTokenTypeTagPairs(tokenTypeTagPairs);
+    }
+
     @GetMapping(path = "getBestSwapPath")
     public GetBestPathResult getBestSwapPath(@RequestParam("from") String tokenInId,
                                              @RequestParam("to") String tokenOutId,

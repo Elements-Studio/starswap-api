@@ -34,7 +34,7 @@ http://localhost:8600/barnard/v1/liquidityTokens/Bot:Ddd
 http://localhost:8600/barnard/v1/liquidityPools
 ```
 
-获得某个交易池子的信息（目前一个 Token Pair 只支持一个池子，故可以使用参数 `{TokenId_X}:{TokenId_Y}` 获取）：
+获得某个流动性池子的信息（目前一个 Token Pair 只支持一个池子，故可以使用参数 `{TokenId_X}:{TokenId_Y}` 获取）：
 
 ```
 http://localhost:8600/barnard/v1/liquidityPools/Bot:Ddd
@@ -44,6 +44,18 @@ http://localhost:8600/barnard/v1/liquidityPools/Bot:Ddd
 
 ```
 http://localhost:8600/barnard/v1/liquidityAccounts?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62
+```
+
+获取多个币对的流动性池子的 Reserves 的列表（目前一个 Token Pair 只支持一个池子）：
+
+```shell
+curl --header 'Content-Type: application/json' -d '[["0x00000000000000000000000000000001::STC::STC","0xfe125d419811297dfab03c61efec0bc9::FAI::FAI"],["0x00000000000000000000000000000001::STC::STC","0x4783d08fb16990bd35d83f3e23bf93b8::STAR::STAR"],["0x00000000000000000000000000000001::STC::STC","0x88e2677b89841cd4ee7c15535798e1c8::WEN::WEN"],["0x00000000000000000000000000000001::STC::STC","0x88e2677b89841cd4ee7c15535798e1c8::SHARE::SHARE"]]' http://localhost:8600/barnard/v1/getTokenPairReservesList
+```
+
+返回结果类似：
+
+```json
+[[7708928910789,98759183446],[11209819318991,110342239475554],[22901598372664,2024315245868],[19729297654058,535292102659369]]
 ```
 
 取得兑换的最佳路径，输入换入代币的金额，估算换出代币金额：

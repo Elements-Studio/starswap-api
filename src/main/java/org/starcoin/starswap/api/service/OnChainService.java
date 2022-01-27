@@ -194,6 +194,51 @@ public class OnChainService {
                 tokenY.getTokenStructType().toTypeTagString());
     }
 
+    public List<BigInteger[]> getReservesListByTokenTypeTagPairs(String[][] tokenTypeTagPairs) {
+        List<BigInteger[]> rs = new ArrayList<>();
+        for (int i = 0; i < tokenTypeTagPairs.length; i++) {
+            String[] typeTagPair = tokenTypeTagPairs[i];
+            Token tokenX = tokenService.getTokenByStructType(StructType.parse(typeTagPair[0]));
+            if (tokenX == null) {
+                rs.add(new BigInteger[]{null, null});
+                continue;
+            }
+            Token tokenY = tokenService.getTokenByStructType(StructType.parse(typeTagPair[1]));
+            if (tokenY == null) {
+                rs.add(new BigInteger[]{null, null});
+                continue;
+            }
+            LiquidityToken liquidityToken = liquidityTokenService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
+            if (liquidityToken == null) {
+                rs.add(new BigInteger[]{null, null});
+                continue;
+            }
+            if (!liquidityToken.getLiquidityTokenId().getTokenXId().equals(tokenX.getTokenId())) {
+                Token t = tokenX;
+                tokenX = tokenY;
+                tokenY = t;
+            }
+            try {
+                Pair<BigInteger, BigInteger> rp = jsonRpcClient.tokenSwapRouterGetReserves(
+                        liquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
+                        tokenX.getTokenStructType().toTypeTagString(),
+                        tokenY.getTokenStructType().toTypeTagString());
+                if (rp == null) {
+                    rs.add(new BigInteger[]{null, null});
+                    continue;
+                }
+                if (tokenX.getTokenStructType().toTypeTagString().equals(typeTagPair[0])) {
+                    rs.add(new BigInteger[]{rp.getItem1(), rp.getItem2()});
+                } else {
+                    rs.add(new BigInteger[]{rp.getItem2(), rp.getItem1()});
+                }
+            } catch (RuntimeException e) {
+                rs.add(new BigInteger[]{null, null});
+            }
+        }
+        return rs;
+    }
+
     public Integer getFarmRewardMultiplier(LiquidityTokenFarm farm) {
         LiquidityTokenFarmId liquidityTokenFarmId = farm.getLiquidityTokenFarmId();
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarmId.getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));

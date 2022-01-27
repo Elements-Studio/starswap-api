@@ -58,5 +58,16 @@ public class CacheConfig {
             LOGGER.debug("Evict Caches at " + Instant.now().atZone(ZoneId.of("UTC")));
         }
     }
+
+    @CacheEvict(allEntries = true, cacheNames = {
+            "tokenSwapRouterGetReservesCache"
+    })
+    @Scheduled(fixedDelay = 1000, initialDelay = 1000)
+    public void evictCachesVeryFast() {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Evict Caches at " + Instant.now().atZone(ZoneId.of("UTC")));
+        }
+    }
+
 }
 

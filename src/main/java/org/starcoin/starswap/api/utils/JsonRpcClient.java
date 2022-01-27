@@ -98,6 +98,8 @@ public class JsonRpcClient {
 
     }
 
+    @Cacheable(cacheNames = "tokenSwapRouterGetReservesCache",
+            key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY", unless = "#result == null")
     public Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
     }
