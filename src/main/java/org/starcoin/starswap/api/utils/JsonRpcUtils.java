@@ -127,9 +127,10 @@ public class JsonRpcUtils {
     }
 
     // ------------------------
+
     public static BigInteger syrupPoolQueryTotalStake(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
         List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_total_stake",
-                Arrays.asList(token), Collections.emptyList(), new TypeReference<List<String>>() {
+                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
     }
@@ -141,21 +142,22 @@ public class JsonRpcUtils {
         //   (syrup.multiplie, syrup.release_per_second)
         // }
         List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_info", //query_release_per_second
-                Arrays.asList(token), Collections.emptyList(), new TypeReference<List<String>>() {
+                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(1));
     }
 
     public static Integer syrupPoolGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
         List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::get_pool_multiplier",//
-                Arrays.asList(token), Collections.emptyList(), new TypeReference<List<Object>>() {
+                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
         return Integer.parseInt(resultFields.get(0).toString());
     }
 
     public static List<Long> syrupPoolQueryStakeList(JSONRPC2Session jsonRpcSession, String token, String poolAddress, String accountAddress) {
+        //todo RPC return List<List<Long>> ???
         List<Long> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_stake_list",//
-                Collections.singletonList(token), Arrays.asList(accountAddress), new TypeReference<List<Long>>() {
+                Collections.singletonList(token), Collections.singletonList(accountAddress), new TypeReference<List<Long>>() {
                 });
         return resultFields;
     }
@@ -180,6 +182,7 @@ public class JsonRpcUtils {
         syrupStake.setAmount(new BigInteger(resultFields.get(3).toString()));
         return syrupStake;
     }
+
     // ------------------------
 
 

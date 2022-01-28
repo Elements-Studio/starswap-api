@@ -301,13 +301,13 @@ public class OnChainService {
 
     private BigDecimal getFarmEstimatedApy(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
         BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsd(tokenX, tokenY, liquidityTokenFarm);
-        int scale = 10;//Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
 //        Integer m = jsonRpcClient.tokenSwapFarmGetRewardMultiplier(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
 //                tokenX.getTokenStructType().toTypeTagString(),
 //                tokenY.getTokenStructType().toTypeTagString());
 //        if (m == null || m == 0) {
 //            m = 1;
 //        }
+        int scale = 10;//Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
         return rewardPerYearInUsd//.multiply(BigDecimal.valueOf(m))
                 .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
@@ -541,12 +541,12 @@ public class OnChainService {
 
     public BigDecimal getSyrupPoolEstimatedApy(SyrupPool pool, BigDecimal tvlInUsd) {
         BigDecimal rewardPerYearInUsd = getSyrupPoolRewardPerYearInUsd(pool);
-        Token token = tokenService.getTokenOrElseThrow(pool.getSyrupPoolId().getTokenId(), () -> new RuntimeException("Cannot find Token by Id: " + pool.getSyrupPoolId().getTokenId()));
-        int scale = 10;//???
+//        Token token = tokenService.getTokenOrElseThrow(pool.getSyrupPoolId().getTokenId(), () -> new RuntimeException("Cannot find Token by Id: " + pool.getSyrupPoolId().getTokenId()));
 //        Integer m = jsonRpcClient.syrupPoolGetRewardMultiplier(pool.getSyrupPoolId().getPoolAddress(), token.getTokenStructType().toTypeTagString());
 //        if (m == null || m == 0) {
 //            m = 1;
 //        }
+        int scale = 10;//Is this ok???
         return rewardPerYearInUsd//.multiply(BigDecimal.valueOf(m))
                 .divide(tvlInUsd, scale, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
