@@ -573,9 +573,15 @@ public class OnChainService {
     public List<SyrupStake> getSyrupPoolStakeList(SyrupPool syrupPool, String accountAddress) {
         Token token = this.tokenService.getToken(syrupPool.getSyrupPoolId().getTokenId());
         if (token == null) {
+            LOG.info("getSyrupPoolStakeList error, cannot get token by Id: " + syrupPool.getSyrupPoolId().getTokenId());
             return null;
         }
-        return jsonRpcClient.syrupPoolQueryStakeList(token.getTokenStructType().toTypeTagString(),
-                syrupPool.getSyrupPoolId().getPoolAddress(), accountAddress);
+        try {
+            return jsonRpcClient.syrupPoolQueryStakeList(token.getTokenStructType().toTypeTagString(),
+                    syrupPool.getSyrupPoolId().getPoolAddress(), accountAddress);
+        } catch (RuntimeException e) {
+            LOG.info("getSyrupPoolStakeList RuntimeException.", e);
+            return Collections.emptyList();
+        }
     }
 }
