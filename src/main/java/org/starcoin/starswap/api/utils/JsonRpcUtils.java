@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.starcoin.bean.Event;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
+import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.service.LiquidityPoolService;
 
 import java.math.BigInteger;
@@ -150,6 +151,34 @@ public class JsonRpcUtils {
                 Arrays.asList(token), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
         return Integer.parseInt(resultFields.get(0).toString());
+    }
+
+    public static List<Long> syrupPoolQueryStakeList(JSONRPC2Session jsonRpcSession, String token, String poolAddress, String accountAddress) {
+        List<Long> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_stake_list",//
+                Collections.singletonList(token), Arrays.asList(accountAddress), new TypeReference<List<Long>>() {
+                });
+        return resultFields;
+    }
+
+    public static SyrupStake syrupPoolGetStakeInfo(JSONRPC2Session jsonRpcSession, String token, String poolAddress, String accountAddress, Long id) {
+        //public fun get_stake_info<TokenT: store>(user_addr: address, id: u64): (u64, u64, u64, u128) acquires SyrupStakeList {
+        ////...
+        //(
+        //        stake.start_time,
+        //        stake.end_time,
+        //        stake.stepwise_multiplier,
+        //        stake.token_amount
+        //)
+        List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::get_stake_info",//
+                Collections.singletonList(token), Arrays.asList(accountAddress, id.toString() + "u64"), new TypeReference<List<Object>>() {
+                });
+        SyrupStake syrupStake = new SyrupStake();
+        syrupStake.setId(id);
+        syrupStake.setStartTime(Long.parseLong(resultFields.get(0).toString()));
+        syrupStake.setEndTime(Long.parseLong(resultFields.get(1).toString()));
+        syrupStake.setStepwiseMultiplier(Integer.parseInt(resultFields.get(2).toString()));
+        syrupStake.setAmount(new BigInteger(resultFields.get(3).toString()));
+        return syrupStake;
     }
     // ------------------------
 

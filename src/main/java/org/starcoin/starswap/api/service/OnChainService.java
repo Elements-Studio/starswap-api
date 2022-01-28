@@ -568,4 +568,13 @@ public class OnChainService {
         return jsonRpcClient.syrupPoolGetRewardMultiplier(pool.getSyrupPoolId().getPoolAddress(),
                 token.getTokenStructType().toTypeTagString());
     }
+
+    public List<SyrupStake> getSyrupPoolStakeList(SyrupPool syrupPool, String accountAddress) {
+        Token token = this.tokenService.getToken(syrupPool.getSyrupPoolId().getTokenId());
+        if (token == null) {
+            return null;
+        }
+        return jsonRpcClient.syrupPoolQueryStakeList(token.getTokenStructType().toTypeTagString(),
+                syrupPool.getSyrupPoolId().getPoolAddress(), accountAddress);
+    }
 }

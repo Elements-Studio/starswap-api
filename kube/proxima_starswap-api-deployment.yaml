@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: starswap-api-proxima
-        image: ghcr.io/elements-studio/starcoin_starswap:sha-2a5a29d
+        image: ghcr.io/elements-studio/starcoin_starswap:sha-60b01bf
         ports:
         - containerPort: 8600
         env:

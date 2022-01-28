@@ -5,12 +5,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.starcoin.bean.Event;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
+import org.starcoin.starswap.api.data.model.SyrupStake;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +60,17 @@ public class JsonRpcClient {
     public Integer syrupPoolGetRewardMultiplier(String poolAddress, String token) {
         return JsonRpcUtils.syrupPoolGetRewardMultiplier(this.jsonRpcSession, poolAddress, token);
     }
+
+    public List<SyrupStake> syrupPoolQueryStakeList(String token, String poolAddress, String accountAddress) {
+        List<Long> idList = JsonRpcUtils.syrupPoolQueryStakeList(this.jsonRpcSession, token, poolAddress, accountAddress);
+        List<SyrupStake> stakeList = new ArrayList<>();
+        for (Long id : idList) {
+            SyrupStake stake = JsonRpcUtils.syrupPoolGetStakeInfo(this.jsonRpcSession, token, poolAddress, accountAddress, id);
+            stakeList.add(stake);
+        }
+        return stakeList;
+    }
+
     // ------------------------
 
     public Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
