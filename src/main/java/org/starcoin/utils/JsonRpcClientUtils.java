@@ -80,7 +80,13 @@ public class JsonRpcClientUtils {
         if (response.indicatesSuccess()) {
             Object result = response.getResult();
             if (result != null) {
-                return resultConverter.apply(result);
+                try {
+                    return resultConverter.apply(result);
+                } catch (RuntimeException e) {
+                    String msg = "resultConverter.apply(result) error. Response: " + response;
+                    //LOG.error(msg);
+                    throw new RuntimeException(msg, e);
+                }
             } else {
                 return null;
             }

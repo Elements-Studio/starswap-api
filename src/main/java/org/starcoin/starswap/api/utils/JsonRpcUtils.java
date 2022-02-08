@@ -155,11 +155,14 @@ public class JsonRpcUtils {
 //    }
 
     public static List<Long> syrupPoolQueryStakeList(JSONRPC2Session jsonRpcSession, String token, String poolAddress, String accountAddress) {
-        //todo RPC return List<List<Long>> ???
-        List<Long> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_stake_list",//
-                Collections.singletonList(token), Collections.singletonList(accountAddress), new TypeReference<List<Long>>() {
+        List<List<Long>> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_stake_list",//
+                Collections.singletonList(token), Collections.singletonList(accountAddress), new TypeReference<List<List<Long>>>() {
                 });
-        return resultFields;
+        if (resultFields.size()>0) {
+            return resultFields.get(0);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public static SyrupStake syrupPoolGetStakeInfo(JSONRPC2Session jsonRpcSession, String token, String poolAddress, String accountAddress, Long id) {
