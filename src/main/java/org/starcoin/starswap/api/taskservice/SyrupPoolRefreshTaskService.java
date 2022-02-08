@@ -29,7 +29,7 @@ public class SyrupPoolRefreshTaskService {
     public void task() {
         List<SyrupPool> pools = syrupPoolRepository.findByDeactivedIsFalse();
         for (SyrupPool pool : pools) {
-            LOG.info("Start refreshing pool info. Farm Id: " + pool.getSyrupPoolId());
+            LOG.info("Start refreshing syrup pool info. Farm Id: " + pool.getSyrupPoolId());
             boolean updated = false;
             try {
                 pool.setTotalStakeAmount(onChainService.getSyrupPoolTotalStakeAmount(pool));
@@ -54,13 +54,13 @@ public class SyrupPoolRefreshTaskService {
                     LOG.error("Update pool estimated APY error. Farm Id: " + pool.getSyrupPoolId(), e);
                 }
             }
-            try {
-                Integer multiplier = onChainService.getSyrupPoolRewardMultiplier(pool);
-                pool.setRewardMultiplier(multiplier);
-                updated = true;
-            } catch (RuntimeException e) {
-                LOG.error("Update pool reward multiplier error. Farm Id: " + pool.getSyrupPoolId(), e);
-            }
+//            try {
+//                Integer multiplier = onChainService.getSyrupPoolRewardMultiplier(pool);
+//                pool.setRewardMultiplier(multiplier);
+//                updated = true;
+//            } catch (RuntimeException e) {
+//                LOG.error("Update pool reward multiplier error. Farm Id: " + pool.getSyrupPoolId(), e);
+//            }
             if (updated) {
                 pool.setUpdatedAt(System.currentTimeMillis());
                 pool.setUpdatedBy("admin");

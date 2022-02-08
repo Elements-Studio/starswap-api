@@ -147,12 +147,12 @@ public class JsonRpcUtils {
         return new BigInteger(resultFields.get(1));
     }
 
-    public static Integer syrupPoolGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
-        List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::get_pool_multiplier",//
-                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<Object>>() {
-                });
-        return Integer.parseInt(resultFields.get(0).toString());
-    }
+//    public static Integer syrupPoolGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
+//        List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::get_pool_multiplier",//
+//                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<Object>>() {
+//                });
+//        return Integer.parseInt(resultFields.get(0).toString());
+//    }
 
     public static List<Long> syrupPoolQueryStakeList(JSONRPC2Session jsonRpcSession, String token, String poolAddress, String accountAddress) {
         //todo RPC return List<List<Long>> ???

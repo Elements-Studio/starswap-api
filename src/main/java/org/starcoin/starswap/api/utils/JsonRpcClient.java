@@ -57,9 +57,9 @@ public class JsonRpcClient {
         return JsonRpcUtils.syrupPoolQueryReleasePerSecond(this.jsonRpcSession, poolAddress, token);
     }
 
-    public Integer syrupPoolGetRewardMultiplier(String poolAddress, String token) {
-        return JsonRpcUtils.syrupPoolGetRewardMultiplier(this.jsonRpcSession, poolAddress, token);
-    }
+//    public Integer syrupPoolGetRewardMultiplier(String poolAddress, String token) {
+//        return JsonRpcUtils.syrupPoolGetRewardMultiplier(this.jsonRpcSession, poolAddress, token);
+//    }
 
     public List<SyrupStake> syrupPoolQueryStakeList(String token, String poolAddress, String accountAddress) {
         List<Long> idList = JsonRpcUtils.syrupPoolQueryStakeList(this.jsonRpcSession, token, poolAddress, accountAddress);

@@ -563,12 +563,12 @@ public class OnChainService {
         return getTokenAmountInUsd(rewardToken, rewardPerYear);
     }
 
-    public Integer getSyrupPoolRewardMultiplier(SyrupPool pool) {
-        String tokenId = pool.getSyrupPoolId().getTokenId();
-        Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
-        return jsonRpcClient.syrupPoolGetRewardMultiplier(pool.getSyrupPoolId().getPoolAddress(),
-                token.getTokenStructType().toTypeTagString());
-    }
+//    public Integer getSyrupPoolRewardMultiplier(SyrupPool pool) {
+//        String tokenId = pool.getSyrupPoolId().getTokenId();
+//        Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
+//        return jsonRpcClient.syrupPoolGetRewardMultiplier(pool.getSyrupPoolId().getPoolAddress(),
+//                token.getTokenStructType().toTypeTagString());
+//    }
 
     public List<SyrupStake> getSyrupPoolStakeList(SyrupPool syrupPool, String accountAddress) {
         Token token = this.tokenService.getToken(syrupPool.getSyrupPoolId().getTokenId());

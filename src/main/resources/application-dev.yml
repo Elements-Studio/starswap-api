@@ -20,7 +20,8 @@ logging:
         web:
           filter:
             CommonsRequestLoggingFilter: DEBUG
-        cache: TRACE
+        #cache: TRACE
+        cache: INFO
       hibernate:
         tool:
           hbm2ddl: DEBUG
@@ -28,7 +29,9 @@ logging:
 
       starcoin:
         starswap:
-          api: DEBUG
+          api:
+            config:
+              CacheConfig: INFO
           subscribe:
             handler: DEBUG
 
