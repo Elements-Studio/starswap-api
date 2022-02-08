@@ -41,6 +41,7 @@ public class LiquidityTokenFarmRefreshTaskService {
             try {
                 farm.setTotalStakeAmount(onChainService.getFarmTotalStakeAmount(farm));
                 updated = true;
+                LOG.debug("Update farm total stake amount Ok. Farm Id: " + farm.getLiquidityTokenFarmId());
             } catch (RuntimeException e) {
                 LOG.error("Update farm total stake amount error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
             }
@@ -49,6 +50,7 @@ public class LiquidityTokenFarmRefreshTaskService {
                 tvlInUsd = onChainService.getFarmTvlInUsd(farm);
                 farm.setTvlInUsd(tvlInUsd);
                 updated = true;
+                LOG.debug("Update farm TVL in USD Ok. Farm Id: " + farm.getLiquidityTokenFarmId());
             } catch (RuntimeException e) {
                 LOG.error("Update farm TVL in USD error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
             }
@@ -57,6 +59,7 @@ public class LiquidityTokenFarmRefreshTaskService {
                     BigDecimal estimatedApy = onChainService.getFarmEstimatedApy(farm, tvlInUsd);
                     farm.setEstimatedApy(estimatedApy);
                     updated = true;
+                    LOG.debug("Update farm estimated APY Ok. Farm Id: " + farm.getLiquidityTokenFarmId());
                 } catch (RuntimeException e) {
                     LOG.error("Update farm estimated APY error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
                 }
@@ -65,6 +68,7 @@ public class LiquidityTokenFarmRefreshTaskService {
                 Integer multiplier = onChainService.getFarmRewardMultiplier(farm);
                 farm.setRewardMultiplier(multiplier);
                 updated = true;
+                LOG.debug("Update farm reward multiplier Ok. Farm Id: " + farm.getLiquidityTokenFarmId());
             } catch (RuntimeException e) {
                 LOG.error("Update farm reward multiplier error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
             }

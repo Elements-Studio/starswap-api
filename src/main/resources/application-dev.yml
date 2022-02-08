@@ -34,5 +34,5 @@ logging:
               CacheConfig: INFO
           subscribe:
             handler: DEBUG
-
+          taskservice: DEBUG
 

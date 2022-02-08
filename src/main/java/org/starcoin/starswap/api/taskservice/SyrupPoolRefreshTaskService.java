@@ -29,29 +29,32 @@ public class SyrupPoolRefreshTaskService {
     public void task() {
         List<SyrupPool> pools = syrupPoolRepository.findByDeactivedIsFalse();
         for (SyrupPool pool : pools) {
-            LOG.info("Start refreshing syrup pool info. Farm Id: " + pool.getSyrupPoolId());
+            LOG.info("Start refreshing syrup pool info. Pool Id: " + pool.getSyrupPoolId());
             boolean updated = false;
             try {
                 pool.setTotalStakeAmount(onChainService.getSyrupPoolTotalStakeAmount(pool));
                 updated = true;
+                LOG.debug("Update syrup pool total stake amount Ok. Pool Id: " + pool.getSyrupPoolId());
             } catch (RuntimeException e) {
-                LOG.error("Update pool total stake amount error. Farm Id: " + pool.getSyrupPoolId(), e);
+                LOG.error("Update syrup pool total stake amount error. Pool Id: " + pool.getSyrupPoolId(), e);
             }
             BigDecimal tvlInUsd = null;
             try {
                 tvlInUsd = onChainService.getSyrupPoolTvlInUsd(pool);
                 pool.setTvlInUsd(tvlInUsd);
                 updated = true;
+                LOG.debug("Update syrup pool TVL in USD Ok. Pool Id: " + pool.getSyrupPoolId());
             } catch (RuntimeException e) {
-                LOG.error("Update pool TVL in USD error. Farm Id: " + pool.getSyrupPoolId(), e);
+                LOG.error("Update syrup pool TVL in USD error. Pool Id: " + pool.getSyrupPoolId(), e);
             }
             if (tvlInUsd != null) {
                 try {
                     BigDecimal estimatedApy = onChainService.getSyrupPoolEstimatedApy(pool, tvlInUsd);
                     pool.setEstimatedApy(estimatedApy);
                     updated = true;
+                    LOG.debug("Update syrup pool estimated APY Ok. Pool Id: " + pool.getSyrupPoolId());
                 } catch (RuntimeException e) {
-                    LOG.error("Update pool estimated APY error. Farm Id: " + pool.getSyrupPoolId(), e);
+                    LOG.error("Update syrup pool estimated APY error. Pool Id: " + pool.getSyrupPoolId(), e);
                 }
             }
 //            try {
@@ -59,7 +62,7 @@ public class SyrupPoolRefreshTaskService {
 //                pool.setRewardMultiplier(multiplier);
 //                updated = true;
 //            } catch (RuntimeException e) {
-//                LOG.error("Update pool reward multiplier error. Farm Id: " + pool.getSyrupPoolId(), e);
+//                LOG.error("Update syrup pool reward multiplier error. Farm Id: " + pool.getSyrupPoolId(), e);
 //            }
             if (updated) {
                 pool.setUpdatedAt(System.currentTimeMillis());
