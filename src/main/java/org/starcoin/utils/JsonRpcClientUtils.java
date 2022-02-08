@@ -85,7 +85,8 @@ public class JsonRpcClientUtils {
                 return null;
             }
         } else {
-            String msg = "JSON RPC error. response error: '" + response.getError() + "'. Request: " + request;
+            String msg = "JSON RPC error. response error: '" + response.getError() + "'. Request: " + request
+                    + ". Response: " + response;
             //LOG.error(msg);
             throw new RuntimeException(msg);
         }

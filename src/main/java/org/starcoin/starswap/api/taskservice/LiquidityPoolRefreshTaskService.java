@@ -55,7 +55,7 @@ public class LiquidityPoolRefreshTaskService {
                 pool.setTokenYReserve(reservePair.getItem2());
                 updated = true;
             } catch (RuntimeException e) {
-                LOG.error("Update pool reserves error. Pool Id: " + pool.getLiquidityPoolId());
+                LOG.error("Update pool reserves error. Pool Id: " + pool.getLiquidityPoolId(), e);
             }
             try {
                 BigDecimal tokenXReserveInUsd = onChainService.getTokenAmountInUsd(tokenX, pool.getTokenXReserve());
@@ -64,7 +64,7 @@ public class LiquidityPoolRefreshTaskService {
                 pool.setTokenYReserveInUsd(tokenYReserveInUsd);
                 updated = true;
             } catch (RuntimeException e) {
-                LOG.error("Update pool reserves in USD error. Pool Id: " + pool.getLiquidityPoolId());
+                LOG.error("Update pool reserves in USD error. Pool Id: " + pool.getLiquidityPoolId(), e);
             }
             if (updated) {
                 pool.setUpdatedAt(System.currentTimeMillis());

@@ -73,10 +73,10 @@ public class JsonRpcUtils {
 
     // public fun get_reserves<X: store, Y: store>(): (u128, u128)
     public static Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::" + SWAP_GET_RESERVES_FUNCTION_MODULE_NAME + "::get_reserves",
-                Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<String>>() {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::" + SWAP_GET_RESERVES_FUNCTION_MODULE_NAME + "::get_reserves",
+                Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
-        return new Pair<>(new BigInteger(resultFields.get(0)), new BigInteger(resultFields.get(1)));
+        return new Pair<>(new BigInteger(resultFields.get(0).toString()), new BigInteger(resultFields.get(1).toString()));
     }
 
     // public fun get_amount_out(amount_in: u128, reserve_in: u128, reserve_out: u128): u128
