@@ -40,8 +40,8 @@ public class SyrupPool {
     @Column(length = 15, nullable = false)
     private String rewardTokenId;
 
-    @Column
-    private Integer rewardMultiplier;
+//    @Column
+//    private Integer rewardMultiplier;
 
     @Column(precision = 51, scale = 10)
     private BigDecimal tvlInUsd;
@@ -115,13 +115,13 @@ public class SyrupPool {
         this.rewardTokenId = rewardTokenId;
     }
 
-    public Integer getRewardMultiplier() {
-        return rewardMultiplier;
-    }
-
-    public void setRewardMultiplier(Integer rewardMultiplier) {
-        this.rewardMultiplier = rewardMultiplier;
-    }
+//    public Integer getRewardMultiplier() {
+//        return rewardMultiplier;
+//    }
+//
+//    public void setRewardMultiplier(Integer rewardMultiplier) {
+//        this.rewardMultiplier = rewardMultiplier;
+//    }
 
     public BigDecimal getTvlInUsd() {
         return tvlInUsd;
@@ -177,5 +177,24 @@ public class SyrupPool {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return "SyrupPool{" +
+                "syrupPoolId=" + syrupPoolId +
+                ", description='" + description + '\'' +
+                ", sequenceNumber=" + sequenceNumber +
+                ", totalStakeAmount=" + totalStakeAmount +
+                ", estimatedApy=" + estimatedApy +
+                ", rewardTokenId='" + rewardTokenId + '\'' +
+                ", tvlInUsd=" + tvlInUsd +
+                ", deactived=" + deactived +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", version=" + version +
+                '}';
     }
 }
