@@ -77,6 +77,10 @@ public class JsonRpcClient {
         return JsonRpcUtils.getTokenSwapFarmStakedReserves(this.jsonRpcSession, farmAddress, lpTokenAddress, tokenX, tokenY);
     }
 
+    public BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY) {
+        return JsonRpcUtils.tokenSwapRouterTotalLiquidity(this.jsonRpcSession, lpTokenAddress, tokenX, tokenY);
+    }
+
     @Cacheable(cacheNames = "tokenScalingFactorCache", key = "#token", unless = "#result == null")
     public BigInteger tokenGetScalingFactor(String token) {
         return JsonRpcUtils.tokenGetScalingFactor(jsonRpcSession, token);

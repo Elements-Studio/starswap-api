@@ -48,6 +48,16 @@ public class LiquidityPoolRefreshTaskService {
 
             boolean updated = false;
             try {
+                BigInteger totalLiquidity = jsonRpcClient.tokenSwapRouterGetTotalLiquidity(
+                        pool.getLiquidityPoolId().getLiquidityTokenId().getLiquidityTokenAddress(),
+                        tokenX.getTokenStructType().toTypeTagString(), tokenY.getTokenStructType().toTypeTagString());
+                pool.setTotalLiquidity(totalLiquidity);
+                updated = true;
+                LOG.debug("Update pool total liquidity Ok. Pool Id: " + pool.getLiquidityPoolId());
+            } catch (RuntimeException e) {
+                LOG.error("Update pool total Liquidity error. Pool Id: " + pool.getLiquidityPoolId(), e);
+            }
+            try {
                 Pair<BigInteger, BigInteger> reservePair = jsonRpcClient.tokenSwapRouterGetReserves(
                         pool.getLiquidityPoolId().getLiquidityTokenId().getLiquidityTokenAddress(),
                         tokenX.getTokenStructType().toTypeTagString(), tokenY.getTokenStructType().toTypeTagString());
