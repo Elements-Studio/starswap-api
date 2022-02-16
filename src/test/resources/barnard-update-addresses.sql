@@ -31,7 +31,7 @@ SET
     token_struct_address = '0x8c109349c6bd91411d6bc962e080c4a3'
 WHERE
     token_struct_address = '0x4783d08fb16990bd35d83f3e23bf93b8'
-        AND token_id = 'TBD';
+    AND token_id = 'STAR';
 
 
 UPDATE liquidity_token
