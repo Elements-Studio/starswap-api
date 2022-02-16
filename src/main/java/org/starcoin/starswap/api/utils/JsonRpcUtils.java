@@ -184,7 +184,9 @@ public class JsonRpcUtils {
     public static BigInteger syrupPoolQueryExpectedGain(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress, Long id) {
         //public fun query_expect_gain<TokenT: store>(user_addr: address, id: u64): u128
         List<BigInteger> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_expect_gain",//
-                Collections.singletonList(token), Collections.singletonList(accountAddress), new TypeReference<List<BigInteger>>() {
+                Collections.singletonList(token),
+                Arrays.asList(accountAddress, id.toString() + "u64"),
+                new TypeReference<List<BigInteger>>() {
                 });
         if (resultFields.size() > 0) {
             return resultFields.get(0);
