@@ -577,8 +577,10 @@ public class OnChainService {
             return null;
         }
         try {
-            return jsonRpcClient.syrupPoolQueryStakeList(token.getTokenStructType().toTypeTagString(),
-                    syrupPool.getSyrupPoolId().getPoolAddress(), accountAddress);
+            //return jsonRpcClient.syrupPoolQueryStakeList(syrupPool.getSyrupPoolId().getPoolAddress(),
+            return jsonRpcClient.syrupPoolQueryStakeWithExpectedGainList(syrupPool.getSyrupPoolId().getPoolAddress(),
+                    token.getTokenStructType().toTypeTagString(),
+                    accountAddress);
         } catch (RuntimeException e) {
             LOG.info("getSyrupPoolStakeList RuntimeException.", e);
             return Collections.emptyList();

@@ -61,13 +61,22 @@ public class JsonRpcClient {
 //        return JsonRpcUtils.syrupPoolGetRewardMultiplier(this.jsonRpcSession, poolAddress, token);
 //    }
 
-    public List<SyrupStake> syrupPoolQueryStakeList(String token, String poolAddress, String accountAddress) {
-        List<Long> idList = JsonRpcUtils.syrupPoolQueryStakeList(this.jsonRpcSession, token, poolAddress, accountAddress);
+    public List<SyrupStake> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
+        List<Long> idList = JsonRpcUtils.syrupPoolQueryStakeList(this.jsonRpcSession, poolAddress, token, accountAddress);
         List<SyrupStake> stakeList = new ArrayList<>();
         for (Long id : idList) {
-            SyrupStake stake = JsonRpcUtils.syrupPoolGetStakeInfo(this.jsonRpcSession, token, poolAddress, accountAddress, id);
+            SyrupStake stake = JsonRpcUtils.syrupPoolGetStakeInfo(this.jsonRpcSession, poolAddress, token, accountAddress, id);
             stakeList.add(stake);
         }
+        return stakeList;
+    }
+
+    public List<SyrupStake> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
+        List<SyrupStake> stakeList = syrupPoolQueryStakeList(poolAddress, token, accountAddress);
+        stakeList.forEach(s -> {
+            s.setExpectedGain(JsonRpcUtils.syrupPoolQueryExpectedGain(this.jsonRpcSession, poolAddress, token, accountAddress,
+                    s.getId()));
+        });
         return stakeList;
     }
 

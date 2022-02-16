@@ -17,6 +17,8 @@ public class SyrupStake {
 
     private Integer stepwiseMultiplier;
 
+    private BigInteger expectedGain;
+
     public Long getId() {
         return id;
     }
@@ -71,5 +73,13 @@ public class SyrupStake {
 
     public void setStepwiseMultiplier(Integer stepwiseMultiplier) {
         this.stepwiseMultiplier = stepwiseMultiplier;
+    }
+
+    public BigInteger getExpectedGain() {
+        return expectedGain;
+    }
+
+    public void setExpectedGain(BigInteger expectedGain) {
+        this.expectedGain = expectedGain;
     }
 }

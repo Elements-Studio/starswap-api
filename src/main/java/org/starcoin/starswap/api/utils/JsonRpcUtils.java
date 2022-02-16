@@ -149,7 +149,7 @@ public class JsonRpcUtils {
 //        return Integer.parseInt(resultFields.get(0).toString());
 //    }
 
-    public static List<Long> syrupPoolQueryStakeList(JSONRPC2Session jsonRpcSession, String token, String poolAddress, String accountAddress) {
+    public static List<Long> syrupPoolQueryStakeList(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress) {
         List<List<Long>> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_stake_list",//
                 Collections.singletonList(token), Collections.singletonList(accountAddress), new TypeReference<List<List<Long>>>() {
                 });
@@ -160,7 +160,7 @@ public class JsonRpcUtils {
         }
     }
 
-    public static SyrupStake syrupPoolGetStakeInfo(JSONRPC2Session jsonRpcSession, String token, String poolAddress, String accountAddress, Long id) {
+    public static SyrupStake syrupPoolGetStakeInfo(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress, Long id) {
         //public fun get_stake_info<TokenT: store>(user_addr: address, id: u64): (u64, u64, u64, u128) acquires SyrupStakeList {
         ////...
         //(
@@ -179,6 +179,18 @@ public class JsonRpcUtils {
         syrupStake.setStepwiseMultiplier(Integer.parseInt(resultFields.get(2).toString()));
         syrupStake.setAmount(new BigInteger(resultFields.get(3).toString()));
         return syrupStake;
+    }
+
+    public static BigInteger syrupPoolQueryExpectedGain(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress, Long id) {
+        //public fun query_expect_gain<TokenT: store>(user_addr: address, id: u64): u128
+        List<BigInteger> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_expect_gain",//
+                Collections.singletonList(token), Collections.singletonList(accountAddress), new TypeReference<List<BigInteger>>() {
+                });
+        if (resultFields.size() > 0) {
+            return resultFields.get(0);
+        } else {
+            return null;
+        }
     }
 
     // ------------------------
