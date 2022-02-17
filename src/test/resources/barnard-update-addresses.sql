@@ -95,3 +95,14 @@ delete from node_heartbeat where node_id != '1qaz';
 
 update pulling_event_task set status ='DONE';
 
+delete from liquidity_token_farm where token_x_id = 'STC' and token_y_id = 'XETH';
+delete from liquidity_token_farm where token_x_id = 'STC' and token_y_id = 'XUSDT';
+
+delete from liquidity_token where token_x_id = 'STC' and token_y_id = 'XETH';
+delete from liquidity_token where token_x_id = 'STC' and token_y_id = 'XUSDT';
+
+delete from liquidity_pool where token_x_id = 'STC' and token_y_id = 'XETH';
+delete from liquidity_pool where token_x_id = 'STC' and token_y_id = 'XUSDT';
+
+-- update token t set t.deactived = true where t.token_id = 'XUSDT';
+update token t set t.token_struct_address = '0xb6d69dd935edf7f2054acf12eb884df8' where token_id = 'XUSDT';

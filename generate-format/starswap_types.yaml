@@ -2,6 +2,7 @@
 # import types from:
 # starcoin_types.yml
 # onchain_events.yml
+
 AddLiquidityEvent:
   STRUCT:
     - liquidity: U128
@@ -11,6 +12,10 @@ AddLiquidityEvent:
         TYPENAME: TokenCode
     - signer:
         TYPENAME: AccountAddress
+    - amount_x_desired: U128
+    - amount_y_desired: U128
+    - amount_x_min: U128
+    - amount_y_min: U128
 
 AddFarmEvent:
   STRUCT:
