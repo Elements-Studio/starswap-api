@@ -1,9 +1,8 @@
-use starswap_barnard;
 
 -- ------------------------ tokens ----------------------------
--- SELECT * FROM starswap_barnard.token;
+-- SELECT * FROM token;
 -- 000000000000000000000000001::STC::STC
-INSERT INTO `starswap_barnard`.`token`
+INSERT INTO `token`
 (`token_id`,
 `created_at`,
 `created_by`,
@@ -36,7 +35,7 @@ null);
 
 
 -- 0x2d81a0427d64ff61b11ede9085efa5ad::XUSDT::XUSDT
-INSERT INTO `starswap_barnard`.`token`
+INSERT INTO `token`
 (`token_id`,
 `created_at`,
 `created_by`,
@@ -69,7 +68,7 @@ null);
 
 
 -- 0x2d81a0427d64ff61b11ede9085efa5ad::XETH::XETH
-INSERT INTO `starswap_barnard`.`token`
+INSERT INTO `token`
 (`token_id`,
 `created_at`,
 `created_by`,
@@ -102,7 +101,7 @@ null);
 
 
 -- 0xfe125d419811297dfab03c61efec0bc9::FAI::FAI
-INSERT INTO `starswap_barnard`.`token`
+INSERT INTO `token`
 (`token_id`,
 `created_at`,
 `created_by`,
@@ -135,7 +134,7 @@ null);
 
 
 -- 0x4783d08fb16990bd35d83f3e23bf93b8::STAR::STAR
-INSERT INTO `starswap_barnard`.`token`
+INSERT INTO `token`
 (`token_id`,
 `created_at`,
 `created_by`,
@@ -169,9 +168,9 @@ null);
 
 -- -------------------- liquidity_token pairs ------------------------
 
--- SELECT * FROM starswap_barnard.liquidity_token;
+-- SELECT * FROM liquidity_token;
 
-INSERT INTO `starswap_barnard`.`liquidity_token`
+INSERT INTO `liquidity_token`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -197,7 +196,7 @@ UNIX_TIMESTAMP() * 1000,
 0);
 
 
-INSERT INTO `starswap_barnard`.`liquidity_token`
+INSERT INTO `liquidity_token`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -223,7 +222,7 @@ UNIX_TIMESTAMP() * 1000,
 0);
 
 
-INSERT INTO `starswap_barnard`.`liquidity_token`
+INSERT INTO `liquidity_token`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -252,9 +251,9 @@ UNIX_TIMESTAMP() * 1000,
 
 
 -- -------------------- swap pools --------------------
--- SELECT * FROM starswap_barnard.liquidity_pool;
+-- SELECT * FROM liquidity_pool;
 
-INSERT INTO `starswap_barnard`.`liquidity_pool`
+INSERT INTO `liquidity_pool`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -284,7 +283,7 @@ UNIX_TIMESTAMP() * 1000,
 0);
 
 
-INSERT INTO `starswap_barnard`.`liquidity_pool`
+INSERT INTO `liquidity_pool`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -314,7 +313,7 @@ UNIX_TIMESTAMP() * 1000,
 0);
 
 
-INSERT INTO `starswap_barnard`.`liquidity_pool`
+INSERT INTO `liquidity_pool`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -345,9 +344,9 @@ UNIX_TIMESTAMP() * 1000,
 
 
 -- ----------------------- farming ------------------------------
--- SELECT * FROM starswap_barnard.liquidity_token_farm;
+-- SELECT * FROM liquidity_token_farm;
 
-INSERT INTO `starswap_barnard`.`liquidity_token_farm`
+INSERT INTO `liquidity_token_farm`
 (`farm_address`,
 `liquidity_token_address`,
 `token_x_id`,
@@ -384,7 +383,7 @@ UNIX_TIMESTAMP() * 1000,
 
 
 
-INSERT INTO `starswap_barnard`.`liquidity_token_farm`
+INSERT INTO `liquidity_token_farm`
 (`farm_address`,
 `liquidity_token_address`,
 `token_x_id`,
@@ -421,7 +420,7 @@ UNIX_TIMESTAMP() * 1000,
 
 
 
-INSERT INTO `starswap_barnard`.`liquidity_token_farm`
+INSERT INTO `liquidity_token_farm`
 (`farm_address`,
 `liquidity_token_address`,
 `token_x_id`,
@@ -468,7 +467,7 @@ UNIX_TIMESTAMP() * 1000,
 -- --------------- 2022-01-12 -----------------
 
 
-INSERT INTO `starswap_barnard`.`liquidity_token`
+INSERT INTO `liquidity_token`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -494,7 +493,7 @@ UNIX_TIMESTAMP() * 1000,
 0);
 
 
-INSERT INTO `starswap_barnard`.`liquidity_pool`
+INSERT INTO `liquidity_pool`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -524,7 +523,7 @@ UNIX_TIMESTAMP() * 1000,
 0);
 
 
-INSERT INTO `starswap_barnard`.`liquidity_token_farm`
+INSERT INTO `liquidity_token_farm`
 (`farm_address`,
 `liquidity_token_address`,
 `token_x_id`,
@@ -590,7 +589,7 @@ UNIX_TIMESTAMP() * 1000,
 update token t set t.description = 'STAR' where t.token_id = 'STAR';
 
 -- 0x88e2677b89841cd4ee7c15535798e1c8::WEN::WEN
-INSERT INTO `starswap_barnard`.`token`
+INSERT INTO `token`
 (`token_id`,
 `created_at`,
 `created_by`,
@@ -622,7 +621,7 @@ UNIX_TIMESTAMP() * 1000,
 null);
 
 -- 0x88e2677b89841cd4ee7c15535798e1c8::SHARE::SHARE
-INSERT INTO `starswap_barnard`.`token`
+INSERT INTO `token`
 (`token_id`,
 `created_at`,
 `created_by`,
@@ -656,7 +655,7 @@ null);
 
 -- STC - WEN
 
-INSERT INTO `starswap_barnard`.`liquidity_token`
+INSERT INTO `liquidity_token`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -681,7 +680,7 @@ UNIX_TIMESTAMP() * 1000,
 'admin',
 0);
 
-INSERT INTO `starswap_barnard`.`liquidity_pool`
+INSERT INTO `liquidity_pool`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -713,7 +712,7 @@ UNIX_TIMESTAMP() * 1000,
 
 -- SHARE-STC
 
-INSERT INTO `starswap_barnard`.`liquidity_token`
+INSERT INTO `liquidity_token`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -738,7 +737,7 @@ UNIX_TIMESTAMP() * 1000,
 'admin',
 0);
 
-INSERT INTO `starswap_barnard`.`liquidity_pool`
+INSERT INTO `liquidity_pool`
 (`liquidity_token_address`,
 `token_x_id`,
 `token_y_id`,
@@ -769,7 +768,7 @@ UNIX_TIMESTAMP() * 1000,
 
 
 -- -----------------------------------
-INSERT INTO `starswap_barnard`.`syrup_pool`
+INSERT INTO `syrup_pool`
 (`pool_address`,
 `token_id`,
 `created_at`,
@@ -803,7 +802,7 @@ UNIX_TIMESTAMP() * 1000,
 0);
 
 -- -----------------------
-INSERT INTO `starswap_barnard`.`syrup_pool_account`
+INSERT INTO `syrup_pool_account`
 (`account_address`,
 `pool_address`,
 `token_id`,
