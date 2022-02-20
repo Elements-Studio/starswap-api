@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: barnard-old
+    context-path: /barnard-old
     # "/${STARCOIN_NETWORK}"
 
 spring:
