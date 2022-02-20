@@ -25,3 +25,8 @@ spec:
             backend:
               serviceName: "starswap-api-proxima"
               servicePort: 80
+          - path: /barnard-old/*
+            backend:
+              serviceName: "starswap-api-barnard-old"
+              servicePort: 80
+
