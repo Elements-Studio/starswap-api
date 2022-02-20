@@ -1,7 +1,7 @@
 
 -- ------------------------ tokens ----------------------------
 -- SELECT * FROM token;
--- 000000000000000000000000001::STC::STC
+-- 0x00000000000000000000000000000001::STC::STC
 INSERT INTO `token`
 (`token_id`,
 `created_at`,
@@ -25,7 +25,7 @@ false,
 'STC',
 '',
 1,
-'000000000000000000000000001',
+'0x00000000000000000000000000000001',
 'STC',
 'STC',
 UNIX_TIMESTAMP() * 1000,
@@ -33,6 +33,7 @@ UNIX_TIMESTAMP() * 1000,
 0,
 null);
 
+update token set token_struct_address = '0x00000000000000000000000000000001' where token_id = 'STC';
 
 -- 0x2d81a0427d64ff61b11ede9085efa5ad::XUSDT::XUSDT
 INSERT INTO `token`
