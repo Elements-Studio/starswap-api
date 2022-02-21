@@ -29,4 +29,8 @@ spec:
             backend:
               serviceName: "starswap-api-barnard-old"
               servicePort: 80
+          - path: /barnard-new/*
+            backend:
+              serviceName: "starswap-api-barnard-new"
+              servicePort: 80
 
