@@ -457,10 +457,10 @@ LOCK TABLES `token_to_usd_price_pair_mapping` WRITE;
 /*!40000 ALTER TABLE `token_to_usd_price_pair_mapping` DISABLE KEYS */;
 INSERT INTO `token_to_usd_price_pair_mapping` VALUES
 ('{TOKEN_ID}',1632567783923,'admin','\0','{TOKEN_ID}_USD',1632567783923,'admin',0),
-('BX_USDT',1632567783987,'admin','','BX_USDT_USD',1632567783987,'admin',0),
-('FAI',1643294475000,'admin','','FAI_USD',1643294475000,'admin',0),
+('BX_USDT',1632567783987,'admin', true,'BX_USDT_USD',1632567783987,'admin',0),
+('FAI',1643294475000,'admin', true,'FAI_USD',1643294475000,'admin',0),
 ('STC',1632567783999,'admin','\0','STCUSD',1632567783999,'admin',0),
-('XUSDT',1639738530635,'admin','','XUSDT_USD',1639738530635,'admin',0)
+('XUSDT',1639738530635,'admin', true,'XUSDT_USD',1639738530635,'admin',0)
 ;
 /*!40000 ALTER TABLE `token_to_usd_price_pair_mapping` ENABLE KEYS */;
 UNLOCK TABLES;
