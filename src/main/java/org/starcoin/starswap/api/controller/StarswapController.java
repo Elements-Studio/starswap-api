@@ -212,6 +212,12 @@ public class StarswapController {
         return tokenPriceService.getProximateToUsdPriceRounds(tokens, timestamp);
     }
 
+    @GetMapping(path = "price-api/getMultiTimestampProximateToUsdPriceRounds")
+    public Map<String, List<Map<String, Object>>> getMultiTimestampProximateToUsdPriceRounds(@RequestParam("t") List<String> tokens,
+                                                                                             @RequestParam("timestamp") List<Long> timestamps) {
+        return tokenPriceService.getMultiTimestampProximateToUsdPriceRounds(tokens, timestamps);
+    }
+
     @GetMapping(path = "price-api/getAnyProximateToUsdExchangeRate")
     public Map<String, BigDecimal> getAnyProximateToUsdExchangeRate(@RequestParam("t") List<String> tokens,
                                                                     @RequestParam("timestamp") Long timestamp) {

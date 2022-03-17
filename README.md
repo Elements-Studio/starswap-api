@@ -157,6 +157,12 @@ http://localhost:8600/barnard/v1/price-api/getProximateToUsdPriceRound?token=0x0
 http://localhost:8600/barnard/v1/price-api/getProximateToUsdPriceRounds?t=0x00000000000000000000000000000001::STC::STC&t=0x598b8cbfd4536ecbe88aa1cfaffa7a62::Bot::Bot&t=0x9350502a3af6c617e9a42fa9e306a385::BX_USDT::BX_USDT&timestamp=1630998680316
 ```
 
+取得一个或多个 token 在多个时间点的最接近时间点兑美元的价格（查询参数名 `t` 和 `timestamp` 可以重复出现。这个接口相当于 `getProximateToUsdPriceRounds` 的批量调用接口。返回的 JSON 对象的 Key 是 timestamp，对无法取得兑美元价格的 token 返回结果为 null）：
+
+```
+http://localhost:8600/barnard/v1/price-api/getMultiTimestampProximateToUsdPriceRounds?t=0x00000000000000000000000000000001::STC::STC&timestamp=1630998680316&&timestamp=1630999680996&timestamp=1631098680316
+```
+
 取得一个或多个 token 兑美元的涨跌幅信息（对无法取得涨跌幅信息的 token 返回结果为 null）：
 
 ```

@@ -109,6 +109,16 @@ public class TokenPriceService {
         return result;
     }
 
+    public Map<String, List<Map<String, Object>>> getMultiTimestampProximateToUsdPriceRounds(List<String> tokens,
+                                                                                             List<Long> timestamps) {
+        Map<String, List<Map<String, Object>>> prsMap = new HashMap<>();
+        for (Long ts : timestamps) {
+            List<Map<String, Object>> prs = getProximateToUsdPriceRounds(tokens, ts);
+            prsMap.put(ts.toString(), prs);
+        }
+        return prsMap;
+    }
+
     public List<Map<String, Object>> getProximateToUsdPriceRounds(List<String> tokens, Long timestamp) {
         List<Map<String, Object>> prs = new ArrayList<>();
         for (String t : tokens) {
