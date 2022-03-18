@@ -1,3 +1,8 @@
+server:
+  servlet:
+    context-path: /barnard
+    # "/${STARCOIN_NETWORK}"
+
 spring:
   flyway:
     baselineOnMigrate: true

@@ -15,28 +15,28 @@ spec:
         app: starswap-api-proxima
     spec:
       containers:
-      - name: starswap-api-proxima
-        image: ghcr.io/elements-studio/starcoin_starswap:sha-effba8e
-        ports:
-        - containerPort: 8600
-        env:
-        - name: spring_profiles_active
-          value: proxima
-        - name: FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS
-          value: "true"
-        - name: STARCOIN_MYSQL_URL
-          value: "jdbc:mysql://starcoin-db-2.c0bz9kehdvnb.ap-northeast-1.rds.amazonaws.com:3306/starswap_proxima?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC"
-        - name: STARCOIN_MYSQL_USER
-          value: "starcoin"
-        - name: STARCOIN_MYSQL_PWD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-pwd
-              key: password
-        - name: STARCOIN_SEEDS
-          value: "proxima1.seed.starcoin.org,proxima2.seed.starcoin.org"
-        - name: STARCOIN_NETWORK
-          value: "proxima"
-        - name: STARCOIN_JSON_RPC_URL
-          value: "https://proxima-seed.starcoin.org"
+        - name: starswap-api-proxima
+          image: ghcr.io/elements-studio/starcoin_starswap:sha-effba8e
+          ports:
+            - containerPort: 8600
+          env:
+            - name: spring_profiles_active
+              value: proxima
+            - name: FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS
+              value: "true"
+            - name: STARCOIN_MYSQL_URL
+              value: "jdbc:mysql://starcoin-db-2.c0bz9kehdvnb.ap-northeast-1.rds.amazonaws.com:3306/starswap_proxima?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC"
+            - name: STARCOIN_MYSQL_USER
+              value: "starcoin"
+            - name: STARCOIN_MYSQL_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pwd
+                  key: password
+            - name: STARCOIN_SEEDS
+              value: "proxima1.seed.starcoin.org,proxima2.seed.starcoin.org"
+            - name: STARCOIN_NETWORK
+              value: "proxima"
+            - name: STARCOIN_JSON_RPC_URL
+              value: "https://proxima-seed.starcoin.org"
 

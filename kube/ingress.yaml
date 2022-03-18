@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: "starswap-api-ingress"
-#  namespace: "default"
+  #  namespace: "default"
   annotations:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
@@ -21,16 +21,17 @@ spec:
             backend:
               serviceName: "starswap-api-barnard"
               servicePort: 80
-          - path: /proxima/*
-            backend:
-              serviceName: "starswap-api-proxima"
-              servicePort: 80
-          - path: /barnard-old/*
-            backend:
-              serviceName: "starswap-api-barnard-old"
-              servicePort: 80
-          - path: /barnard-new/*
-            backend:
-              serviceName: "starswap-api-barnard-new"
-              servicePort: 80
+
+#          - path: /proxima/*
+#            backend:
+#              serviceName: "starswap-api-proxima"
+#              servicePort: 80
+#          - path: /barnard-old/*
+#            backend:
+#              serviceName: "starswap-api-barnard-old"
+#              servicePort: 80
+#          - path: /barnard-new/*
+#            backend:
+#              serviceName: "starswap-api-barnard-new"
+#              servicePort: 80
 
