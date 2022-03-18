@@ -100,6 +100,15 @@ http://localhost:8600/barnard/v1/lpTokenFarms/Bot:Ddd
 http://localhost:8600/barnard/v1/lpTokenFarmAccounts?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62
 ```
 
+取得账号在 Farm 中的抵押信息：
+
+```
+http://localhost:8600/barnard/v1/getAccountFarmStakeInfo?tokenXId=STC&tokenYId=STAR&accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62
+```
+
+该接口返回：账号抵押的流动性的数额，Farm 的总抵押流动性的数额，账号在 farm 中的占比，账号抵押的流动性的美元计价的金额，抵押的流动性可以换回的 Token 的数额等。
+
+
 取得所有 Farm 的 TVL：
 
 ```

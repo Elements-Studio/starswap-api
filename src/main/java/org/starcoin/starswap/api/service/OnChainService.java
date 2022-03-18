@@ -66,9 +66,11 @@ public class OnChainService {
 
         //        BigDecimal farmTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
         //        BigDecimal stakedAmountInUsd = farmTvlInUsd.multiply(farmStakeInfo.getSharePercentage()).divide(BigDecimal.valueOf(100L), 9, RoundingMode.HALF_UP);
-        BigDecimal tokenXAmountInUsd = getTokenAmountInUsd(tokenX, farmStakeInfo.getTokenXAmount().getAmount());
-        BigDecimal tokenYAmountInUsd = getTokenAmountInUsd(tokenY, farmStakeInfo.getTokenYAmount().getAmount());
-        BigDecimal stakedAmountInUsd = tokenXAmountInUsd.add(tokenYAmountInUsd);
+        BigDecimal tokenXAmountInUsd = getTokenAmountInUsdOffChainFirst(tokenX, farmStakeInfo.getTokenXAmount().getAmount());
+        BigDecimal tokenYAmountInUsd = getTokenAmountInUsdOffChainFirst(tokenY, farmStakeInfo.getTokenYAmount().getAmount());
+        BigDecimal stakedAmountInUsd = (tokenXAmountInUsd.compareTo(tokenYAmountInUsd) > 0
+                ? tokenXAmountInUsd
+                : tokenYAmountInUsd).multiply(BigDecimal.valueOf(2));
         farmStakeInfo.setStakedAmountInUsd(stakedAmountInUsd.round(new MathContext(9, RoundingMode.HALF_UP)));
 
         if (!tokenXId.equals(tokenIdPair.tokenXId())){
@@ -404,6 +406,15 @@ public class OnChainService {
                 .divide(new BigDecimal(tokenScalingFactor), tokenScalingFactor.toString().length() - 1, RoundingMode.HALF_UP)
                 .multiply(tokenToUsdRate);
     }
+
+    public BigDecimal getTokenAmountInUsdOffChainFirst(Token token, BigInteger tokenAmount) {
+        BigInteger tokenScalingFactor = getTokenScalingFactorOffChainFirst(token);
+        BigDecimal tokenToUsdRate = getToUsdExchangeRate(token, offChainTokenToUsdExchangeRateShortCircuitFun());
+        return new BigDecimal(tokenAmount)
+                .divide(new BigDecimal(tokenScalingFactor), tokenScalingFactor.toString().length() - 1, RoundingMode.HALF_UP)
+                .multiply(tokenToUsdRate);
+    }
+
 
     // get token scaling factor from database first, or else get from on-chain.
     private BigInteger getTokenScalingFactorOffChainFirst(Token token) {
