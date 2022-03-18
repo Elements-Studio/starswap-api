@@ -40,8 +40,11 @@ public class SyrupPool {
     @Column(length = 15, nullable = false)
     private String rewardTokenId;
 
-//    @Column
-//    private Integer rewardMultiplier;
+    //    @Column
+    //    private Integer rewardMultiplier;
+
+    @Column(precision = 31, scale = 0)
+    private BigInteger dailyReward;
 
     @Column(precision = 51, scale = 10)
     private BigDecimal tvlInUsd;
@@ -179,6 +182,14 @@ public class SyrupPool {
         this.version = version;
     }
 
+    public BigInteger getDailyReward() {
+        return dailyReward;
+    }
+
+    public void setDailyReward(BigInteger dailyReward) {
+        this.dailyReward = dailyReward;
+    }
+
     @Override
     public String toString() {
         return "SyrupPool{" +
@@ -188,6 +199,7 @@ public class SyrupPool {
                 ", totalStakeAmount=" + totalStakeAmount +
                 ", estimatedApy=" + estimatedApy +
                 ", rewardTokenId='" + rewardTokenId + '\'' +
+                ", dailyReward=" + dailyReward +
                 ", tvlInUsd=" + tvlInUsd +
                 ", deactived=" + deactived +
                 ", createdBy='" + createdBy + '\'' +

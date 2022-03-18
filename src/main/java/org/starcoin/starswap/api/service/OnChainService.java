@@ -19,6 +19,8 @@ import java.util.function.Function;
 public class OnChainService {
     public static final int MAX_SWAP_DEPTH = 3;
     private static final long ONE_YEAR_SECONDS = 60L * 60 * 24 * 365;
+    private static final long ONE_DAY_SECONDS = 60L * 60 * 24;
+    private static final long SYRUP_POOL_TOTAL_REWARD_MULTIPLIER = 2 + 3 + 4 + 6+ 8;
 
     private static final Logger LOG = LoggerFactory.getLogger(OnChainService.class);
 
@@ -327,6 +329,20 @@ public class OnChainService {
         return getTokenAmountInUsd(rewardToken, rewardPerYear);
     }
 
+    public BigInteger getFarmDailyReward(LiquidityTokenFarm liquidityTokenFarm) {
+        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+
+        String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
+
+        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
+                tokenX.getTokenStructType().toTypeTagString(),
+                tokenY.getTokenStructType().toTypeTagString());
+        BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS))
+                .multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
+        return rewardPerDay;
+    }
+
     /**
      * get farm total value locked in USD.
      */
@@ -564,6 +580,16 @@ public class OnChainService {
         return getTokenAmountInUsd(rewardToken, rewardPerYear);
     }
 
+    public BigInteger getSyrupPoolDailyReward(SyrupPool pool) {
+        String rewardTokenId = pool.getRewardTokenId();
+        Token rewardToken = tokenService.getTokenOrElseThrow(rewardTokenId, () -> new RuntimeException("Cannot find Token by Id: " + rewardTokenId));
+        BigInteger rewardReleasePerSecond = jsonRpcClient.syrupPoolQueryReleasePerSecond(pool.getSyrupPoolId().getPoolAddress(),
+                rewardToken.getTokenStructType().toTypeTagString());
+        BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
+
+        return rewardPerDay.multiply(BigInteger.valueOf(SYRUP_POOL_TOTAL_REWARD_MULTIPLIER));
+    }
+
 //    public Integer getSyrupPoolRewardMultiplier(SyrupPool pool) {
 //        String tokenId = pool.getSyrupPoolId().getTokenId();
 //        Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
@@ -587,4 +613,7 @@ public class OnChainService {
             return Collections.emptyList();
         }
     }
+
+
+
 }

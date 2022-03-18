@@ -50,6 +50,9 @@ public class LiquidityTokenFarm {
     @Column
     private Integer rewardMultiplier;
 
+    @Column(precision = 31, scale = 0)
+    private BigInteger dailyReward;
+
     @Column(precision = 51, scale = 10)
     private BigDecimal tvlInUsd;
 
@@ -194,4 +197,11 @@ public class LiquidityTokenFarm {
         this.tvlInUsd = tvlInUsd;
     }
 
+    public BigInteger getDailyReward() {
+        return dailyReward;
+    }
+
+    public void setDailyReward(BigInteger dailyReward) {
+        this.dailyReward = dailyReward;
+    }
 }

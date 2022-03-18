@@ -10,6 +10,7 @@ import org.starcoin.starswap.api.data.repo.SyrupPoolRepository;
 import org.starcoin.starswap.api.service.OnChainService;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -64,6 +65,14 @@ public class SyrupPoolRefreshTaskService {
 //            } catch (RuntimeException e) {
 //                LOG.error("Update syrup pool reward multiplier error. Farm Id: " + pool.getSyrupPoolId(), e);
 //            }
+            try {
+                BigInteger dailyReward = onChainService.getSyrupPoolDailyReward(pool);
+                pool.setDailyReward(dailyReward);
+                updated = true;
+                LOG.debug("Update syrup pool dailyReward Ok. Farm Id: " + pool.getSyrupPoolId());
+            } catch (RuntimeException e) {
+                LOG.error("Update syrup pool dailyReward error. Farm Id: " + pool.getSyrupPoolId(), e);
+            }
             if (updated) {
                 pool.setUpdatedAt(System.currentTimeMillis());
                 pool.setUpdatedBy("admin");

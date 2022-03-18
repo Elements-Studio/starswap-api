@@ -10,6 +10,7 @@ import org.starcoin.starswap.api.data.repo.LiquidityTokenFarmRepository;
 import org.starcoin.starswap.api.service.OnChainService;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.util.List;
 
@@ -72,6 +73,16 @@ public class LiquidityTokenFarmRefreshTaskService {
             } catch (RuntimeException e) {
                 LOG.error("Update farm reward multiplier error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
             }
+
+            try {
+                BigInteger dailyReward = onChainService.getFarmDailyReward(farm);
+                farm.setDailyReward(dailyReward);
+                updated = true;
+                LOG.debug("Update farm reward dailyReward Ok. Farm Id: " + farm.getLiquidityTokenFarmId());
+            } catch (RuntimeException e) {
+                LOG.error("Update farm reward dailyReward error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
+            }
+
             if (updated) {
                 farm.setUpdatedAt(System.currentTimeMillis());
                 farm.setUpdatedBy("admin");
