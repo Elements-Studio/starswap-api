@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.service.*;
+import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.starswap.api.vo.GetBestPathAndAmountInResult;
 import org.starcoin.starswap.api.vo.GetBestPathResult;
 
@@ -124,6 +125,12 @@ public class StarswapController {
         return liquidityTokenFarmAccountService.findByAccountAddress(accountAddress);
     }
 
+    @GetMapping(path = "getAccountFarmStakeInfo")
+    public AccountFarmStakeInfo getAccountFarmStakeInfo(@RequestParam(value = "tokenXId", required = true) String tokenXId,
+                                                        @RequestParam(value = "tokenYId", required = true) String tokenYId,
+                                                        @RequestParam(value = "accountAddress", required = true) String accountAddress) {
+        return onChainService.getAccountFarmStakeInfo(tokenXId, tokenYId, accountAddress);
+    }
 
     @GetMapping(path = "syrupPools")
     public List<SyrupPool> getSyrupPools() {

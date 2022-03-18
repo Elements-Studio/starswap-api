@@ -6,9 +6,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.data.repo.*;
 import org.starcoin.starswap.api.service.*;
+import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,6 +73,21 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
+
+        try {
+            JsonRpcClient jsonRpcClient = new JsonRpcClient("https://main-seed.starcoin.org");
+            AccountFarmStakeInfo accountFarmStakeInfo = jsonRpcClient.getAccountFarmStakeInfo(
+                    "0x8c109349c6bd91411d6bc962e080c4a3",
+                    "0x8c109349c6bd91411d6bc962e080c4a3",
+                    "0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR",
+                    "0x00000000000000000000000000000001::STC::STC",
+                    "...");
+            System.out.println(accountFarmStakeInfo);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        if (true) return;
+
         LiquidityTokenFarm farm = liquidityTokenFarmService.findOneByTokenIdPair("FAI", "STC");
         Integer farmMultiplier = onChainService.getFarmRewardMultiplier(farm);
         System.out.println(farmMultiplier);

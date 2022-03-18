@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -20,7 +21,7 @@ public class OnChainService {
     public static final int MAX_SWAP_DEPTH = 3;
     private static final long ONE_YEAR_SECONDS = 60L * 60 * 24 * 365;
     private static final long ONE_DAY_SECONDS = 60L * 60 * 24;
-    private static final long SYRUP_POOL_TOTAL_REWARD_MULTIPLIER = 2 + 3 + 4 + 6+ 8;
+    private static final long SYRUP_POOL_TOTAL_REWARD_MULTIPLIER = 2 + 3 + 4 + 6 + 8;
 
     private static final Logger LOG = LoggerFactory.getLogger(OnChainService.class);
 
@@ -45,6 +46,31 @@ public class OnChainService {
     @Autowired
     public OnChainService(JsonRpcClient jsonRpcClient) throws MalformedURLException {
         this.jsonRpcClient = jsonRpcClient;
+    }
+
+
+    public AccountFarmStakeInfo getAccountFarmStakeInfo(String tokenXId, String tokenYId, String accountAddress) {
+        TokenIdPair tokenIdPair = new TokenIdPair(tokenXId, tokenYId);
+        Token tokenX = tokenService.getTokenOrElseThrow(tokenIdPair.tokenXId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenXId()));
+        Token tokenY = tokenService.getTokenOrElseThrow(tokenIdPair.tokenYId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenYId()));
+        LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
+
+        AccountFarmStakeInfo farmStakeInfo = this.jsonRpcClient.getAccountFarmStakeInfo(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+                liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress(),
+                tokenX.getTokenStructType().toTypeTagString(),
+                tokenY.getTokenStructType().toTypeTagString(),
+                accountAddress);
+        farmStakeInfo.getTokenXAmount().setTokenId(tokenIdPair.tokenXId());
+        farmStakeInfo.getTokenYAmount().setTokenId(tokenIdPair.tokenYId());
+
+        //        BigDecimal farmTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
+        //        BigDecimal stakedAmountInUsd = farmTvlInUsd.multiply(farmStakeInfo.getSharePercentage()).divide(BigDecimal.valueOf(100L), 9, RoundingMode.HALF_UP);
+        BigDecimal tokenXAmountInUsd = getTokenAmountInUsd(tokenX, farmStakeInfo.getTokenXAmount().getAmount());
+        BigDecimal tokenYAmountInUsd = getTokenAmountInUsd(tokenY, farmStakeInfo.getTokenYAmount().getAmount());
+        BigDecimal stakedAmountInUsd = tokenXAmountInUsd.add(tokenYAmountInUsd);
+        farmStakeInfo.setStakedAmountInUsd(stakedAmountInUsd);
+
+        return farmStakeInfo;
     }
 
     public Pair<List<String>, BigInteger> getBestSwapPathAndAmountOut(String tokenInId, String tokenOutId, BigInteger amountIn) {
@@ -613,7 +639,6 @@ public class OnChainService {
             return Collections.emptyList();
         }
     }
-
 
 
 }

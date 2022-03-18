@@ -126,6 +126,13 @@ public class JsonRpcUtils {
         return Integer.parseInt(resultFields.get(0).toString());
     }
 
+    public static BigInteger tokenSwapFarmGetAccountStakedLiquidity(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY, String accountAddress) {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::TokenSwapFarmScript::query_stake",//
+                Arrays.asList(tokenX, tokenY), Collections.singletonList(accountAddress), new TypeReference<List<Object>>() {
+                });
+        return new BigInteger(resultFields.get(0).toString());
+    }
+
     // ------------------------
 
     public static BigInteger syrupPoolQueryTotalStake(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {

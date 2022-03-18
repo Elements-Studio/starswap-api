@@ -6,6 +6,8 @@ import org.starcoin.bean.Event;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
+import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
+import springfox.documentation.spring.web.json.Json;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -81,6 +83,22 @@ public class JsonRpcClient {
     }
 
     // ------------------------
+
+    public AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress) {
+        BigInteger stakedLiquidity = JsonRpcUtils.tokenSwapFarmGetAccountStakedLiquidity(this.jsonRpcSession, farmAddress, tokenX, tokenY, accountAddress);
+        BigInteger farmTotalLiquidity = JsonRpcUtils.tokenSwapFarmQueryTotalStake(this.jsonRpcSession, farmAddress, tokenX, tokenY);
+        BigDecimal sharePercentage = new BigDecimal(stakedLiquidity.multiply(BigInteger.valueOf(100))).divide(new BigDecimal(farmTotalLiquidity), 9, RoundingMode.HALF_UP);
+        Pair<BigInteger, BigInteger> stakedAmountPair = JsonRpcUtils.getReservesByLiquidity(this.jsonRpcSession, lpTokenAddress, tokenX, tokenY, stakedLiquidity);
+
+        AccountFarmStakeInfo farmStakeInfo = new AccountFarmStakeInfo();
+        farmStakeInfo.setStakedLiquidity(stakedLiquidity);
+        farmStakeInfo.setFarmTotalLiquidity(farmTotalLiquidity);
+        farmStakeInfo.setSharePercentage(sharePercentage);
+        farmStakeInfo.setTokenXAmount(new AccountFarmStakeInfo.TokenAmount(null, tokenX, stakedAmountPair.getItem1()));
+        farmStakeInfo.setTokenYAmount(new AccountFarmStakeInfo.TokenAmount(null, tokenY, stakedAmountPair.getItem2()));
+        //farmStakeInfo.setStakedAmountInUsd();
+        return farmStakeInfo;
+    }
 
     public Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.getTokenSwapFarmStakedReserves(this.jsonRpcSession, farmAddress, lpTokenAddress, tokenX, tokenY);
