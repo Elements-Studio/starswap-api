@@ -11,6 +11,7 @@ import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.util.*;
@@ -68,8 +69,13 @@ public class OnChainService {
         BigDecimal tokenXAmountInUsd = getTokenAmountInUsd(tokenX, farmStakeInfo.getTokenXAmount().getAmount());
         BigDecimal tokenYAmountInUsd = getTokenAmountInUsd(tokenY, farmStakeInfo.getTokenYAmount().getAmount());
         BigDecimal stakedAmountInUsd = tokenXAmountInUsd.add(tokenYAmountInUsd);
-        farmStakeInfo.setStakedAmountInUsd(stakedAmountInUsd);
+        farmStakeInfo.setStakedAmountInUsd(stakedAmountInUsd.round(new MathContext(9, RoundingMode.HALF_UP)));
 
+        if (!tokenXId.equals(tokenIdPair.tokenXId())){
+            AccountFarmStakeInfo.TokenAmount t = farmStakeInfo.getTokenXAmount();
+            farmStakeInfo.setTokenXAmount(farmStakeInfo.getTokenYAmount());
+            farmStakeInfo.setTokenYAmount(t);
+        }
         return farmStakeInfo;
     }
 

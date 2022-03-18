@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: starswap-api-barnard
-          image: ghcr.io/elements-studio/starcoin_starswap:sha-80562f0
+          image: ghcr.io/elements-studio/starcoin_starswap:sha-eeac47d
           ports:
             - containerPort: 8600
           env:
