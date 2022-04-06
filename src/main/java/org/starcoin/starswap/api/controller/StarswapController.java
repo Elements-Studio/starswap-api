@@ -22,7 +22,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("v1")
 public class StarswapController {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(StarswapController.class);
 
     @Resource
@@ -205,45 +204,6 @@ public class StarswapController {
     @GetMapping(path = "heartbeatBreakIntervals")
     public List<Pair<BigInteger, BigInteger>> getBreakIntervals() {
         return nodeHeartbeatService.findBreakIntervals();
-    }
-
-    @GetMapping(path = "price-api/getProximateToUsdPriceRound")
-    public Map<String, Object> getProximateToUsdPriceRound(@RequestParam("token") String token,
-                                                           @RequestParam("timestamp") Long timestamp) {
-        return tokenPriceService.getProximateToUsdPriceRound(token, timestamp);
-    }
-
-    @GetMapping(path = "price-api/getProximateToUsdPriceRounds")
-    public List<Map<String, Object>> getProximateToUsdPriceRounds(@RequestParam("t") List<String> tokens,
-                                                                  @RequestParam("timestamp") Long timestamp) {
-        return tokenPriceService.getProximateToUsdPriceRounds(tokens, timestamp);
-    }
-
-    @GetMapping(path = "price-api/getMultiTimestampProximateToUsdPriceRounds")
-    public Map<String, List<Map<String, Object>>> getMultiTimestampProximateToUsdPriceRounds(@RequestParam("t") List<String> tokens,
-                                                                                             @RequestParam("timestamp") List<Long> timestamps) {
-        return tokenPriceService.getMultiTimestampProximateToUsdPriceRounds(tokens, timestamps);
-    }
-
-    @GetMapping(path = "price-api/getAnyProximateToUsdExchangeRate")
-    public Map<String, BigDecimal> getAnyProximateToUsdExchangeRate(@RequestParam("t") List<String> tokens,
-                                                                    @RequestParam("timestamp") Long timestamp) {
-        return tokenPriceService.getAnyProximateToUsdExchangeRate(tokens, timestamp);
-    }
-
-    @GetMapping(path = "price-api/getToUsdPriceGrowths")
-    public List<Map<String, Object>> getToUsdPriceGrowths(@RequestParam("t") List<String> tokens) {
-        return tokenPriceService.getToUsdPriceGrowths(tokens);
-    }
-
-    @GetMapping(path = "price-api/getToUsdExchangeRate")
-    public BigDecimal getToUsdExchangeRate(@RequestParam("token") String token) {
-        return onChainService.getToUsdExchangeRateOffChainFirst(token);
-    }
-
-    @GetMapping(path = "price-api/getAnyToUsdExchangeRate")
-    public Map<String, BigDecimal> getAnyToUsdExchangeRate(@RequestParam("t") List<String> tokens) {
-        return onChainService.getAnyToUsdExchangeRateOffChainFirst(tokens);
     }
 
     private String[] parseTokenIdPair(String tokenPairId) {
