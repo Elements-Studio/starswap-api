@@ -431,6 +431,9 @@ public class OnChainService {
     public BigDecimal getToUsdExchangeRate(String tokenTypeTag) {
         StructType tokenStructType = StructType.parse(tokenTypeTag);
         Token token = tokenService.getTokenByStructType(tokenStructType);
+        if (token == null) {
+            return null;
+        }
         return getToUsdExchangeRate(token, defaultTokenToUsdExchangeRateShortCircuitFun());
     }
 
@@ -465,7 +468,10 @@ public class OnChainService {
     }
 
     public BigDecimal getToUsdExchangeRateByTokenId(String tokenId) {
-        Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
+        Token token = tokenService.getToken(tokenId);//getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
+        if (token == null) {
+            return null;
+        }
         return getToUsdExchangeRate(token, defaultTokenToUsdExchangeRateShortCircuitFun());
     }
 

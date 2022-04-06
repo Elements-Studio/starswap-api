@@ -152,6 +152,12 @@ http://localhost:8600/barnard/v1/syrupStakes?accountAddress=0x4783d08fb16990bd35
 http://localhost:8600/barnard/v1/tokenToUsdPricePairMappings
 ```
 
+Get token to USD exchange rate computed by swap pool:
+
+```
+http://localhost:8600/barnard/v1/getToUsdExchangeRate?t=STAR
+```
+
 ### 价格相关 API
 
 取得某个 token 最接近某个时间点的兑美元的价格：

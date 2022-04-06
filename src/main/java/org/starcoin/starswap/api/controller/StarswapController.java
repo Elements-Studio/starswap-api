@@ -196,6 +196,12 @@ public class StarswapController {
         return tokenPriceService.getTokenToUsdPricePairMappings();
     }
 
+    @ApiOperation("Get token to USD exchange rate computed by swap pool")
+    @GetMapping(path = "getToUsdExchangeRate")
+    public BigDecimal getToUsdExchangeRate(@RequestParam("t") String tokenId) {
+        return onChainService.getToUsdExchangeRateByTokenId(tokenId);
+    }
+
     @PostMapping(path = "pullingEventTasks")
     public void postPullingEventTask(@RequestBody PullingEventTask pullingEventTask) {
         pullingEventTaskService.createOrUpdatePullingEventTask(pullingEventTask);
