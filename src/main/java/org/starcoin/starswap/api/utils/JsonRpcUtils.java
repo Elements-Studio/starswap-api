@@ -25,6 +25,10 @@ public class JsonRpcUtils {
     private static final String SWAP_GET_RESERVES_FUNCTION_MODULE_NAME = "TokenSwapRouter";
     private static final String SWAP_FARM_QUERY_TOTAL_STAKE_FUNCTION_MODULE_NAME = "TokenSwapFarmScript";
     private static final String SWAP_FARM_QUERY_RELEASE_PER_SECOND_FUNCTION_MODULE_NAME = "TokenSwapFarmScript";
+    private static final String TOKEN_SWAP_ROUTER_MODULE_NAME = "TokenSwapRouter";
+    private static final String TOKEN_SWAP_FARM_SCRIPT_MODULE_NAME = "TokenSwapFarmScript";
+    private static final String TOKEN_SWAP_SYRUP_MODULE_NAME = "TokenSwapSyrup";
+    private static final String TOKEN_SWAP_ORACLE_LIBRARY_MODULE_NAME = "TokenSwapOracleLibrary";
 
     private static final String SWAP_FEE_NUMERATOR = "3u64";
     private static final String SWAP_FEE_DENUMERATOR = "1000u64";
@@ -65,7 +69,8 @@ public class JsonRpcUtils {
 
     // public fun total_liquidity<X: store, Y: store>(): u128
     public static BigInteger tokenSwapRouterTotalLiquidity(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::TokenSwapRouter::total_liquidity",
+        List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
+                        + TOKEN_SWAP_ROUTER_MODULE_NAME + "::total_liquidity",
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
@@ -73,7 +78,8 @@ public class JsonRpcUtils {
 
     // public fun get_reserves<X: store, Y: store>(): (u128, u128)
     public static Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
-        List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::" + SWAP_GET_RESERVES_FUNCTION_MODULE_NAME + "::get_reserves",
+        List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
+                        + SWAP_GET_RESERVES_FUNCTION_MODULE_NAME + "::get_reserves",
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
         return new Pair<>(new BigInteger(resultFields.get(0).toString()), new BigInteger(resultFields.get(1).toString()));
@@ -81,7 +87,8 @@ public class JsonRpcUtils {
 
     // public fun get_amount_out(amount_in: u128, reserve_in: u128, reserve_out: u128): u128
     public static BigInteger tokenSwapRouterGetAmountOut(JSONRPC2Session jsonRpcSession, String lpTokenAddress, BigInteger amountIn, BigInteger reserveIn, BigInteger reserveOut) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::" + SWAP_GET_AMOUNT_IN_OUT_FUNCTION_MODULE_NAME + "::get_amount_out",
+        List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
+                        + SWAP_GET_AMOUNT_IN_OUT_FUNCTION_MODULE_NAME + "::get_amount_out",
                 Collections.emptyList(), Arrays.asList(
                         amountIn.toString() + "u128",
                         reserveIn.toString() + "u128",
@@ -93,7 +100,8 @@ public class JsonRpcUtils {
     }
 
     public static BigInteger tokenSwapRouterGetAmountIn(JSONRPC2Session jsonRpcSession, String lpTokenAddress, BigInteger amountOut, BigInteger reserveIn, BigInteger reserveOut) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::" + SWAP_GET_AMOUNT_IN_OUT_FUNCTION_MODULE_NAME + "::get_amount_in",
+        List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
+                        + SWAP_GET_AMOUNT_IN_OUT_FUNCTION_MODULE_NAME + "::get_amount_in",
                 Collections.emptyList(), Arrays.asList(
                         amountOut.toString() + "u128",
                         reserveIn.toString() + "u128",
@@ -106,28 +114,32 @@ public class JsonRpcUtils {
 
     //public fun query_total_stake<TokenX: store, TokenY: store>() : u128
     public static BigInteger tokenSwapFarmQueryTotalStake(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::" + SWAP_FARM_QUERY_TOTAL_STAKE_FUNCTION_MODULE_NAME + "::query_total_stake",
+        List<String> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
+                        + SWAP_FARM_QUERY_TOTAL_STAKE_FUNCTION_MODULE_NAME + "::query_total_stake",
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
     }
 
     public static BigInteger tokenSwapFarmQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::" + SWAP_FARM_QUERY_RELEASE_PER_SECOND_FUNCTION_MODULE_NAME + "::query_release_per_second",
+        List<String> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
+                        + SWAP_FARM_QUERY_RELEASE_PER_SECOND_FUNCTION_MODULE_NAME + "::query_release_per_second",
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
     }
 
     public static Integer tokenSwapFarmGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
-        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::TokenSwapFarmScript::get_farm_multiplier",//
+        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
+                        + TOKEN_SWAP_FARM_SCRIPT_MODULE_NAME + "::get_farm_multiplier",//
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
         return Integer.parseInt(resultFields.get(0).toString());
     }
 
     public static BigInteger tokenSwapFarmGetAccountStakedLiquidity(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY, String accountAddress) {
-        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::TokenSwapFarmScript::query_stake",//
+        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
+                        + TOKEN_SWAP_FARM_SCRIPT_MODULE_NAME + "::query_stake",//
                 Arrays.asList(tokenX, tokenY), Collections.singletonList(accountAddress), new TypeReference<List<Object>>() {
                 });
         return new BigInteger(resultFields.get(0).toString());
@@ -136,28 +148,25 @@ public class JsonRpcUtils {
     // ------------------------
 
     public static BigInteger syrupPoolQueryTotalStake(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_total_stake",
+        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_total_stake",
                 Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
     }
 
     public static BigInteger syrupPoolQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_release_per_second",
+        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_release_per_second",
                 Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
     }
 
-//    public static Integer syrupPoolGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
-//        List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::get_pool_multiplier",//
-//                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<Object>>() {
-//                });
-//        return Integer.parseInt(resultFields.get(0).toString());
-//    }
 
     public static List<Long> syrupPoolQueryStakeList(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress) {
-        List<List<Long>> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_stake_list",//
+        List<List<Long>> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_stake_list",//
                 Collections.singletonList(token), Collections.singletonList(accountAddress), new TypeReference<List<List<Long>>>() {
                 });
         if (resultFields.size() > 0) {
@@ -176,7 +185,8 @@ public class JsonRpcUtils {
         //        stake.stepwise_multiplier,
         //        stake.token_amount
         //)
-        List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::get_stake_info",//
+        List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::get_stake_info",//
                 Collections.singletonList(token), Arrays.asList(accountAddress, id.toString() + "u64"), new TypeReference<List<Object>>() {
                 });
         SyrupStake syrupStake = new SyrupStake();
@@ -190,7 +200,8 @@ public class JsonRpcUtils {
 
     public static BigInteger syrupPoolQueryExpectedGain(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress, Long id) {
         //public fun query_expect_gain<TokenT: store>(user_addr: address, id: u64): u128
-        List<BigInteger> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::" + "TokenSwapSyrup" + "::query_expect_gain",//
+        List<BigInteger> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_expect_gain",//
                 Collections.singletonList(token),
                 Arrays.asList(accountAddress, id.toString() + "u64"),
                 new TypeReference<List<BigInteger>>() {
@@ -206,7 +217,8 @@ public class JsonRpcUtils {
 
 
     public static List<Object> tokenSwapOracleLibraryCurrentCumulativePrices(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
-        List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::TokenSwapOracleLibrary::current_cumulative_prices",
+        List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
+                        + TOKEN_SWAP_ORACLE_LIBRARY_MODULE_NAME + "::current_cumulative_prices",
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
         return resultFields;
