@@ -29,6 +29,7 @@ public class JsonRpcUtils {
     private static final String TOKEN_SWAP_FARM_SCRIPT_MODULE_NAME = "TokenSwapFarmScript";
     private static final String TOKEN_SWAP_SYRUP_MODULE_NAME = "TokenSwapSyrup";
     private static final String TOKEN_SWAP_ORACLE_LIBRARY_MODULE_NAME = "TokenSwapOracleLibrary";
+    private static final String TOKEN_SWAP_FARM_ROUTER_MODULE_NAME = "TokenSwapFarmRouter";
 
     private static final String SWAP_FEE_NUMERATOR = "3u64";
     private static final String SWAP_FEE_DENUMERATOR = "1000u64";
@@ -143,6 +144,39 @@ public class JsonRpcUtils {
                 Arrays.asList(tokenX, tokenY), Collections.singletonList(accountAddress), new TypeReference<List<Object>>() {
                 });
         return new BigInteger(resultFields.get(0).toString());
+    }
+
+    /***
+     * TokenSwapFarmRouter::query_global_pool_info
+     * @param jsonRpcSession
+     * @param farmAddress
+     * @return total_alloc_point, pool_release_per_second.
+     */
+    public static Pair<BigInteger, BigInteger> tokenSwapFarmQueryGlobalPoolInfo(JSONRPC2Session jsonRpcSession, String farmAddress) {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
+                        + TOKEN_SWAP_FARM_ROUTER_MODULE_NAME + "::query_global_pool_info",//
+                Collections.emptyList(), Collections.emptyList(), new TypeReference<List<Object>>() {
+                });
+        return new Pair<>(new BigInteger(resultFields.get(0).toString()), new BigInteger(resultFields.get(1).toString()));
+    }
+
+    /***
+     * TokenSwapFarmRouter::query_info_v2
+     * @param jsonRpcSession
+     * @param farmAddress
+     * @param tokenX
+     * @param tokenY
+     * @return (alloc_point, asset_total_amount, asset_total_weight, harvest_index)
+     */
+    public static List<BigInteger> tokenSwapFarmQueryInfoV2(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
+                        + TOKEN_SWAP_FARM_ROUTER_MODULE_NAME + "::query_info_v2",//
+                Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
+                });
+        return Arrays.asList(new BigInteger(resultFields.get(0).toString()),
+                new BigInteger(resultFields.get(1).toString()),
+                new BigInteger(resultFields.get(2).toString()),
+                new BigInteger(resultFields.get(3).toString()));
     }
 
     // ------------------------

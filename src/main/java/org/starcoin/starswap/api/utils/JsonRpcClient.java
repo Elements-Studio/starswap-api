@@ -46,6 +46,15 @@ public class JsonRpcClient {
         return JsonRpcUtils.tokenSwapFarmQueryReleasePerSecond(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 
+    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String tokenX, String tokenY) {
+        List<BigInteger> farmInfoV2 = JsonRpcUtils.tokenSwapFarmQueryInfoV2(this.jsonRpcSession, farmAddress, tokenX, tokenY);
+        BigInteger alloc_point = farmInfoV2.get(0);
+        Pair<BigInteger, BigInteger> farmGlobalInfo = JsonRpcUtils.tokenSwapFarmQueryGlobalPoolInfo(this.jsonRpcSession, farmAddress);
+        BigInteger total_alloc_point = farmGlobalInfo.getItem1();
+        BigInteger total_pool_release_per_second = farmGlobalInfo.getItem2();
+        return total_pool_release_per_second.multiply(alloc_point).divide(total_alloc_point);
+    }
+
     public Integer tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapFarmGetRewardMultiplier(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
