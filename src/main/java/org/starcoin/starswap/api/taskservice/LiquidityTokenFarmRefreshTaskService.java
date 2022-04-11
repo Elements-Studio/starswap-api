@@ -57,7 +57,7 @@ public class LiquidityTokenFarmRefreshTaskService {
             }
             if (tvlInUsd != null) {
                 try {
-                    BigDecimal estimatedApy = onChainService.getFarmEstimatedApy(farm, tvlInUsd);
+                    BigDecimal estimatedApy = onChainService.getFarmEstimatedApyV2(farm, tvlInUsd);
                     farm.setEstimatedApy(estimatedApy);
                     updated = true;
                     LOG.debug("Update farm estimated APY Ok. Farm Id: " + farm.getLiquidityTokenFarmId());
