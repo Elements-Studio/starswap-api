@@ -70,6 +70,16 @@ public class LiquidityPool {
     @Column(nullable = false)
     private Long updatedAt;
 
+    @Embedded
+    @AttributeOverride(name = "numerator", column = @Column(name = "poundage_rate_numerator", nullable = false))
+    @AttributeOverride(name = "denominator", column = @Column(name = "poundage_rate_denominator", nullable = false))
+    private Quotient poundageRate;
+
+    @Embedded
+    @AttributeOverride(name = "numerator", column = @Column(name = "swap_fee_op_rate_v2_numerator", nullable = false))
+    @AttributeOverride(name = "denominator", column = @Column(name = "swap_fee_op_rate_v2_denominator", nullable = false))
+    private Quotient swapFeeOperationRateV2;
+
     @Version
     private Long version;
 
@@ -183,6 +193,22 @@ public class LiquidityPool {
 
     public void setTokenYReserveInUsd(BigDecimal tokenYReserveInUsd) {
         this.tokenYReserveInUsd = tokenYReserveInUsd;
+    }
+
+    public Quotient getPoundageRate() {
+        return poundageRate;
+    }
+
+    public void setPoundageRate(Quotient poundageRate) {
+        this.poundageRate = poundageRate;
+    }
+
+    public Quotient getSwapFeeOperationRateV2() {
+        return swapFeeOperationRateV2;
+    }
+
+    public void setSwapFeeOperationRateV2(Quotient swapFeeOperationRateV2) {
+        this.swapFeeOperationRateV2 = swapFeeOperationRateV2;
     }
 
     public Long getVersion() {

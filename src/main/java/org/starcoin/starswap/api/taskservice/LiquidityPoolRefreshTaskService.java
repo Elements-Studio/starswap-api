@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.LiquidityPool;
 import org.starcoin.starswap.api.data.model.Pair;
+import org.starcoin.starswap.api.data.model.Quotient;
 import org.starcoin.starswap.api.data.model.Token;
 import org.starcoin.starswap.api.data.repo.LiquidityPoolRepository;
 import org.starcoin.starswap.api.service.OnChainService;
@@ -77,6 +78,26 @@ public class LiquidityPoolRefreshTaskService {
                 LOG.debug("Update pool reserves in USD Ok. Pool Id: " + pool.getLiquidityPoolId());
             } catch (RuntimeException e) {
                 LOG.error("Update pool reserves in USD error. Pool Id: " + pool.getLiquidityPoolId(), e);
+            }
+            try {
+                Pair<Long, Long> r = jsonRpcClient.tokenSwapRouterGetPoundageRate(
+                        pool.getLiquidityPoolId().getLiquidityTokenId().getLiquidityTokenAddress(),
+                        tokenX.getTokenStructType().toTypeTagString(), tokenY.getTokenStructType().toTypeTagString());
+                pool.setPoundageRate(new Quotient(r.getItem1(), r.getItem2()));
+                updated = true;
+                LOG.debug("Update pool PoundageRate Ok. Pool Id: " + pool.getLiquidityPoolId());
+            } catch (RuntimeException e) {
+                LOG.error("Update pool PoundageRate error. Pool Id: " + pool.getLiquidityPoolId(), e);
+            }
+            try {
+                Pair<Long, Long> r = jsonRpcClient.tokenSwapRouterGetSwapFeeOperationRateV2(
+                        pool.getLiquidityPoolId().getLiquidityTokenId().getLiquidityTokenAddress(),
+                        tokenX.getTokenStructType().toTypeTagString(), tokenY.getTokenStructType().toTypeTagString());
+                pool.setSwapFeeOperationRateV2(new Quotient(r.getItem1(), r.getItem2()));
+                updated = true;
+                LOG.debug("Update pool SwapFeeOperationRateV2 Ok. Pool Id: " + pool.getLiquidityPoolId());
+            } catch (RuntimeException e) {
+                LOG.error("Update pool SwapFeeOperationRateV2 error. Pool Id: " + pool.getLiquidityPoolId(), e);
             }
             if (updated) {
                 pool.setUpdatedAt(System.currentTimeMillis());

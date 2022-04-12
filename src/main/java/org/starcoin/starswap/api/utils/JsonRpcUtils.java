@@ -30,6 +30,7 @@ public class JsonRpcUtils {
     private static final String TOKEN_SWAP_SYRUP_MODULE_NAME = "TokenSwapSyrup";
     private static final String TOKEN_SWAP_ORACLE_LIBRARY_MODULE_NAME = "TokenSwapOracleLibrary";
     private static final String TOKEN_SWAP_FARM_ROUTER_MODULE_NAME = "TokenSwapFarmRouter";
+    //private static final String TOKEN_SWAP_SCRIPTS_MODULE_NAME = "TokenSwapScripts";
 
     private static final String SWAP_FEE_NUMERATOR = "3u64";
     private static final String SWAP_FEE_DENUMERATOR = "1000u64";
@@ -111,6 +112,22 @@ public class JsonRpcUtils {
                 ), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
+    }
+
+    public static Pair<Long, Long> tokenSwapRouterGetPoundageRate(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
+                        + TOKEN_SWAP_ROUTER_MODULE_NAME + "::get_poundage_rate",
+                Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
+                });
+        return new Pair<>(Long.parseLong(resultFields.get(0).toString()), Long.parseLong(resultFields.get(1).toString()));
+    }
+
+    public static Pair<Long, Long> tokenSwapRouterGetSwapFeeOperationRateV2(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
+                        + TOKEN_SWAP_ROUTER_MODULE_NAME + "::get_swap_fee_operation_rate_v2",
+                Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
+                });
+        return new Pair<>(Long.parseLong(resultFields.get(0).toString()), Long.parseLong(resultFields.get(1).toString()));
     }
 
     //public fun query_total_stake<TokenX: store, TokenY: store>() : u128

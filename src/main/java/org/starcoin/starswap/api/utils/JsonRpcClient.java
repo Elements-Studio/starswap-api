@@ -7,16 +7,15 @@ import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
-import springfox.documentation.spring.web.json.Json;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.starcoin.utils.JsonRpcClientUtils.contractCallV2;
 
 public class JsonRpcClient {
 
@@ -165,6 +164,14 @@ public class JsonRpcClient {
     public BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountOut) {
         Pair<BigInteger, BigInteger> reserves = JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenIn, tokenOut);
         return JsonRpcUtils.tokenSwapRouterGetAmountIn(jsonRpcSession, lpTokenAddress, amountOut, reserves.getItem1(), reserves.getItem2());
+    }
+
+    public Pair<Long, Long> tokenSwapRouterGetPoundageRate(String lpTokenAddress, String tokenX, String tokenY) {
+        return JsonRpcUtils.tokenSwapRouterGetPoundageRate(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
+    }
+
+    public Pair<Long, Long> tokenSwapRouterGetSwapFeeOperationRateV2(String lpTokenAddress, String tokenX, String tokenY) {
+        return JsonRpcUtils.tokenSwapRouterGetSwapFeeOperationRateV2(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
     }
 
     public List<Object> tokenSwapOracleLibraryCurrentCumulativePrices(String lpTokenAddress, String tokenX, String tokenY) {
