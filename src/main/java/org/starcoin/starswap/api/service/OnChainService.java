@@ -85,6 +85,17 @@ public class OnChainService {
         return farmStakeInfo;
     }
 
+    public Long getAccountFarmBoostFactor(String tokenXId, String tokenYId, String accountAddress) {
+        TokenIdPair tokenIdPair = new TokenIdPair(tokenXId, tokenYId);
+        Token tokenX = tokenService.getTokenOrElseThrow(tokenIdPair.tokenXId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenXId()));
+        Token tokenY = tokenService.getTokenOrElseThrow(tokenIdPair.tokenYId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenYId()));
+        LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
+        return this.jsonRpcClient.tokenSwapFarmGetBoostFactor(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+                tokenX.getTokenStructType().toTypeTagString(),
+                tokenY.getTokenStructType().toTypeTagString(),
+                accountAddress);
+    }
+
     public Pair<List<String>, BigInteger> getBestSwapPathAndAmountOut(String tokenInId, String tokenOutId, BigInteger amountIn) {
         Pair<Token, Token> tokenPair = getTokenPairByIds(tokenInId, tokenOutId);
         Token tokenIn = tokenPair.getItem1(), tokenOut = tokenPair.getItem2();

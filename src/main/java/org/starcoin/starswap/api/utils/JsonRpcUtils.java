@@ -197,6 +197,15 @@ public class JsonRpcUtils {
                 new BigInteger(resultFields.get(3).toString()));
     }
 
+    public static Long tokenSwapFarmGetBoostFactor(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY, String accountAddress) {
+        //public fun get_boost_factor<X: copy + drop + store, Y: copy + drop + store>(account: address): u64 {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
+                        + TOKEN_SWAP_FARM_ROUTER_MODULE_NAME + "::get_boost_factor",//
+                Arrays.asList(tokenX, tokenY), Collections.singletonList(accountAddress), new TypeReference<List<Object>>() {
+                });
+        return Long.parseLong(resultFields.get(0).toString());
+    }
+
     // ------------------------
 
     public static BigInteger syrupPoolQueryTotalStake(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {

@@ -131,6 +131,13 @@ public class StarswapController {
         return onChainService.getAccountFarmStakeInfo(tokenXId, tokenYId, accountAddress);
     }
 
+    @GetMapping(path = "getAccountFarmBoostFactor")
+    public Long getAccountFarmBoostFactor(@RequestParam(value = "tokenXId", required = true) String tokenXId,
+                                             @RequestParam(value = "tokenYId", required = true) String tokenYId,
+                                             @RequestParam(value = "accountAddress", required = true) String accountAddress) {
+        return onChainService.getAccountFarmBoostFactor(tokenXId, tokenYId, accountAddress);
+    }
+
     @GetMapping(path = "syrupPools")
     public List<SyrupPool> getSyrupPools() {
         return syrupPoolService.findByDeactivedIsFalse();

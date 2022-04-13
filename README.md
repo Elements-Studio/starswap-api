@@ -152,6 +152,12 @@ http://localhost:8600/barnard/v1/syrupStakes?accountAddress=0x4783d08fb16990bd35
 http://localhost:8600/barnard/v1/getAccountVeStarAmount?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62
 ```
 
+查询一个账号在某个 Farm 里的 Boost Factor：
+
+```
+http://localhost:8600/barnard/v1/getAccountFarmBoostFactor?tokenXId=STAR&tokenYId=STC&accountAddress=0x4783d08fb16990bd35d83f3e23bf93b8&tokenId=STAR
+```
+
 取得 Token 到其兑换美元的价格的 Pair 之间的映射信息（用于调用价格 API）：
 
 ```

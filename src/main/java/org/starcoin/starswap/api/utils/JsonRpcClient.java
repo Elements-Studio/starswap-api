@@ -58,6 +58,10 @@ public class JsonRpcClient {
         return JsonRpcUtils.tokenSwapFarmGetRewardMultiplier(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 
+    public Long tokenSwapFarmGetBoostFactor(String farmAddress, String tokenX, String tokenY, String accountAddress) {
+        return JsonRpcUtils.tokenSwapFarmGetBoostFactor(this.jsonRpcSession, farmAddress, tokenX, tokenY, accountAddress);
+    }
+
     // ------------------------
     public BigInteger syrupPoolQueryTotalStake(String poolAddress, String token) {
         return JsonRpcUtils.syrupPoolQueryTotalStake(this.jsonRpcSession, poolAddress, token);
