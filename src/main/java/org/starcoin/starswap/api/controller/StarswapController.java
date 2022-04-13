@@ -165,6 +165,13 @@ public class StarswapController {
         return onChainService.getSyrupPoolStakeList(syrupPool, accountAddress);
     }
 
+    @GetMapping(path = "getAccountVeStarAmount")
+    public BigInteger getAccountVeStarAmount(
+            @RequestParam(value = "accountAddress", required = true) String accountAddress
+    ) {
+        return onChainService.getAccountVeStarAmount(accountAddress);
+    }
+
     @PostMapping(path = "getTokenPairReservesList")
     public List<BigInteger[]> getReservesListByTokenTypeTagPairs(@RequestBody String[][] tokenTypeTagPairs) {
         return onChainService.getReservesListByTokenTypeTagPairs(tokenTypeTagPairs);

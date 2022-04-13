@@ -90,6 +90,11 @@ public class JsonRpcClient {
         return stakeList;
     }
 
+
+    public BigInteger getAccountVeStarAmount(String contractAddress, String accountAddress) {
+        return JsonRpcUtils.getAccountVeStarAmount(this.jsonRpcSession, contractAddress, accountAddress);
+    }
+
     // ------------------------
 
     public AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress) {

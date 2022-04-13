@@ -71,6 +71,7 @@ starcoin:
     syrup-pool-stake-event-type-tag: "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapSyrup::StakeEvent"
 
 starswap:
+  contract-address: "0x8c109349c6bd91411d6bc962e080c4a3"
   lp-token-farming:
     default-reward-token-id: "STAR"
   default-usd-equivalent-token-id: "XUSDT"

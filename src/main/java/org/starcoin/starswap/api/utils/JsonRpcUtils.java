@@ -31,6 +31,7 @@ public class JsonRpcUtils {
     private static final String TOKEN_SWAP_ORACLE_LIBRARY_MODULE_NAME = "TokenSwapOracleLibrary";
     private static final String TOKEN_SWAP_FARM_ROUTER_MODULE_NAME = "TokenSwapFarmRouter";
     //private static final String TOKEN_SWAP_SCRIPTS_MODULE_NAME = "TokenSwapScripts";
+    private static final String TOKEN_SWAP_SYRUP_SCRIPT_MODULE_NAME = "TokenSwapSyrupScript";
 
     private static final String SWAP_FEE_NUMERATOR = "3u64";
     private static final String SWAP_FEE_DENUMERATOR = "1000u64";
@@ -255,6 +256,21 @@ public class JsonRpcUtils {
                         + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_expect_gain",//
                 Collections.singletonList(token),
                 Arrays.asList(accountAddress, id.toString() + "u64"),
+                new TypeReference<List<BigInteger>>() {
+                });
+        if (resultFields.size() > 0) {
+            return resultFields.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public static BigInteger getAccountVeStarAmount(JSONRPC2Session jsonRpcSession, String contractAddress, String accountAddress) {
+        //TokenSwapSyrupScript::query_vestar_amount(user_addr: address)
+        List<BigInteger> resultFields = contractCallV2(jsonRpcSession, contractAddress + "::"
+                        + TOKEN_SWAP_SYRUP_SCRIPT_MODULE_NAME + "::query_vestar_amount",//
+                Collections.emptyList(),
+                Arrays.asList(accountAddress),
                 new TypeReference<List<BigInteger>>() {
                 });
         if (resultFields.size() > 0) {

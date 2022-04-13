@@ -4,6 +4,7 @@ package org.starcoin.starswap.api.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
@@ -28,6 +29,9 @@ public class OnChainService {
 
     private final JsonRpcClient jsonRpcClient;
 
+
+    @Value("${starswap.contract-address}")
+    private String contractAddress;
 
     @Autowired
     private TokenService tokenService;
@@ -734,4 +738,7 @@ public class OnChainService {
     }
 
 
+    public BigInteger getAccountVeStarAmount(String accountAddress) {
+        return this.jsonRpcClient.getAccountVeStarAmount(this.contractAddress, accountAddress);
+    }
 }
