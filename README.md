@@ -152,6 +152,12 @@ http://localhost:8600/barnard/v1/syrupStakes?accountAddress=0x4783d08fb16990bd35
 http://localhost:8600/barnard/v1/getAccountVeStarAmount?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62
 ```
 
+查询一个账号在一笔抵押里面的 veStar 数量：
+
+```
+http://localhost:8600/barnard/v1/getAccountStakedVeStarAmount?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62&id=1
+```
+
 查询一个账号在某个 Farm 里的 Boost Factor：
 
 ```

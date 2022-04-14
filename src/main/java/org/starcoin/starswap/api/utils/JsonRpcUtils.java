@@ -289,6 +289,21 @@ public class JsonRpcUtils {
         }
     }
 
+    public static BigInteger getAccountVeStarAmountByStakeId(JSONRPC2Session jsonRpcSession, String contractAddress, String accountAddress, Long stakeId) {
+        //public fun query_vestar_amount_by_staked_id(user_addr: address, id: u64): u128 {
+        List<BigInteger> resultFields = contractCallV2(jsonRpcSession, contractAddress + "::"
+                        + TOKEN_SWAP_SYRUP_SCRIPT_MODULE_NAME + "::query_vestar_amount_by_staked_id",//
+                Collections.emptyList(),
+                Arrays.asList(accountAddress, stakeId.toString() + "u64"),
+                new TypeReference<List<BigInteger>>() {
+                });
+        if (resultFields.size() > 0) {
+            return resultFields.get(0);
+        } else {
+            return null;
+        }
+    }
+
     // ------------------------
 
 

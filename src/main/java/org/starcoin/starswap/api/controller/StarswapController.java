@@ -133,8 +133,8 @@ public class StarswapController {
 
     @GetMapping(path = "getAccountFarmBoostFactor")
     public Long getAccountFarmBoostFactor(@RequestParam(value = "tokenXId", required = true) String tokenXId,
-                                             @RequestParam(value = "tokenYId", required = true) String tokenYId,
-                                             @RequestParam(value = "accountAddress", required = true) String accountAddress) {
+                                          @RequestParam(value = "tokenYId", required = true) String tokenYId,
+                                          @RequestParam(value = "accountAddress", required = true) String accountAddress) {
         return onChainService.getAccountFarmBoostFactor(tokenXId, tokenYId, accountAddress);
     }
 
@@ -177,6 +177,13 @@ public class StarswapController {
             @RequestParam(value = "accountAddress", required = true) String accountAddress
     ) {
         return onChainService.getAccountVeStarAmount(accountAddress);
+    }
+
+    @GetMapping(path = "getAccountStakedVeStarAmount")
+    public BigInteger getAccountStakedVeStarAmount(
+            @RequestParam(value = "accountAddress", required = true) String accountAddress,
+            @RequestParam(value = "id", required = true) Long stakeId) {
+        return onChainService.getAccountVeStarAmountByStakeId(accountAddress, stakeId);
     }
 
     @PostMapping(path = "getTokenPairReservesList")

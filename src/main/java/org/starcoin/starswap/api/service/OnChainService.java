@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.utils.JsonRpcUtils;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.math.BigDecimal;
@@ -748,8 +749,12 @@ public class OnChainService {
         }
     }
 
-
     public BigInteger getAccountVeStarAmount(String accountAddress) {
         return this.jsonRpcClient.getAccountVeStarAmount(this.contractAddress, accountAddress);
     }
+
+    public BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId) {
+        return this.jsonRpcClient.getAccountVeStarAmountByStakeId(this.contractAddress, accountAddress, stakeId);
+    }
+
 }
