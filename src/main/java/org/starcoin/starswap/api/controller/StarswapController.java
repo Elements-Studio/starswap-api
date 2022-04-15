@@ -25,6 +25,9 @@ public class StarswapController {
     private static final Logger LOGGER = LoggerFactory.getLogger(StarswapController.class);
 
     @Resource
+    private Map<String, String> farmingBoostWhitelist;
+
+    @Resource
     private TokenService tokenService;
 
     @Resource
@@ -59,6 +62,11 @@ public class StarswapController {
 
     @Resource
     private TokenPriceService tokenPriceService;
+
+    @GetMapping(path = "farmingBoostWhitelist")
+    public Map<String, String> getFarmingBoostWhitelist() {
+        return this.farmingBoostWhitelist;
+    }
 
     @GetMapping(path = "tokens")
     public List<Token> getTokens() {
