@@ -19,6 +19,8 @@ public class SyrupStake {
 
     private BigInteger expectedGain;
 
+    private BigInteger veStarAmount;
+
     public Long getId() {
         return id;
     }
@@ -81,5 +83,13 @@ public class SyrupStake {
 
     public void setExpectedGain(BigInteger expectedGain) {
         this.expectedGain = expectedGain;
+    }
+
+    public BigInteger getVeStarAmount() {
+        return veStarAmount;
+    }
+
+    public void setVeStarAmount(BigInteger veStarAmount) {
+        this.veStarAmount = veStarAmount;
     }
 }

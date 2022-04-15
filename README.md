@@ -158,6 +158,11 @@ http://localhost:8600/barnard/v1/getAccountVeStarAmount?accountAddress=0x598b8cb
 http://localhost:8600/barnard/v1/getAccountStakedVeStarAmount?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62&id=1
 ```
 
+取得某个账号某种代币在 syrup pool 的抵押列表以及获得的 veStar 的数量：
+```
+http://localhost:8600/barnard/v1/getAccountSyrupStakes?accountAddress=0x8c109349c6bd91411d6bc962e080c4a3&tokenId=STAR
+```
+
 查询一个账号在某个 Farm 里的 Boost Factor：
 
 ```
