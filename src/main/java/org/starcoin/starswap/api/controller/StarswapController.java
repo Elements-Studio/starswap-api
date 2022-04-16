@@ -11,6 +11,7 @@ import org.starcoin.starswap.api.service.*;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.starswap.api.vo.GetBestPathAndAmountInResult;
 import org.starcoin.starswap.api.vo.GetBestPathResult;
+import org.starcoin.starswap.api.vo.VeStarAmountAndSignature;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -202,6 +203,15 @@ public class StarswapController {
             @RequestParam(value = "accountAddress", required = true) String accountAddress
     ) {
         return onChainService.getAccountVeStarAmount(accountAddress);
+    }
+
+    @GetMapping(path = "getAccountVeStarAmountAndBoostSignature")
+    public VeStarAmountAndSignature getAccountVeStarAmountAndBoostSignature(
+            @RequestParam(value = "accountAddress", required = true) String accountAddress
+    ) {
+        BigInteger amount = onChainService.getAccountVeStarAmount(accountAddress);
+        String signature = this.farmingBoostWhitelist.get(accountAddress);
+        return new VeStarAmountAndSignature(amount, signature);
     }
 
     @GetMapping(path = "getAccountStakedVeStarAmount")
