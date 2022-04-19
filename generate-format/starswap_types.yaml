@@ -49,3 +49,23 @@ SyrupPoolStakeEvent:
     - amount: U128
     - admin:
         TYPENAME: AccountAddress
+
+BoostEvent:
+  STRUCT:
+    - x_token_code:
+        TYPENAME: TokenCode
+    - y_token_code:
+        TYPENAME: TokenCode
+    - signer:
+        TYPENAME: AccountAddress
+    - amount: U128
+
+UnBoostEvent:
+  STRUCT:
+    - x_token_code:
+        TYPENAME: TokenCode
+    - y_token_code:
+        TYPENAME: TokenCode
+    - signer:
+        TYPENAME: AccountAddress
+    - amount: U128
