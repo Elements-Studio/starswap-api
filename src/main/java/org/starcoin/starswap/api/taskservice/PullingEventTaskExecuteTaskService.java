@@ -58,7 +58,7 @@ public class PullingEventTaskExecuteTaskService {
         // use a new individual nodeId to record heartbeats.
         NodeHeartbeatService nodeHeartbeatService = new NodeHeartbeatService(nodeHeartbeatRepository);
         nodeHeartbeatService.beat(t.getFromBlockNumber());
-        while (fromBlockNumber.compareTo(t.getToBlockNumber()) < 0) {
+        while (fromBlockNumber.compareTo(t.getToBlockNumber()) <= 0) {
             BigInteger toBlockNumber = fromBlockNumber.add(BigInteger.valueOf(PULLING_BLOCK_MAX_COUNT));
             if (toBlockNumber.compareTo(t.getToBlockNumber()) > 0) {
                 toBlockNumber = t.getToBlockNumber();
@@ -77,7 +77,7 @@ public class PullingEventTaskExecuteTaskService {
                 }
                 handleEventService.handleEvent(e, Event.getFromAddressFromEventKey(e.getEventKey()));//note：Get address from eventKey?
             }
-            fromBlockNumber = toBlockNumber;
+            fromBlockNumber = toBlockNumber.add(BigInteger.ONE);
         }
         pullingEventTaskService.updateStatusDone(t);
         nodeHeartbeatService.beat(t.getToBlockNumber());

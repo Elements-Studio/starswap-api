@@ -3,8 +3,6 @@ package org.starcoin.bean;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Map;
-
 public class Event {
     private static final int ADDRESS_BYTE_LENGTH = 16;
     @JsonProperty("block_hash")
@@ -30,6 +28,14 @@ public class Event {
     @JsonProperty("event_seq_number")
     String eventSeqNumber;
 
+    @JSONField(name = "transaction_global_index")
+    @JsonProperty("transaction_global_index")
+    Long transactionGlobalIndex;
+
+
+    @JSONField(name = "event_index")
+    @JsonProperty("event_index")
+    Long eventIndex;
 //    @JSONField(name = "decode_event_data")
 //    @JsonProperty("decode_event_data")
 //    Map<String, Object> decodeEventData;
@@ -110,6 +116,23 @@ public class Event {
 //        this.decodeEventData = decodeEventData;
 //    }
 
+    public Long getTransactionGlobalIndex() {
+        return transactionGlobalIndex;
+    }
+
+    public void setTransactionGlobalIndex(Long transactionGlobalIndex) {
+        this.transactionGlobalIndex = transactionGlobalIndex;
+    }
+
+
+    public Long getEventIndex() {
+        return eventIndex;
+    }
+
+    public void setEventIndex(Long eventIndex) {
+        this.eventIndex = eventIndex;
+    }
+
     @Override
     public String toString() {
         return "Event{" +
@@ -121,7 +144,8 @@ public class Event {
                 ", typeTag='" + typeTag + '\'' +
                 ", eventKey='" + eventKey + '\'' +
                 ", eventSeqNumber='" + eventSeqNumber + '\'' +
-                //", decodeEventData=" + decodeEventData +
+                ", transactionGlobalIndex=" + transactionGlobalIndex +
+                ", eventIndex=" + eventIndex +
                 '}';
     }
 }
