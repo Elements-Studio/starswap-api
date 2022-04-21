@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: starswap-api-proxima
-          image: ghcr.io/elements-studio/starcoin_starswap:sha-dbda7b0
+          image: ghcr.io/elements-studio/starcoin_starswap:sha-5d20779
           ports:
             - containerPort: 8600
           env:
@@ -39,4 +39,10 @@ spec:
               value: "proxima"
             - name: STARCOIN_JSON_RPC_URL
               value: "https://proxima-seed.starcoin.org"
+            - name: FARMING_BOOST_WHITELIST
+              valueFrom:
+                secretKeyRef:
+                  name: proxima-starswap-farming-boost-secrets
+                  key: whitelist
+
 

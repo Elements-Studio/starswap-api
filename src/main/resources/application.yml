@@ -28,7 +28,7 @@ spring:
       max-lifetime: 1800000 # maximum lifetime in milliseconds of a connection in the pool after it is closed.
 
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         hbm2ddl:
@@ -114,7 +114,7 @@ logging:
       # 输出数据库模型（开发阶段）
       hibernate:
         tool:
-          hbm2ddl: DEBUG
+          hbm2ddl: INFO
 
       starcoin:
         starswap:

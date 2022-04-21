@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: starswap-api-barnard
-          image: ghcr.io/elements-studio/starcoin_starswap:sha-cb2054b
+          image: ghcr.io/elements-studio/starcoin_starswap:sha-5d20779
           ports:
             - containerPort: 8600
           env:
@@ -40,4 +40,6 @@ spec:
               value: "barnard"
             - name: STARCOIN_JSON_RPC_URL
               value: "https://barnard-seed.starcoin.org"
+            - name: FARMING_BOOST_WHITELIST
+              value: '{}'
 

@@ -27,6 +27,8 @@ starswap:
   token-price-service:
     base-url: http://k8s-default-starcoin-cbf39ae390-308376289.ap-northeast-1.elb.amazonaws.com/barnard/v1
     #https://price-api.starcoin.org/barnard/v1
+  farming-boost:
+    whitelist: "${FARMING_BOOST_WHITELIST}"
 
 
 logging:

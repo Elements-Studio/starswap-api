@@ -57,7 +57,9 @@ public class LiquidityTokenFarmRefreshTaskService {
             }
             if (tvlInUsd != null) {
                 try {
-                    BigDecimal estimatedApy = onChainService.getFarmEstimatedApyV2(farm, tvlInUsd);
+                    boolean farmingBoostEnabled = true; // Now enable farming boost
+                    BigDecimal estimatedApy = farmingBoostEnabled ? onChainService.getFarmEstimatedApyV2(farm, tvlInUsd)
+                            : onChainService.getFarmEstimatedApy(farm, tvlInUsd);
                     farm.setEstimatedApy(estimatedApy);
                     updated = true;
                     LOG.debug("Update farm estimated APY Ok. Farm Id: " + farm.getLiquidityTokenFarmId());

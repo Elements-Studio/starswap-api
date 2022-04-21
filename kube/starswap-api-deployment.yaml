@@ -39,4 +39,6 @@ spec:
               value: "main"
             - name: STARCOIN_JSON_RPC_URL
               value: "https://main-seed.starcoin.org"
+            - name: FARMING_BOOST_WHITELIST
+              value: '{}'
 
