@@ -373,7 +373,12 @@ public class OnChainService {
         if (liquidityTokenFarm == null) {
             throw new RuntimeException("Cannot find LiquidityTokenFarm by tokenId pair: " + tokenXId + " / " + tokenYId);
         }
-        return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
+        if (false) {
+            BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
+            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
+        } else {
+            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
+        }
     }
 
     private Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsd(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
