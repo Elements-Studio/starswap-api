@@ -13,9 +13,9 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
-
-import static org.starcoin.utils.JsonRpcClientUtils.contractCallV2;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class JsonRpcClient {
 
@@ -45,13 +45,22 @@ public class JsonRpcClient {
         return JsonRpcUtils.tokenSwapFarmQueryReleasePerSecond(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 
-    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String tokenX, String tokenY) {
+    /**
+     * @param farmAddress
+     * @param tokenX
+     * @param tokenY
+     * @return return farm ReleasePerSecond and asset_total_weight which is a "boosted" virtual LP amount.
+     */
+    public Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress, String tokenX, String tokenY) {
         List<BigInteger> farmInfoV2 = JsonRpcUtils.tokenSwapFarmQueryInfoV2(this.jsonRpcSession, farmAddress, tokenX, tokenY);
         BigInteger alloc_point = farmInfoV2.get(0);
+        //BigInteger asset_total_amount = farmInfoV2.get(1);
+        BigInteger asset_total_weight = farmInfoV2.get(2);
         Pair<BigInteger, BigInteger> farmGlobalInfo = JsonRpcUtils.tokenSwapFarmQueryGlobalPoolInfo(this.jsonRpcSession, farmAddress);
         BigInteger total_alloc_point = farmGlobalInfo.getItem1();
         BigInteger total_pool_release_per_second = farmGlobalInfo.getItem2();
-        return total_pool_release_per_second.multiply(alloc_point).divide(total_alloc_point);
+        BigInteger rps = total_pool_release_per_second.multiply(alloc_point).divide(total_alloc_point);
+        return new Pair<>(rps, asset_total_weight);
     }
 
     public Integer tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
@@ -122,6 +131,10 @@ public class JsonRpcClient {
 
     public Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.getTokenSwapFarmStakedReserves(this.jsonRpcSession, farmAddress, lpTokenAddress, tokenX, tokenY);
+    }
+
+    public Pair<BigInteger, BigInteger> getReservesByLiquidity(String lpTokenAddress, String tokenX, String tokenY, BigInteger liquidity) {
+        return JsonRpcUtils.getReservesByLiquidity(this.jsonRpcSession, lpTokenAddress, tokenX, tokenY, liquidity);
     }
 
     public BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY) {

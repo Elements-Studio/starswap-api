@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
-import org.starcoin.starswap.api.utils.JsonRpcUtils;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.math.BigDecimal;
@@ -350,7 +349,11 @@ public class OnChainService {
     public BigDecimal getFarmEstimatedApyV2(LiquidityTokenFarm liquidityTokenFarm, BigDecimal tvlInUsd) {
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, tvlInUsd);
+        if (false) {
+            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, tvlInUsd);
+        } else {
+            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
+        }
     }
 
     public BigDecimal getFarmEstimatedApyByTokenIdPair(String tokenXId, String tokenYId) {
@@ -370,7 +373,7 @@ public class OnChainService {
         if (liquidityTokenFarm == null) {
             throw new RuntimeException("Cannot find LiquidityTokenFarm by tokenId pair: " + tokenXId + " / " + tokenYId);
         }
-        return getFarmEstimatedApyAndTvlInUsdV2(tokenX, tokenY, liquidityTokenFarm).getItem1();
+        return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
     }
 
     private Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsd(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
@@ -381,8 +384,35 @@ public class OnChainService {
 
     private Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsdV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
         BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
-        BigDecimal estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
-        return new Pair<>(estimatedApy, totalTvlInUsd);
+        if (false) {
+            BigDecimal estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
+            return new Pair<>(estimatedApy, totalTvlInUsd);
+        } else {
+            BigDecimal estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
+            return new Pair<>(estimatedApy, totalTvlInUsd);
+        }
+    }
+
+    private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
+        Pair<BigDecimal, BigInteger> p = getFarmRewardPerYearInUsdV2AndAssetTotalWeight(tokenX, tokenY, liquidityTokenFarm);
+        BigDecimal rewardPerYearInUsd = p.getItem1();
+        BigInteger asset_total_weight = p.getItem2(); // asset_total_weight which is a "boosted" virtual LP amount.
+        BigDecimal virtualTotalTvlInUsd = getLiquidityAmountInUsd(tokenX, tokenY,
+                liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress(),
+                asset_total_weight);
+        int scale = 10;
+        BigDecimal estimatedApy = rewardPerYearInUsd
+                .divide(virtualTotalTvlInUsd, scale, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+        return estimatedApy;
+    }
+
+    private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
+        BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsdV2AndAssetTotalWeight(tokenX, tokenY, liquidityTokenFarm).getItem1();
+        int scale = 10;
+        return rewardPerYearInUsd
+                .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
     }
 
     private BigDecimal getFarmEstimatedApy(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
@@ -399,13 +429,6 @@ public class OnChainService {
                 .multiply(BigDecimal.valueOf(100));
     }
 
-    private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
-        BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsdV2(tokenX, tokenY, liquidityTokenFarm);
-        int scale = 10;
-        return rewardPerYearInUsd
-                .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
-    }
 
     private BigDecimal getFarmRewardPerYearInUsd(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
@@ -421,17 +444,21 @@ public class OnChainService {
         return getTokenAmountInUsd(rewardToken, rewardPerYear);
     }
 
-    private BigDecimal getFarmRewardPerYearInUsdV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
+    private Pair<BigDecimal, BigInteger> getFarmRewardPerYearInUsdV2AndAssetTotalWeight(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
 
-        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecondV2(farmAddress,
+        Pair<BigInteger, BigInteger> p = jsonRpcClient.tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(
+                farmAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
-                tokenY.getTokenStructType().toTypeTagString());
+                tokenY.getTokenStructType().toTypeTagString()
+        );
+        BigInteger rewardReleasePerSecond = p.getItem1();
         BigInteger rewardPerYear = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_YEAR_SECONDS));
         //.multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
         Token rewardToken = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getRewardTokenId(),
                 () -> new RuntimeException("Cannot find Token by Id: " + liquidityTokenFarm.getRewardTokenId()));
-        return getTokenAmountInUsd(rewardToken, rewardPerYear);
+        BigDecimal tokenAmountInUsd = getTokenAmountInUsd(rewardToken, rewardPerYear);
+        return new Pair<>(tokenAmountInUsd, p.getItem2());
     }
 
     public BigInteger getFarmDailyReward(LiquidityTokenFarm liquidityTokenFarm) {
@@ -454,9 +481,9 @@ public class OnChainService {
 
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
 
-        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecondV2(farmAddress,
+        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(farmAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
-                tokenY.getTokenStructType().toTypeTagString());
+                tokenY.getTokenStructType().toTypeTagString()).getItem1();
         BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
         //.multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
         return rewardPerDay;
@@ -484,6 +511,20 @@ public class OnChainService {
         BigDecimal tokenYReserveInUsd = getTokenAmountInUsd(tokenY, tokenYAmount);
         return tokenXReserveInUsd.add(tokenYReserveInUsd);
     }
+
+    private BigDecimal getLiquidityAmountInUsd(Token tokenX, Token tokenY, String liquidityTokenAddress, BigInteger liquidity) {
+        Pair<BigInteger, BigInteger> reservePair = jsonRpcClient.getReservesByLiquidity(
+                liquidityTokenAddress,
+                tokenX.getTokenStructType().toTypeTagString(),
+                tokenY.getTokenStructType().toTypeTagString(),
+                liquidity);
+        BigInteger tokenXAmount = reservePair.getItem1();
+        BigInteger tokenYAmount = reservePair.getItem2();
+        BigDecimal tokenXReserveInUsd = getTokenAmountInUsd(tokenX, tokenXAmount);
+        BigDecimal tokenYReserveInUsd = getTokenAmountInUsd(tokenY, tokenYAmount);
+        return tokenXReserveInUsd.add(tokenYReserveInUsd);
+    }
+
 
     public BigDecimal getTokenAmountInUsd(Token token, BigInteger tokenAmount) {
         BigInteger tokenScalingFactor = getTokenScalingFactorOffChainFirst(token);

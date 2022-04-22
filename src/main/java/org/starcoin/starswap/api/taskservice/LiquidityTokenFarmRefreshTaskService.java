@@ -55,9 +55,9 @@ public class LiquidityTokenFarmRefreshTaskService {
             } catch (RuntimeException e) {
                 LOG.error("Update farm TVL in USD error. Farm Id: " + farm.getLiquidityTokenFarmId(), e);
             }
+            boolean farmingBoostEnabled = true; // Now enable farming boost!
             if (tvlInUsd != null) {
                 try {
-                    boolean farmingBoostEnabled = true; // Now enable farming boost
                     BigDecimal estimatedApy = farmingBoostEnabled ? onChainService.getFarmEstimatedApyV2(farm, tvlInUsd)
                             : onChainService.getFarmEstimatedApy(farm, tvlInUsd);
                     farm.setEstimatedApy(estimatedApy);
@@ -77,7 +77,8 @@ public class LiquidityTokenFarmRefreshTaskService {
             }
 
             try {
-                BigInteger dailyReward = onChainService.getFarmDailyReward(farm);
+                BigInteger dailyReward = farmingBoostEnabled ? onChainService.getFarmDailyRewardV2(farm)
+                        : onChainService.getFarmDailyReward(farm);
                 farm.setDailyReward(dailyReward);
                 updated = true;
                 LOG.debug("Update farm reward dailyReward Ok. Farm Id: " + farm.getLiquidityTokenFarmId());
