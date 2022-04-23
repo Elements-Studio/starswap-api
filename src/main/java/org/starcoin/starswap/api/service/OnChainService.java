@@ -20,15 +20,20 @@ import java.util.function.Function;
 
 @Service
 public class OnChainService {
+
     public static final int MAX_SWAP_DEPTH = 3;
+
     private static final long ONE_YEAR_SECONDS = 60L * 60 * 24 * 365;
+
     private static final long ONE_DAY_SECONDS = 60L * 60 * 24;
+
     private static final long SYRUP_POOL_TOTAL_REWARD_MULTIPLIER = 2 + 3 + 4 + 6 + 8;
 
     private static final Logger LOG = LoggerFactory.getLogger(OnChainService.class);
 
-    private final JsonRpcClient jsonRpcClient;
+    private static final boolean USE_FARM_AVERAGE_APY = false;
 
+    private final JsonRpcClient jsonRpcClient;
 
     @Value("${starswap.contract-address}")
     private String contractAddress;
@@ -349,7 +354,7 @@ public class OnChainService {
     public BigDecimal getFarmEstimatedApyV2(LiquidityTokenFarm liquidityTokenFarm, BigDecimal tvlInUsd) {
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        if (false) {
+        if (USE_FARM_AVERAGE_APY) {
             return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, tvlInUsd);
         } else {
             return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
@@ -373,7 +378,7 @@ public class OnChainService {
         if (liquidityTokenFarm == null) {
             throw new RuntimeException("Cannot find LiquidityTokenFarm by tokenId pair: " + tokenXId + " / " + tokenYId);
         }
-        if (false) {
+        if (USE_FARM_AVERAGE_APY) {
             BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
             return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
         } else {
@@ -389,13 +394,13 @@ public class OnChainService {
 
     private Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsdV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
         BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
-        if (false) {
-            BigDecimal estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
-            return new Pair<>(estimatedApy, totalTvlInUsd);
+        BigDecimal estimatedApy;
+        if (USE_FARM_AVERAGE_APY) {
+            estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
         } else {
-            BigDecimal estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
-            return new Pair<>(estimatedApy, totalTvlInUsd);
+            estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
         }
+        return new Pair<>(estimatedApy, totalTvlInUsd);
     }
 
     private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
@@ -412,6 +417,15 @@ public class OnChainService {
         return estimatedApy;
     }
 
+    /**
+     * Get FarmEstimatedApyV2 using the totalTvlInUsd argument.
+     *
+     * @param tokenX
+     * @param tokenY
+     * @param liquidityTokenFarm
+     * @param totalTvlInUsd
+     * @return
+     */
     private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
         BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsdV2AndAssetTotalWeight(tokenX, tokenY, liquidityTokenFarm).getItem1();
         int scale = 10;
