@@ -255,7 +255,7 @@ public class OnChainService {
         List<BigInteger[]> rs = new ArrayList<>();
         for (int i = 0; i < tokenTypeTagPairs.length; i++) {
             String[] typeTagPair = tokenTypeTagPairs[i];
-            if (typeTagPair.length < 2 || typeTagPair[0] == null || typeTagPair[1] == null) {
+            if (typeTagPair == null || typeTagPair.length < 2 || typeTagPair[0] == null || typeTagPair[1] == null) {
                 rs.add(emptyReservePair);
                 LOG.info("Illegal token pair. Index: " + i);
                 continue;
