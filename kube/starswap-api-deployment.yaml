@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: starswap-api
-          image: ghcr.io/elements-studio/starcoin_starswap:sha-3bb530a
+          image: ghcr.io/elements-studio/starcoin_starswap:sha-0c154d5
           ports:
             - containerPort: 8600
           env:
@@ -40,5 +40,8 @@ spec:
             - name: STARCOIN_JSON_RPC_URL
               value: "https://main-seed.starcoin.org"
             - name: FARMING_BOOST_WHITELIST
-              value: '{}'
+              valueFrom:
+                secretKeyRef:
+                  name: starswap-farming-boost-secrets
+                  key: whitelist
 
