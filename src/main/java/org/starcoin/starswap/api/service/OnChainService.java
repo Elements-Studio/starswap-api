@@ -257,7 +257,7 @@ public class OnChainService {
             String[] typeTagPair = tokenTypeTagPairs[i];
             if (typeTagPair == null || typeTagPair.length < 2 || typeTagPair[0] == null || typeTagPair[1] == null) {
                 rs.add(emptyReservePair);
-                LOG.info("Illegal token pair. Index: " + i);
+                LOG.info("Illegal token pair. Index: " + i + ", tokenTypeTagPairs: " + Arrays.deepToString(tokenTypeTagPairs));
                 continue;
             }
             try {
