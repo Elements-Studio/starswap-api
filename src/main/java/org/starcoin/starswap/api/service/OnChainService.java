@@ -800,9 +800,11 @@ public class OnChainService {
         }
         try {
             //return jsonRpcClient.syrupPoolQueryStakeList(syrupPool.getSyrupPoolId().getPoolAddress(),
-            return jsonRpcClient.syrupPoolQueryStakeWithExpectedGainList(syrupPool.getSyrupPoolId().getPoolAddress(),
+            List<SyrupStake> stakeList = jsonRpcClient.syrupPoolQueryStakeWithExpectedGainList(syrupPool.getSyrupPoolId().getPoolAddress(),
                     token.getTokenStructType().toTypeTagString(),
                     accountAddress);
+            stakeList.forEach(s -> s.setTokenTypeTag(token.getTokenStructType().toTypeTagString()));
+            return stakeList;
         } catch (RuntimeException e) {
             LOG.info("getSyrupPoolStakeList RuntimeException.", e);
             return Collections.emptyList();
@@ -813,8 +815,8 @@ public class OnChainService {
         return this.jsonRpcClient.getAccountVeStarAmount(this.contractAddress, accountAddress);
     }
 
-    public BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId) {
-        return this.jsonRpcClient.getAccountVeStarAmountByStakeId(this.contractAddress, accountAddress, stakeId);
+    public BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
+        return this.jsonRpcClient.getAccountVeStarAmountByStakeId(this.contractAddress, accountAddress, stakeId, tokenTypeTag);
     }
 
 }

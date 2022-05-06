@@ -107,8 +107,8 @@ public class JsonRpcClient {
         return JsonRpcUtils.getAccountVeStarAmount(this.jsonRpcSession, contractAddress, accountAddress);
     }
 
-    public BigInteger getAccountVeStarAmountByStakeId(String contractAddress, String accountAddress, Long stakeId) {
-        return JsonRpcUtils.getAccountVeStarAmountByStakeId(this.jsonRpcSession, contractAddress, accountAddress, stakeId);
+    public BigInteger getAccountVeStarAmountByStakeId(String contractAddress, String accountAddress, Long stakeId, String tokenTypeTag) {
+        return JsonRpcUtils.getAccountVeStarAmountByStakeId(this.jsonRpcSession, contractAddress, accountAddress, stakeId, tokenTypeTag);
     }
 
     // ------------------------

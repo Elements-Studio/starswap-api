@@ -21,6 +21,8 @@ public class SyrupStake {
 
     private BigInteger veStarAmount;
 
+    private String tokenTypeTag;
+
     public Long getId() {
         return id;
     }
@@ -91,5 +93,13 @@ public class SyrupStake {
 
     public void setVeStarAmount(BigInteger veStarAmount) {
         this.veStarAmount = veStarAmount;
+    }
+
+    public String getTokenTypeTag() {
+        return tokenTypeTag;
+    }
+
+    public void setTokenTypeTag(String tokenTypeTag) {
+        this.tokenTypeTag = tokenTypeTag;
     }
 }

@@ -158,10 +158,10 @@ http://localhost:8600/barnard/v1/getAccountVeStarAmount?accountAddress=0x598b8cb
 http://localhost:8600/barnard/v1/getAccountVeStarAmountAndBoostSignature?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62
 ```
 
-查询一个账号在一笔抵押里面的 veStar 数量：
+查询一个账号在一笔抵押里面的 veStar 数量（参数 t 为 Token 的 Type Tag）：
 
 ```
-http://localhost:8600/barnard/v1/getAccountStakedVeStarAmount?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62&id=1
+http://localhost:8600/barnard/v1/getAccountStakedVeStarAmount?accountAddress=0x598b8cbfd4536ecbe88aa1cfaffa7a62&id=1&t=0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR
 ```
 
 取得某个账号某种代币在 syrup pool 的抵押列表以及获得的 veStar 的数量：

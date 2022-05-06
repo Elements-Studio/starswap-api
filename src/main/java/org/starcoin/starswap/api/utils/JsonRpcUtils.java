@@ -289,12 +289,25 @@ public class JsonRpcUtils {
         }
     }
 
-    public static BigInteger getAccountVeStarAmountByStakeId(JSONRPC2Session jsonRpcSession, String contractAddress, String accountAddress, Long stakeId) {
+    public static BigInteger getAccountVeStarAmountByStakeId(JSONRPC2Session jsonRpcSession, String contractAddress, String accountAddress, Long stakeId, String tokenType) {
         //public fun query_vestar_amount_by_staked_id(user_addr: address, id: u64): u128 {
         List<BigInteger> resultFields = contractCallV2(jsonRpcSession, contractAddress + "::"
                         + TOKEN_SWAP_SYRUP_SCRIPT_MODULE_NAME + "::query_vestar_amount_by_staked_id",//
                 Collections.emptyList(),
                 Arrays.asList(accountAddress, stakeId.toString() + "u64"),
+                new TypeReference<List<BigInteger>>() {
+                });
+        if (resultFields.size() > 0) {
+            if (resultFields.get(0).compareTo(BigInteger.ZERO) > 0) {
+                return resultFields.get(0);
+            }
+        }
+
+        //public fun query_vestar_amount_by_staked_id_tokentype<TokenT: store>(user_addr: address, id: u64): u128 {
+        resultFields = contractCallV2(jsonRpcSession, contractAddress + "::"
+                        + TOKEN_SWAP_SYRUP_SCRIPT_MODULE_NAME + "::query_vestar_amount_by_staked_id_tokentype",//
+                Collections.singletonList(tokenType),
+                Arrays.asList(accountAddress, stakeId + "u64"),
                 new TypeReference<List<BigInteger>>() {
                 });
         if (resultFields.size() > 0) {
