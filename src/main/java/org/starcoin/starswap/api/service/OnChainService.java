@@ -411,7 +411,7 @@ public class OnChainService {
                 liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress(),
                 asset_total_weight);
         int scale = 10;
-        BigDecimal estimatedApy = rewardPerYearInUsd
+        BigDecimal estimatedApy = virtualTotalTvlInUsd.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rewardPerYearInUsd
                 .divide(virtualTotalTvlInUsd, scale, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
         return estimatedApy;
@@ -429,7 +429,7 @@ public class OnChainService {
     private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
         BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsdV2AndAssetTotalWeight(tokenX, tokenY, liquidityTokenFarm).getItem1();
         int scale = 10;
-        return rewardPerYearInUsd
+        return totalTvlInUsd.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rewardPerYearInUsd
                 .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
     }
@@ -443,7 +443,7 @@ public class OnChainService {
 //            m = 1;
 //        }
         int scale = 10;//Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
-        return rewardPerYearInUsd//.multiply(BigDecimal.valueOf(m))
+        return totalTvlInUsd.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rewardPerYearInUsd//.multiply(BigDecimal.valueOf(m))
                 .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
     }
@@ -759,7 +759,7 @@ public class OnChainService {
 //            m = 1;
 //        }
         int scale = 10;//Is this ok???
-        return rewardPerYearInUsd//.multiply(BigDecimal.valueOf(m))
+        return tvlInUsd.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rewardPerYearInUsd//.multiply(BigDecimal.valueOf(m))
                 .divide(tvlInUsd, scale, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
     }
