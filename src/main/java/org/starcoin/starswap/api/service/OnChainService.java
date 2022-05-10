@@ -483,9 +483,7 @@ public class OnChainService {
     public BigInteger getFarmDailyReward(LiquidityTokenFarm liquidityTokenFarm) {
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
-
         BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString());
@@ -495,16 +493,24 @@ public class OnChainService {
     }
 
     public BigInteger getFarmDailyRewardV2(LiquidityTokenFarm liquidityTokenFarm) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
+//        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(farmAddress,
+//                tokenX.getTokenStructType().toTypeTagString(),
+//                tokenY.getTokenStructType().toTypeTagString()).getItem1();
+//        BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
+//        //.multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
+//        return rewardPerDay;
+
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
-
-        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(farmAddress,
+        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
-                tokenY.getTokenStructType().toTypeTagString()).getItem1();
+                tokenY.getTokenStructType().toTypeTagString());
         BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
-        //.multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
+                //.multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
         return rewardPerDay;
     }
 
