@@ -3,6 +3,7 @@ package org.starcoin.starswap.api.utils;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.starcoin.bean.Event;
+import org.starcoin.bean.StateWithProof;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
@@ -35,6 +36,10 @@ public class JsonRpcClient {
 
     public Event[] getEvents(Map<String, Object> eventFilter) {
         return JsonRpcUtils.getEvents(this.jsonRpcSession, eventFilter);
+    }
+
+    public StateWithProof getStateWithProofByRoot(String accessPath, String stateRoot) {
+        return JsonRpcUtils.getStateWithProofByRoot(this.jsonRpcSession, accessPath, stateRoot);
     }
 
     public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY) {

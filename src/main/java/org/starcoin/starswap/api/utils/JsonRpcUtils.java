@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.starcoin.bean.Event;
+import org.starcoin.bean.StateWithProof;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
@@ -44,6 +45,13 @@ public class JsonRpcUtils {
         Class<Event[]> objectClass = Event[].class;
         Event[] events = callForObject(jsonRpcSession, method, Collections.singletonList(eventFilter), objectClass);
         return events == null ? new Event[0] : events;
+    }
+
+    public static StateWithProof getStateWithProofByRoot(JSONRPC2Session jsonRpcSession, String accessPath, String stateRoot) {
+        String method = "state.get_with_proof_by_root";
+        Class<StateWithProof> objectClass = StateWithProof.class;
+        StateWithProof stateWithProof = callForObject(jsonRpcSession, method, Arrays.asList(accessPath, stateRoot), objectClass);
+        return stateWithProof;
     }
 
     // public fun scaling_factor<TokenType: store>(): u128
