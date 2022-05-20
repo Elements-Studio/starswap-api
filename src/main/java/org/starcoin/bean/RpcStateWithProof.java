@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
 
-public class StateWithProof {
+public class RpcStateWithProof {
 
     /**
      * Account state's proof for global state root.

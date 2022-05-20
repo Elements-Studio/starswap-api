@@ -6,7 +6,7 @@ import com.novi.serde.DeserializationError;
 import com.novi.serde.SerializationError;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.starcoin.bean.StateWithProof;
+import org.starcoin.bean.RpcStateWithProof;
 import org.starcoin.smt.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
 import org.starcoin.types.*;
@@ -60,7 +60,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
                 "0x00000000000000000000000000000001::STC::STC, 0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR" +
                 ">";
         String accessPath = accountAddress + "/" + ACCESS_PATH_DATA_TYPE_RESOURCE + "/" + resourceStructTag;
-        StateWithProof stateWithProof = jsonRpcClient.getStateWithProofByRoot(accessPath,
+        RpcStateWithProof stateWithProof = jsonRpcClient.getStateWithProofByRoot(accessPath,
                 "0x99163c0fc319b62c3897ada8f97881e396e33b30383f47e23d93aaed07d6806d");
         System.out.println(stateWithProof);
         try {
