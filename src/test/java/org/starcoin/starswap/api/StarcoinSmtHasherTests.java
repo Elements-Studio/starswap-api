@@ -7,7 +7,10 @@ import com.novi.serde.SerializationError;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.starcoin.bean.StateWithProof;
-import org.starcoin.smt.*;
+import org.starcoin.smt.Bytes;
+import org.starcoin.smt.HexUtils;
+import org.starcoin.smt.SparseMerkleProof;
+import org.starcoin.smt.StarcoinTreeHasher;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
 import org.starcoin.types.*;
 
@@ -45,6 +48,8 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
     }
      */
 
+    static final String ACCESS_PATH_DATA_TYPE_RESOURCE = "1";
+
     @Test
     public void testGetStateWithProofByRoot() {
         JsonRpcClient jsonRpcClient = null;
@@ -53,9 +58,12 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        String testAccountAddress = "0x76a45fbf9631f68eb09812a21452e38e";
-        StateWithProof stateWithProof = jsonRpcClient.getStateWithProofByRoot(
-                testAccountAddress + "/1/0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarmBoost::UserInfo<0x00000000000000000000000000000001::STC::STC, 0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR>",
+        String accountAddress = "0x8c109349c6bd91411d6bc962e080c4a3";// account address
+        String resourceStructTag = "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarmBoost::UserInfo<" +
+                "0x00000000000000000000000000000001::STC::STC, 0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR" +
+                ">";
+        String accessPath = accountAddress + "/" + ACCESS_PATH_DATA_TYPE_RESOURCE + "/" + resourceStructTag;
+        StateWithProof stateWithProof = jsonRpcClient.getStateWithProofByRoot(accessPath,
                 "0x99163c0fc319b62c3897ada8f97881e396e33b30383f47e23d93aaed07d6806d");
         System.out.println(stateWithProof);
         try {
@@ -91,7 +99,8 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         StarcoinTreeHasher th = new StarcoinTreeHasher();
         Bytes pathHash = th.path(new Bytes(bcsBytes));
         System.out.println(HexUtils.byteArrayToHex(pathHash.getValue()));
-        //313fcf74be39e19d75b6d028d28cf3e43efd92e95abd580971b6552667e69ee0
+        Assertions.assertEquals(new Bytes(HexUtils.hexToByteArray("313fcf74be39e19d75b6d028d28cf3e43efd92e95abd580971b6552667e69ee0")),
+                pathHash);
     }
 
     @Test
@@ -104,7 +113,10 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         Bytes stateHash = th.valueHash(new Bytes(state));
         System.out.println(HexUtils.byteArrayToHex(stateHash.getValue()));
         //e5c11e706a534b191358b9954c2f03c371162d950ff81a7cd3d20701bbaec525
-        //94cd17eeae8ffa6267ce9e56ec95088094800a0c219c2ffa3c132d6481ae80fe
+        Assertions.assertEquals(new Bytes(HexUtils.hexToByteArray("94cd17eeae8ffa6267ce9e56ec95088094800a0c219c2ffa3c132d6481ae80fe")),
+                stateHash);
+
+        //System.out.println(HexUtils.byteArrayToHex(th.valueHash(new Bytes(new byte[0])).getValue()));
     }
 
     @Test
@@ -112,6 +124,8 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         byte[] bytes = HexUtils.hexToByteArray("0x020001200f30a41872208c6324fa842889315b14f9be6f3dd0d5050686317adfdd0cda60");
         AccountState accountState = AccountState.bcsDeserialize(bytes);
         System.out.println(accountState);
+        Assertions.assertEquals(new Bytes(HexUtils.hexToByteArray("0f30a41872208c6324fa842889315b14f9be6f3dd0d5050686317adfdd0cda60")),
+                new Bytes(accountState.getStorageRoots()[1]));
     }
 
     @Test
