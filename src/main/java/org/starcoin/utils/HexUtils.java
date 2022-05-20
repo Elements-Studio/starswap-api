@@ -1,8 +1,17 @@
 package org.starcoin.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HexUtils {
+
+    public static byte[][] hexArrayToByteArrays(String[] hs) {
+        List<byte[]> bytesList = new ArrayList<>(hs.length);
+        for (String h : hs) {
+            bytesList.add(hexToByteArray(h));
+        }
+        return bytesList.toArray(new byte[0][]);
+    }
 
     public static byte hexToByte(String inHex) {
         return (byte) Integer.parseInt(inHex, 16);

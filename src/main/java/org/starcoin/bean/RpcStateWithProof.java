@@ -74,7 +74,7 @@ public class RpcStateWithProof {
 
     public static class SparseMerkleProof {
         @JsonProperty("siblings")
-        public String[] siblings;
+        private String[] siblings;
         @JsonProperty("leaf")
         private String[] leaf;
 

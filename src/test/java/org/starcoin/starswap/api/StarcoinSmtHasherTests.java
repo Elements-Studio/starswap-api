@@ -7,9 +7,11 @@ import com.novi.serde.SerializationError;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.starcoin.bean.RpcStateWithProof;
+import org.starcoin.bean.StateProof;
 import org.starcoin.smt.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
 import org.starcoin.types.*;
+import org.starcoin.utils.StarcoinProofUtils;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 }'
      */
 
-    //return state:
+    //return state like:
 
     /*
     "state": "0xfa000000000000007b161ceeef010000000000000000000000000000000000000000000000000000"
@@ -47,31 +49,59 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 
     static final String ACCESS_PATH_DATA_TYPE_RESOURCE = "1";
 
+    private byte[] getTestStructTagBcsBytes() throws SerializationError {
+        StructTag structTag = getTestStructTag();
+        //DataPath dataPath = new DataPath.Resource(structTag);
+        return structTag.bcsSerialize();
+    }
+
+    private StructTag getTestStructTag() {
+        List<TypeTag> typeParams = new ArrayList<>();
+        StructTag innerStructTag1 = new StructTag(AccountAddress.valueOf(HexUtils.hexToByteArray("0x00000000000000000000000000000001")),
+                new Identifier("STC"), new Identifier("STC"), Collections.emptyList());
+        StructTag innerStructTag2 = new StructTag(AccountAddress.valueOf(HexUtils.hexToByteArray("0x8c109349c6bd91411d6bc962e080c4a3")),
+                new Identifier("STAR"), new Identifier("STAR"), Collections.emptyList());
+        typeParams.add(new TypeTag.Struct(innerStructTag1));
+        typeParams.add(new TypeTag.Struct(innerStructTag2));
+        StructTag structTag = new StructTag(AccountAddress.valueOf(HexUtils.hexToByteArray("0x8c109349c6bd91411d6bc962e080c4a3")),
+                new Identifier("TokenSwapFarmBoost"), new Identifier("UserInfo"), typeParams);
+        return structTag;
+    }
+
     @Test
-    public void testGetStateWithProofByRoot() {
+    public void testGetStateWithProofByRootAndVerify() throws SerializationError, DeserializationError {
         JsonRpcClient jsonRpcClient = null;
         try {
             jsonRpcClient = new JsonRpcClient("https://main-seed.starcoin.org");
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         String accountAddress = "0x8c109349c6bd91411d6bc962e080c4a3";// account address
         String resourceStructTag = "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarmBoost::UserInfo<" +
                 "0x00000000000000000000000000000001::STC::STC, 0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR" +
                 ">";
         String accessPath = accountAddress + "/" + ACCESS_PATH_DATA_TYPE_RESOURCE + "/" + resourceStructTag;
+        String stateRoot = "0x99163c0fc319b62c3897ada8f97881e396e33b30383f47e23d93aaed07d6806d";
         RpcStateWithProof stateWithProof = jsonRpcClient.getStateWithProofByRoot(accessPath,
-                "0x99163c0fc319b62c3897ada8f97881e396e33b30383f47e23d93aaed07d6806d");
+                stateRoot);
         System.out.println(stateWithProof);
         try {
             System.out.println(new ObjectMapper().writeValueAsString(stateWithProof));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        String stateHex = stateWithProof.getState();
-        //byte[] stateBytes = HexUtils.hexToByteArray(stateHex);
-        System.out.println(stateHex);
+        StateProof proof = StateProof.from(stateWithProof); // converted StateProof from JSON RPC object.
+        System.out.println(proof);
+        System.out.println(stateWithProof.getState());
+        byte[] state = stateWithProof.getState() == null ? null : HexUtils.hexToByteArray(stateWithProof.getState());
+        boolean v = StarcoinProofUtils.verifyResourceStateProof(proof, HexUtils.hexToByteArray(stateRoot),
+                AccountAddress.valueOf(HexUtils.hexToByteArray(accountAddress)),
+                getTestStructTag(), //todo should parse resourceStructTag to this StructTag
+                state);
+        Assertions.assertTrue(v);
     }
 
     @Test
@@ -90,19 +120,6 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
                 pathHash);
     }
 
-    private byte[] getTestStructTagBcsBytes() throws SerializationError {
-        List<TypeTag> typeParams = new ArrayList<>();
-        StructTag innerStructTag1 = new StructTag(AccountAddress.valueOf(HexUtils.hexToByteArray("0x00000000000000000000000000000001")),
-                new Identifier("STC"), new Identifier("STC"), Collections.emptyList());
-        StructTag innerStructTag2 = new StructTag(AccountAddress.valueOf(HexUtils.hexToByteArray("0x8c109349c6bd91411d6bc962e080c4a3")),
-                new Identifier("STAR"), new Identifier("STAR"), Collections.emptyList());
-        typeParams.add(new TypeTag.Struct(innerStructTag1));
-        typeParams.add(new TypeTag.Struct(innerStructTag2));
-        StructTag structTag = new StructTag(AccountAddress.valueOf(HexUtils.hexToByteArray("0x8c109349c6bd91411d6bc962e080c4a3")),
-                new Identifier("TokenSwapFarmBoost"), new Identifier("UserInfo"), typeParams);
-        //DataPath dataPath = new DataPath.Resource(structTag);
-        return structTag.bcsSerialize();
-    }
 
     @Test
     void testValueHash() {
