@@ -32,6 +32,11 @@ public class StarcoinTreeHasher extends AbstractTreeHasher {
 
     @Override
     public Bytes path(Bytes bytes) {
+        return digest(new Bytes(ByteUtils.concat(PREFIX_STARCOIN.getBytes(StandardCharsets.UTF_8), bytes.getValue())));
+    }
+
+    @Override
+    public Bytes valueHash(Bytes bytes) {
         throw new UnsupportedOperationException();
     }
 

@@ -32,10 +32,10 @@
             <scope>test</scope>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.elasticsearch.client</groupId>-->
-<!--            <artifactId>elasticsearch-rest-high-level-client</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.elasticsearch.client</groupId>-->
+        <!--            <artifactId>elasticsearch-rest-high-level-client</artifactId>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -81,11 +81,11 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.thetransactioncompany</groupId>-->
-<!--            <artifactId>jsonrpc2-client</artifactId>-->
-<!--            <version>1.16.5</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.thetransactioncompany</groupId>-->
+        <!--            <artifactId>jsonrpc2-client</artifactId>-->
+        <!--            <version>1.16.5</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -103,11 +103,11 @@
             <version>2.16.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.starcoin</groupId>
-            <artifactId>smt</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.starcoin</groupId>-->
+        <!--            <artifactId>smt</artifactId>-->
+        <!--            <version>1.0-SNAPSHOT</version>-->
+        <!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -119,14 +119,14 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>smt-github</id>
-            <url>https://maven.pkg.github.com/wubuku/smt-java</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <!--    <repositories>-->
+    <!--        <repository>-->
+    <!--            <id>smt-github</id>-->
+    <!--            <url>https://maven.pkg.github.com/wubuku/smt-java</url>-->
+    <!--            <snapshots>-->
+    <!--                <enabled>true</enabled>-->
+    <!--            </snapshots>-->
+    <!--        </repository>-->
+    <!--    </repositories>-->
 
 </project>
