@@ -1,16 +1,16 @@
 package org.starcoin.smt;
 
 import com.novi.serde.SerializationError;
-import org.starcoin.types.DataPath;
 
 import java.nio.charset.StandardCharsets;
 
 public class StarcoinTreeHasher extends AbstractTreeHasher {
 
-    public static final String PREFIX_STARCOIN = "STARCOIN::";
+    public static final String STARCOIN_HASH_PREFIX = "STARCOIN::";
     public static final String SPARSE_MERKLE_LEAF_NODE = "SparseMerkleLeafNode";
     public static final String SPARSE_MERKLE_INTERNAL_NODE = "SparseMerkleInternalNode";
     public static final byte[] SPARSE_MERKLE_PLACEHOLDER_HASH = createLiteralHash("SPARSE_MERKLE_PLACEHOLDER_HASH");
+    public static final String PREFIX_NAME_BLOB = "Blob";
 
     public StarcoinTreeHasher() {
         this(new Sha3Digest256Hasher());
@@ -30,14 +30,41 @@ public class StarcoinTreeHasher extends AbstractTreeHasher {
         throw new IllegalArgumentException("literal hash wrong length");
     }
 
+    static byte[] bcsSerializeBytes(byte[] bytes) throws com.novi.serde.SerializationError {
+        com.novi.serde.Serializer serializer = new com.novi.bcs.BcsSerializer();
+        serialize_vector_u8(bytes, serializer);
+        return serializer.get_bytes();
+    }
+
+    static void serialize_vector_u8(byte[] value, com.novi.serde.Serializer serializer) throws com.novi.serde.SerializationError {
+        serializer.serialize_len(value.length);
+        for (byte item : value) {
+            serializer.serialize_u8(item);
+        }
+    }
+
+//    static void serialize_option_bytes(java.util.Optional<com.novi.serde.Bytes> value, com.novi.serde.Serializer serializer) throws com.novi.serde.SerializationError {
+//        if (value.isPresent()) {
+//            serializer.serialize_option_tag(true);
+//            serializer.serialize_bytes(value.get());
+//        } else {
+//            serializer.serialize_option_tag(false);
+//        }
+//    }
+
     @Override
     public Bytes path(Bytes bytes) {
-        return digest(new Bytes(ByteUtils.concat(PREFIX_STARCOIN.getBytes(StandardCharsets.UTF_8), bytes.getValue())));
+        return digest(bytes);
     }
 
     @Override
     public Bytes valueHash(Bytes bytes) {
-        throw new UnsupportedOperationException();
+        try {
+            Bytes salt = prefixHash(PREFIX_NAME_BLOB);
+            return digest(new Bytes(ByteUtils.concat(salt.getValue(), bcsSerializeBytes(bytes.getValue()))));
+        } catch (SerializationError e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -89,19 +116,9 @@ public class StarcoinTreeHasher extends AbstractTreeHasher {
         throw new UnsupportedOperationException();
     }
 
-    //todo
-//    public Bytes dataPathHash(DataPath dataPath) {
-//        try {
-//            byte[] bcs = dataPath.bcsSerialize();
-//            return this.hasher.hash(new Bytes(bcs));
-//        } catch (SerializationError e) {
-//            throw new IllegalArgumentException(e);
-//        }
-//    }
-
-    private Bytes prefixHash(String content) {
-        return hasher.hash(new Bytes(ByteUtils.concat(PREFIX_STARCOIN.getBytes(StandardCharsets.UTF_8),
-                content.getBytes(StandardCharsets.UTF_8))));
+    private Bytes prefixHash(String prefixName) {
+        return hasher.hash(new Bytes(ByteUtils.concat(STARCOIN_HASH_PREFIX.getBytes(StandardCharsets.UTF_8),
+                prefixName.getBytes(StandardCharsets.UTF_8))));
     }
 
     public static class Node {
@@ -111,13 +128,6 @@ public class StarcoinTreeHasher extends AbstractTreeHasher {
         public Node(byte[] hash1, byte[] hash2) {
             this.hash1 = hash1;
             this.hash2 = hash2;
-        }
-
-        static void serialize_vector_u8(byte[] value, com.novi.serde.Serializer serializer) throws com.novi.serde.SerializationError {
-            serializer.serialize_len(value.length);
-            for (byte item : value) {
-                serializer.serialize_u8(item);
-            }
         }
 
         public byte[] getHash1() {
