@@ -7,10 +7,7 @@ import com.novi.serde.SerializationError;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.starcoin.bean.StateWithProof;
-import org.starcoin.smt.Bytes;
-import org.starcoin.smt.HexUtils;
-import org.starcoin.smt.SparseMerkleProof;
-import org.starcoin.smt.StarcoinTreeHasher;
+import org.starcoin.smt.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
 import org.starcoin.types.*;
 
@@ -85,6 +82,15 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 //        System.out.println(HexUtils.byteArrayToHex(keyHash.getValue()));
 //        //a64823bd1efeac7ef50fb0fb5d5cb142823e4029d4da013d06e51b86deef73c8
 
+        byte[] bcsBytes = getTestStructTagBcsBytes();
+        StarcoinTreeHasher th = new StarcoinTreeHasher();
+        Bytes pathHash = th.path(new Bytes(bcsBytes));
+        System.out.println(HexUtils.byteArrayToHex(pathHash.getValue()));
+        Assertions.assertEquals(new Bytes(HexUtils.hexToByteArray("313fcf74be39e19d75b6d028d28cf3e43efd92e95abd580971b6552667e69ee0")),
+                pathHash);
+    }
+
+    private byte[] getTestStructTagBcsBytes() throws SerializationError {
         List<TypeTag> typeParams = new ArrayList<>();
         StructTag innerStructTag1 = new StructTag(AccountAddress.valueOf(HexUtils.hexToByteArray("0x00000000000000000000000000000001")),
                 new Identifier("STC"), new Identifier("STC"), Collections.emptyList());
@@ -95,12 +101,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         StructTag structTag = new StructTag(AccountAddress.valueOf(HexUtils.hexToByteArray("0x8c109349c6bd91411d6bc962e080c4a3")),
                 new Identifier("TokenSwapFarmBoost"), new Identifier("UserInfo"), typeParams);
         //DataPath dataPath = new DataPath.Resource(structTag);
-        byte[] bcsBytes = structTag.bcsSerialize();//dataPath.bcsSerialize();
-        StarcoinTreeHasher th = new StarcoinTreeHasher();
-        Bytes pathHash = th.path(new Bytes(bcsBytes));
-        System.out.println(HexUtils.byteArrayToHex(pathHash.getValue()));
-        Assertions.assertEquals(new Bytes(HexUtils.hexToByteArray("313fcf74be39e19d75b6d028d28cf3e43efd92e95abd580971b6552667e69ee0")),
-                pathHash);
+        return structTag.bcsSerialize();
     }
 
     @Test
@@ -150,15 +151,16 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         };
         byte[][] byteArrays = HexUtils.hexArrayToByteArrays(hexArray);
         System.out.println(byteArrays);
-        SparseMerkleProof proof = new SparseMerkleProof(Bytes.toBytesArray(byteArrays), Bytes.EMPTY, Bytes.EMPTY);
-        System.out.println(proof);
+        Bytes[] sideNodes = Bytes.toBytesArray(byteArrays);
+        //SparseMerkleProof proof = new SparseMerkleProof(Bytes.toBytesArray(byteArrays), Bytes.EMPTY, Bytes.EMPTY);
+        //System.out.println(proof);
 
         StarcoinTreeHasher.Node leaf = new StarcoinTreeHasher.Node(
                 HexUtils.hexToByteArray("0xa64823bd1efeac7ef50fb0fb5d5cb142823e4029d4da013d06e51b86deef73c8"),
                 HexUtils.hexToByteArray("0x94cd17eeae8ffa6267ce9e56ec95088094800a0c219c2ffa3c132d6481ae80fe")
         );
         StarcoinTreeHasher th = new StarcoinTreeHasher();
-        Bytes root = SparseMerkleProof.computeRootByPathAndValueHash(proof.getSideNodes(), new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2()), th);
+        Bytes root = SparseMerkleProof.computeRootByPathAndValueHash(sideNodes, new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2()), th);
         System.out.println(HexUtils.byteArrayToHex(root.getValue()));
 
         Bytes expectedRoot = new Bytes(HexUtils.hexToByteArray("0x99163c0fc319b62c3897ada8f97881e396e33b30383f47e23d93aaed07d6806d"));
@@ -167,7 +169,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 
 
     @Test
-    public void testComputeRootByPathAndValueHash2() {
+    public void testComputeRootByPathAndValueHash2() throws SerializationError {
         String[] hexArray = new String[]{
                 "0x24521d9cbd1bb73959b54a3993159b125f1500221e1455490189466858725948",
                 "0xa5f028948c522a35e6a75775de25c097ffefee7d63c4949482e38df0428b3b6d",
@@ -179,19 +181,63 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         };
         byte[][] byteArrays = HexUtils.hexArrayToByteArrays(hexArray);
         System.out.println(byteArrays);
-        SparseMerkleProof proof = new SparseMerkleProof(Bytes.toBytesArray(byteArrays), Bytes.EMPTY, Bytes.EMPTY);
-        System.out.println(proof);
+        Bytes[] sideNodes = Bytes.toBytesArray(byteArrays);
+        //SparseMerkleProof proof = new SparseMerkleProof(Bytes.toBytesArray(byteArrays), Bytes.EMPTY, Bytes.EMPTY);
+        //System.out.println(proof);
 
         StarcoinTreeHasher.Node leaf = new StarcoinTreeHasher.Node(
                 HexUtils.hexToByteArray("0x313fcf74be39e19d75b6d028d28cf3e43efd92e95abd580971b6552667e69ee0"),
                 HexUtils.hexToByteArray("0xe5c11e706a534b191358b9954c2f03c371162d950ff81a7cd3d20701bbaec525")
         );
         StarcoinTreeHasher th = new StarcoinTreeHasher();
-        Bytes root = SparseMerkleProof.computeRootByPathAndValueHash(proof.getSideNodes(), new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2()), th);
+        Bytes root = SparseMerkleProof.computeRootByPathAndValueHash(sideNodes, new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2()), th);
         System.out.println(HexUtils.byteArrayToHex(root.getValue()));
 
         Bytes expectedRoot = new Bytes(HexUtils.hexToByteArray("0x0f30a41872208c6324fa842889315b14f9be6f3dd0d5050686317adfdd0cda60"));
         Assertions.assertEquals(expectedRoot, root);
+
+        byte[] keyBcsBytes = getTestStructTagBcsBytes();
+        Bytes key = new Bytes(keyBcsBytes);
+        Bytes value = new Bytes(HexUtils.hexToByteArray("0xfa000000000000007b161ceeef010000000000000000000000000000000000000000000000000000"));
+        boolean v = SparseMerkleProof.verifyProof(sideNodes,
+                new Pair<>(new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2())), expectedRoot,
+                key, value, th);
+        System.out.println(v);
+        Assertions.assertTrue(v);
+    }
+
+
+    @Test
+    public void testComputeRootByPathAndValueHash3() throws SerializationError {
+        String[] hexArray = new String[]{
+                "0x66d13f603dda1966f5da6cb1593f7beece2bed60447cfa3af6c8e554379af086",
+                "0x5350415253455f4d45524b4c455f504c414345484f4c4445525f484153480000",
+                "0x51294505d6efd9fbf1ab69acbab1f96affbb5a8d21ec0cb677749335ca0ca69b",
+                "0x8624870eed10be3da5bd4c844d2e353b1fa669fac2def2dc50ef41f83f0b88a0",
+                "0xca94481b3ed045922fad7d8bf592af16c2c5c9253c79136ca3bed73ea3c23699",
+                "0x6ac0af801ccb0a6ceb5c6ac82c7c20e29b9e2c69ee12bb4a3c5395e4400f4bfb",
+                "0x4c2daa765e34f38cde5dcc20ea4b10264c10427ba1a02388077f33befb422677",
+                "0x8d7893145f15bb8aeccf0424f267b6aeb807b20889f8498f5f15f4defe0f806f"
+        };
+        byte[][] byteArrays = HexUtils.hexArrayToByteArrays(hexArray);
+        System.out.println(byteArrays);
+        Bytes[] sideNodes = Bytes.toBytesArray(byteArrays);
+
+        StarcoinTreeHasher.Node leaf = new StarcoinTreeHasher.Node(
+                HexUtils.hexToByteArray("0x3173da2c06e9caf448ab60e9a475d0278c842810d611a25063b85f9cfd7605f8"),
+                HexUtils.hexToByteArray("0xc6a66554c88f2e25c251a49f068574930681944e906f1c66fab1b7cfc42d9eb0")
+        );
+        byte[] stateRoot = HexUtils.hexToByteArray("6ceb24e0929653e882cb7dd3f4a4914a1e427f502c4f90c52ec6e591e1a2a94c");
+        StarcoinTreeHasher th = new StarcoinTreeHasher();
+
+        byte[] keyBcsBytes = getTestStructTagBcsBytes();
+        Bytes key = new Bytes(keyBcsBytes);
+
+        boolean v = SparseMerkleProof.verifyProof(sideNodes,
+                new Pair<>(new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2())), new Bytes(stateRoot),
+                key, null, th);
+        System.out.println(v);
+        Assertions.assertTrue(v);
     }
 
 }

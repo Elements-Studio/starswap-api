@@ -244,6 +244,28 @@ public class SparseMerkleProof {
         return new Pair<>(Bytes.equals(currentHash, root), updates);
     }
 
+    public static boolean verifyProof(Bytes[] sideNodes, Pair<Bytes, Bytes> leafData, Bytes root, Bytes key, Bytes value, AbstractTreeHasher th) {
+        Bytes path = th.path(key);
+        if (value == null || Bytes.equals(value, DEFAULT_VALUE)) { // Non-membership proof.
+            if (Bytes.equals(leafData.getItem1(), path)) {
+                return false;
+            }
+            if (!(ByteUtils.countCommonPrefix(leafData.getItem1().getValue(), path.getValue()) >= sideNodes.length)) {
+                return false;
+            }
+        } else {
+            if (!Bytes.equals(leafData.getItem1(), path)) {
+                return false;
+            }
+            Bytes valueHash = th.valueHash(value);
+            if (!Bytes.equals(leafData.getItem2(), valueHash)) {
+                return false;
+            }
+        }
+        Bytes computedRoot = computeRootByPathAndValueHash(sideNodes, leafData.getItem1(), leafData.getItem2(), th);
+        return Bytes.equals(root, computedRoot);
+    }
+
     public static Bytes computeRootByPathAndValueHash(Bytes[] sideNodes, Bytes path, Bytes valueHash, AbstractTreeHasher th) {
         Pair<Bytes, Bytes> p = th.digestLeaf(path, valueHash);
         Bytes currentHash = p.getItem1();

@@ -1,6 +1,9 @@
 package org.starcoin.smt;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 public class SparseMerkleTree {
@@ -99,13 +102,18 @@ public class SparseMerkleTree {
     }
 
     public SparseMerkleProof proveMembershipForRoot(Bytes key, Bytes root) throws MembershipProofException {
+        Pair<SparseMerkleProof, Bytes> p = proveMembershipForRootAndGetLeafData(key, root);
+        return p.getItem1();
+    }
+
+    public Pair<SparseMerkleProof, Bytes> proveMembershipForRootAndGetLeafData(Bytes key, Bytes root) throws MembershipProofException {
         Pair<SparseMerkleProof, Bytes> p = doProveForRoot(key, root, false);
         if (this.treeHasher.isKeyUnrelatedWithLeafData(key, p.getItem2())) {
             throw new MembershipProofException(String.format("Key(%1$s) is unrelated with leaf data(%2$s)",
                     HexUtils.byteArrayToHex(key.getValue()),
                     p.getItem2() == null ? null : HexUtils.byteArrayToHex(p.getItem2().getValue())));
         }
-        return p.getItem1();
+        return p;
     }
 
     public SparseMerkleProof proveNonMembershipForRoot(Bytes key, Bytes root) throws NonMembershipProofException {
