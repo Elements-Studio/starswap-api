@@ -244,6 +244,16 @@ public class SparseMerkleProof {
         return new Pair<>(Bytes.equals(currentHash, root), updates);
     }
 
+
+    public static boolean verifyProof(byte[][] sideNodes, Pair<byte[], byte[]> leafData, byte[] root, byte[] key, byte[] value, AbstractTreeHasher th) {
+        return verifyProof(Bytes.toBytesArray(sideNodes),
+                new Pair<>(new Bytes(leafData.getItem1()), new Bytes(leafData.getItem2())), new Bytes(root),
+                new Bytes(key),
+                value == null ? null : new Bytes(value),
+                th
+        );
+    }
+
     public static boolean verifyProof(Bytes[] sideNodes, Pair<Bytes, Bytes> leafData, Bytes root, Bytes key, Bytes value, AbstractTreeHasher th) {
         Bytes path = th.path(key);
         if (value == null || Bytes.equals(value, DEFAULT_VALUE)) { // Non-membership proof.

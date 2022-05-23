@@ -3,7 +3,6 @@ package org.starcoin.utils;
 import com.novi.serde.DeserializationError;
 import com.novi.serde.SerializationError;
 import org.starcoin.bean.StateProof;
-import org.starcoin.smt.Bytes;
 import org.starcoin.smt.Pair;
 import org.starcoin.smt.SparseMerkleProof;
 import org.starcoin.smt.StarcoinTreeHasher;
@@ -40,28 +39,24 @@ public class StarcoinProofUtils {
         // First, verify state for storage root.
         //
         byte[] storageRoot = accountState.getStorageRoots()[ACCOUNT_STORAGE_INDEX_RESOURCE];
-        boolean ok = SparseMerkleProof.verifyProof(
-                Bytes.toBytesArray(stateProof.getProof().getSiblings()),
-                new Pair<>(new Bytes(stateProof.getProof().getLeaf().getPath()),
-                        new Bytes(stateProof.getProof().getLeaf().getValueHash())),
-                new Bytes(storageRoot),
-                new Bytes(resourceStructTag.bcsSerialize()), // resource struct tag BCS serialized as key
-                state == null ? null : new Bytes(state),
-                th);
+        boolean ok = SparseMerkleProof.verifyProof(stateProof.getProof().getSiblings(),
+                new Pair<>(stateProof.getProof().getLeaf().getPath(),
+                        stateProof.getProof().getLeaf().getValueHash()),
+                storageRoot,
+                resourceStructTag.bcsSerialize(), // resource struct tag BCS serialized as key
+                state, th);
         if (!ok) {
             return false;
         }
         //
         // Then, verify account state for global state root.
         //
-        ok = SparseMerkleProof.verifyProof(
-                Bytes.toBytesArray(stateProof.getAccountProof().getSiblings()),
-                new Pair<>(new Bytes(stateProof.getAccountProof().getLeaf().getPath()),
-                        new Bytes(stateProof.getAccountProof().getLeaf().getValueHash())),
-                new Bytes(stateRoot),
-                new Bytes(accountAddress.toBytes()), // account address as key
-                new Bytes(stateProof.getAccountState()),
-                th);
+        ok = SparseMerkleProof.verifyProof(stateProof.getAccountProof().getSiblings(),
+                new Pair<>(stateProof.getAccountProof().getLeaf().getPath(),
+                        stateProof.getAccountProof().getLeaf().getValueHash()),
+                stateRoot,
+                accountAddress.toBytes(), // account address as key
+                stateProof.getAccountState(), th);
         return ok;
     }
 }
