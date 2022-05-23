@@ -11,6 +11,7 @@ import org.starcoin.bean.StateProof;
 import org.starcoin.smt.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
 import org.starcoin.types.*;
+import org.starcoin.utils.MiscUtils;
 import org.starcoin.utils.StarcoinProofUtils;
 
 import java.net.MalformedURLException;
@@ -47,6 +48,10 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
     }
      */
 
+    static final String TEST_RESOURCE_STRUCT_TAG = "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarmBoost::UserInfo<" +
+            "0x00000000000000000000000000000001::STC::STC, 0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR" +
+            ">";
+
     static final String ACCESS_PATH_DATA_TYPE_RESOURCE = "1";
 
     private byte[] getTestStructTagBcsBytes() throws SerializationError {
@@ -69,6 +74,22 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
     }
 
     @Test
+    void testParseStructTag() throws SerializationError {
+        String resourceStructTag = TEST_RESOURCE_STRUCT_TAG;
+        StructTag parsed = MiscUtils.parseStructTag(resourceStructTag);
+        StructTag expected = getTestStructTag();
+        Assertions.assertEquals(HexUtils.byteArrayToHex(expected.bcsSerialize()),
+                HexUtils.byteArrayToHex(parsed.bcsSerialize()));
+
+//        String resourceStructTagSTC = "0x00000000000000000000000000000001::STC::STC";
+//        System.out.println(MiscUtils.parseStructTag(resourceStructTagSTC).name.value);
+//        String resourceStructTag2 = "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarmBoost::UserInfo<" +
+//                "0x00000000000000000000000000000001::STC::STC" +
+//                ">";
+//        System.out.println(HexUtils.byteArrayToHex(MiscUtils.parseStructTag(resourceStructTag2).type_params.get(0).bcsSerialize()));
+    }
+
+    @Test
     public void testGetStateWithProofByRootAndVerify() throws SerializationError, DeserializationError {
         JsonRpcClient jsonRpcClient = null;
         try {
@@ -78,9 +99,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
             throw new RuntimeException(e);
         }
         String accountAddress = "0x8c109349c6bd91411d6bc962e080c4a3";// account address
-        String resourceStructTag = "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarmBoost::UserInfo<" +
-                "0x00000000000000000000000000000001::STC::STC, 0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR" +
-                ">";
+        String resourceStructTag = TEST_RESOURCE_STRUCT_TAG;
         String accessPath = accountAddress + "/" + ACCESS_PATH_DATA_TYPE_RESOURCE + "/" + resourceStructTag;
         String stateRoot = "0x99163c0fc319b62c3897ada8f97881e396e33b30383f47e23d93aaed07d6806d";
         RpcStateWithProof stateWithProof = jsonRpcClient.getStateWithProofByRoot(accessPath,
@@ -99,7 +118,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         byte[] state = stateWithProof.getState() == null ? null : HexUtils.hexToByteArray(stateWithProof.getState());
         boolean v = StarcoinProofUtils.verifyResourceStateProof(proof, HexUtils.hexToByteArray(stateRoot),
                 AccountAddress.valueOf(HexUtils.hexToByteArray(accountAddress)),
-                getTestStructTag(), //todo should parse resourceStructTag to this StructTag
+                MiscUtils.parseStructTag(resourceStructTag),
                 state);
         Assertions.assertTrue(v);
     }
