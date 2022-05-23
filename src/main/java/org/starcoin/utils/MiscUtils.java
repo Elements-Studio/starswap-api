@@ -32,13 +32,13 @@ public class MiscUtils {
             structName = parts[2];
             typeParams = Collections.emptyList();
         } else {
-            int i1 = parts[2].indexOf(LT);
-            int i2 = parts[2].indexOf(GT);
-            if (i1 < 1 || i2 < 0 || i1 > i2) {
+            int idx_lt = parts[2].indexOf(LT);
+            int idx_gt = parts[2].lastIndexOf(GT);
+            if (idx_lt < 1 || idx_gt < 0 || idx_lt > idx_gt) {
                 throw new IllegalArgumentException(s);
             }
-            structName = parts[2].substring(0, i1);
-            String ts = parts[2].substring(i1 + 1, i2);
+            structName = parts[2].substring(0, idx_lt);
+            String ts = parts[2].substring(idx_lt + 1, idx_gt);
             typeParams = new ArrayList<>();
             for (String t : ts.split(COMMA)) {
                 if (!t.contains(COLON_COLON)) {

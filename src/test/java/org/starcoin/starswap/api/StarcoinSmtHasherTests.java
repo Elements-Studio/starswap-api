@@ -84,7 +84,9 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 //        String resourceStructTagSTC = "0x00000000000000000000000000000001::STC::STC";
 //        System.out.println(MiscUtils.parseStructTag(resourceStructTagSTC).name.value);
 //        String resourceStructTag2 = "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarmBoost::UserInfo<" +
+//                "0x8c109349c6bd91411d6bc962e080c4a3::TEST::TEST<" +
 //                "0x00000000000000000000000000000001::STC::STC" +
+//                ">" +
 //                ">";
 //        System.out.println(HexUtils.byteArrayToHex(MiscUtils.parseStructTag(resourceStructTag2).type_params.get(0).bcsSerialize()));
     }
