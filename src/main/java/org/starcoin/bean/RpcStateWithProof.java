@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
 
+/**
+ * State with proof returned by JSON RPC.
+ */
 public class RpcStateWithProof {
 
     /**

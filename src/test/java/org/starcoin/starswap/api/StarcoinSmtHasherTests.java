@@ -193,12 +193,12 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         //SparseMerkleProof proof = new SparseMerkleProof(Bytes.toBytesArray(byteArrays), Bytes.EMPTY, Bytes.EMPTY);
         //System.out.println(proof);
 
-        StarcoinTreeHasher.Node leaf = new StarcoinTreeHasher.Node(
+        byte[][] leaf = new byte[][]{
                 HexUtils.hexToByteArray("0xa64823bd1efeac7ef50fb0fb5d5cb142823e4029d4da013d06e51b86deef73c8"),
                 HexUtils.hexToByteArray("0x94cd17eeae8ffa6267ce9e56ec95088094800a0c219c2ffa3c132d6481ae80fe")
-        );
+        };
         StarcoinTreeHasher th = new StarcoinTreeHasher();
-        Bytes root = SparseMerkleProof.computeRootByPathAndValueHash(sideNodes, new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2()), th);
+        Bytes root = SparseMerkleProof.computeRootByPathAndValueHash(sideNodes, new Bytes(leaf[0]), new Bytes(leaf[1]), th);
         System.out.println(HexUtils.byteArrayToHex(root.getValue()));
 
         Bytes expectedRoot = new Bytes(HexUtils.hexToByteArray("0x99163c0fc319b62c3897ada8f97881e396e33b30383f47e23d93aaed07d6806d"));
@@ -223,12 +223,12 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         //SparseMerkleProof proof = new SparseMerkleProof(Bytes.toBytesArray(byteArrays), Bytes.EMPTY, Bytes.EMPTY);
         //System.out.println(proof);
 
-        StarcoinTreeHasher.Node leaf = new StarcoinTreeHasher.Node(
+        byte[][] leaf = new byte[][]{
                 HexUtils.hexToByteArray("0x313fcf74be39e19d75b6d028d28cf3e43efd92e95abd580971b6552667e69ee0"),
                 HexUtils.hexToByteArray("0xe5c11e706a534b191358b9954c2f03c371162d950ff81a7cd3d20701bbaec525")
-        );
+        };
         StarcoinTreeHasher th = new StarcoinTreeHasher();
-        Bytes root = SparseMerkleProof.computeRootByPathAndValueHash(sideNodes, new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2()), th);
+        Bytes root = SparseMerkleProof.computeRootByPathAndValueHash(sideNodes, new Bytes(leaf[0]), new Bytes(leaf[1]), th);
         System.out.println(HexUtils.byteArrayToHex(root.getValue()));
 
         Bytes expectedRoot = new Bytes(HexUtils.hexToByteArray("0x0f30a41872208c6324fa842889315b14f9be6f3dd0d5050686317adfdd0cda60"));
@@ -238,7 +238,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         Bytes key = new Bytes(keyBcsBytes);
         Bytes value = new Bytes(HexUtils.hexToByteArray("0xfa000000000000007b161ceeef010000000000000000000000000000000000000000000000000000"));
         boolean v = SparseMerkleProof.verifyProof(sideNodes,
-                new Pair<>(new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2())), expectedRoot,
+                new Pair<>(new Bytes(leaf[0]), new Bytes(leaf[1])), expectedRoot,
                 key, value, th);
         System.out.println(v);
         Assertions.assertTrue(v);
@@ -261,10 +261,10 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         System.out.println(byteArrays);
         Bytes[] sideNodes = Bytes.toBytesArray(byteArrays);
 
-        StarcoinTreeHasher.Node leaf = new StarcoinTreeHasher.Node(
+        byte[][] leaf = new byte[][]{
                 HexUtils.hexToByteArray("0x3173da2c06e9caf448ab60e9a475d0278c842810d611a25063b85f9cfd7605f8"),
                 HexUtils.hexToByteArray("0xc6a66554c88f2e25c251a49f068574930681944e906f1c66fab1b7cfc42d9eb0")
-        );
+        };
         byte[] stateRoot = HexUtils.hexToByteArray("6ceb24e0929653e882cb7dd3f4a4914a1e427f502c4f90c52ec6e591e1a2a94c");
         StarcoinTreeHasher th = new StarcoinTreeHasher();
 
@@ -272,7 +272,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         Bytes key = new Bytes(keyBcsBytes);
 
         boolean v = SparseMerkleProof.verifyProof(sideNodes,
-                new Pair<>(new Bytes(leaf.getHash1()), new Bytes(leaf.getHash2())), new Bytes(stateRoot),
+                new Pair<>(new Bytes(leaf[0]), new Bytes(leaf[1])), new Bytes(stateRoot),
                 key, null, th);
         System.out.println(v);
         Assertions.assertTrue(v);

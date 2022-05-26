@@ -121,21 +121,13 @@ public class StarcoinTreeHasher extends AbstractTreeHasher {
                 prefixName.getBytes(StandardCharsets.UTF_8))));
     }
 
-    public static class Node {
+    private static class Node {
         private final byte[] hash1;
         private final byte[] hash2;
 
         public Node(byte[] hash1, byte[] hash2) {
             this.hash1 = hash1;
             this.hash2 = hash2;
-        }
-
-        public byte[] getHash1() {
-            return hash1;
-        }
-
-        public byte[] getHash2() {
-            return hash2;
         }
 
         public byte[] bcsSerialize() throws com.novi.serde.SerializationError {

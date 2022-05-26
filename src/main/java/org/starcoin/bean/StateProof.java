@@ -4,6 +4,9 @@ import org.starcoin.utils.HexUtils;
 
 import java.util.Arrays;
 
+/**
+ * Starcoin state proof.
+ */
 public class StateProof {
     /**
      * Account state's proof for global state root.
@@ -106,6 +109,9 @@ public class StateProof {
         }
     }
 
+    /**
+     * Leaf data.
+     */
     public static class Leaf {
         /**
          * Path(key hash).
