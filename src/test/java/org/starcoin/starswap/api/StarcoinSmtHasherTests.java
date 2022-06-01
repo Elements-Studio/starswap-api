@@ -117,6 +117,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         StateProof proof = StateProof.from(stateWithProof); // converted StateProof from JSON RPC object.
         System.out.println("proof:");
         System.out.println(proof);
+        System.out.println("state:");
         System.out.println(stateWithProof.getState());
         byte[] state = stateWithProof.getState() == null ? null : HexUtils.hexToByteArray(stateWithProof.getState());
         boolean v = StarcoinProofUtils.verifyResourceStateProof(proof, HexUtils.hexToByteArray(stateRoot),
