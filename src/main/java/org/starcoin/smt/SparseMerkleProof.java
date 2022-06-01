@@ -210,6 +210,9 @@ public class SparseMerkleProof {
                     // This is not an unrelated leaf; non-membership proof failed.
                     return new Pair<>(false, null);
                 }
+                if (!(ByteUtils.countCommonPrefix(actualPath.getValue(), path.getValue()) >= proof.sideNodes.length)) {
+                    return new Pair<>(false, null);
+                }
                 p = th.digestLeaf(actualPath, valueHash);
                 currentHash = p.getItem1();
                 currentData = p.getItem2();
