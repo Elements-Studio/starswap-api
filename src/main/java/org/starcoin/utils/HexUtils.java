@@ -65,6 +65,15 @@ public class HexUtils {
         return "0x" + byteArrayToHex(bytes);
     }
 
+    public static String[] bytesArrayToHexArray(byte[][] bytes) {
+        List<String> hexArray = new ArrayList<>();
+        for (byte[] bs : bytes) {
+            String h = bs == null ? null : byteArrayToHex(bs);
+            hexArray.add(h);
+        }
+        return hexArray.toArray(new String[0]);
+    }
+
     public static String byteArrayToHex(byte[] bytes) {
         StringBuilder result = new StringBuilder();
         for (int index = 0, len = bytes.length; index <= len - 1; index += 1) {

@@ -115,6 +115,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         }
 
         StateProof proof = StateProof.from(stateWithProof); // converted StateProof from JSON RPC object.
+        System.out.println("proof:");
         System.out.println(proof);
         System.out.println(stateWithProof.getState());
         byte[] state = stateWithProof.getState() == null ? null : HexUtils.hexToByteArray(stateWithProof.getState());
@@ -236,6 +237,8 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 
         byte[] keyBcsBytes = getTestStructTagBcsBytes();
         Bytes key = new Bytes(keyBcsBytes);
+        System.out.println("key:");
+        System.out.println(HexUtils.byteArrayToHex(key.getValue()));
         Bytes value = new Bytes(HexUtils.hexToByteArray("0xfa000000000000007b161ceeef010000000000000000000000000000000000000000000000000000"));
         boolean v = SparseMerkleProof.verifyProof(sideNodes,
                 new Pair<>(new Bytes(leaf[0]), new Bytes(leaf[1])), expectedRoot,

@@ -62,7 +62,7 @@ public class StateProof {
     public String toString() {
         return "StateProof{" +
                 "accountProof=" + accountProof +
-                ", accountState=" + Arrays.toString(accountState) +
+                ", accountState=" + (accountProof == null ? null : HexUtils.byteArrayToHex(accountState)) +
                 ", proof=" + proof +
                 '}';
     }
@@ -103,7 +103,7 @@ public class StateProof {
         @Override
         public String toString() {
             return "SparseMerkleProof{" +
-                    "siblings=" + Arrays.toString(siblings) +
+                    "siblings=" + Arrays.toString(siblings == null ? null : HexUtils.bytesArrayToHexArray(siblings)) +
                     ", leaf=" + leaf +
                     '}';
         }
@@ -159,8 +159,8 @@ public class StateProof {
         @Override
         public String toString() {
             return "Leaf{" +
-                    "path=" + Arrays.toString(path) +
-                    ", valueHash=" + Arrays.toString(valueHash) +
+                    "path=" + (path == null ? null : HexUtils.byteArrayToHex(path)) +
+                    ", valueHash=" + (valueHash == null ? null : HexUtils.byteArrayToHex(valueHash)) +
                     '}';
         }
     }
