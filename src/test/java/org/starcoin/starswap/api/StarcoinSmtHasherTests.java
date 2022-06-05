@@ -282,4 +282,12 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         Assertions.assertTrue(v);
     }
 
+    @Test
+    public void testPlaceHolder() {
+        StarcoinTreeHasher th = new StarcoinTreeHasher();
+        //System.out.println(th.placeholder());
+        System.out.println(HexUtils.byteArrayToHex(th.placeholder().getValue()));
+        Assertions.assertEquals(th.placeholder(), new Bytes(HexUtils.hexToByteArray("5350415253455f4d45524b4c455f504c414345484f4c4445525f484153480000")));
+    }
+
 }
