@@ -8,6 +8,7 @@ import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
+import org.starcoin.utils.JsonRpcClientUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -35,11 +36,11 @@ public class JsonRpcClient {
     }
 
     public Event[] getEvents(Map<String, Object> eventFilter) {
-        return JsonRpcUtils.getEvents(this.jsonRpcSession, eventFilter);
+        return JsonRpcClientUtils.getEvents(this.jsonRpcSession, eventFilter);
     }
 
     public RpcStateWithProof getStateWithProofByRoot(String accessPath, String stateRoot) {
-        return JsonRpcUtils.getStateWithProofByRoot(this.jsonRpcSession, accessPath, stateRoot);
+        return JsonRpcClientUtils.getStateWithProofByRoot(this.jsonRpcSession, accessPath, stateRoot);
     }
 
     public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY) {
@@ -148,12 +149,12 @@ public class JsonRpcClient {
 
     @Cacheable(cacheNames = "tokenScalingFactorCache", key = "#token", unless = "#result == null")
     public BigInteger tokenGetScalingFactor(String token) {
-        return JsonRpcUtils.tokenGetScalingFactor(jsonRpcSession, token);
+        return JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, token);
     }
 
     public BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY) {
-        BigInteger tokenXScalingFactor = JsonRpcUtils.tokenGetScalingFactor(jsonRpcSession, tokenX);
-        BigInteger tokenYScalingFactor = JsonRpcUtils.tokenGetScalingFactor(jsonRpcSession, tokenY);
+        BigInteger tokenXScalingFactor = JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, tokenX);
+        BigInteger tokenYScalingFactor = JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, tokenY);
         return getExchangeRate(lpTokenAddress, tokenX, tokenY, tokenXScalingFactor, tokenYScalingFactor);
     }
 

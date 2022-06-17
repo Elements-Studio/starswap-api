@@ -3,8 +3,6 @@ package org.starcoin.starswap.api.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.starcoin.bean.Event;
-import org.starcoin.bean.RpcStateWithProof;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
@@ -14,9 +12,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import static org.starcoin.utils.JsonRpcClientUtils.callForObject;
 import static org.starcoin.utils.JsonRpcClientUtils.contractCallV2;
 
 
@@ -38,29 +34,6 @@ public class JsonRpcUtils {
     private static final String SWAP_FEE_DENUMERATOR = "1000u64";
 
     private static final Logger LOG = LoggerFactory.getLogger(LiquidityPoolService.class);
-
-
-    public static Event[] getEvents(JSONRPC2Session jsonRpcSession, Map<String, Object> eventFilter) {
-        String method = "chain.get_events";
-        Class<Event[]> objectClass = Event[].class;
-        Event[] events = callForObject(jsonRpcSession, method, Collections.singletonList(eventFilter), objectClass);
-        return events == null ? new Event[0] : events;
-    }
-
-    public static RpcStateWithProof getStateWithProofByRoot(JSONRPC2Session jsonRpcSession, String accessPath, String stateRoot) {
-        String method = "state.get_with_proof_by_root";
-        Class<RpcStateWithProof> objectClass = RpcStateWithProof.class;
-        RpcStateWithProof stateWithProof = callForObject(jsonRpcSession, method, Arrays.asList(accessPath, stateRoot), objectClass);
-        return stateWithProof;
-    }
-
-    // public fun scaling_factor<TokenType: store>(): u128
-    public static BigInteger tokenGetScalingFactor(JSONRPC2Session jsonRpcSession, String token) {
-        List<BigInteger> resultFields = contractCallV2(jsonRpcSession, "0x1::Token::scaling_factor",
-                Arrays.asList(token), Collections.emptyList(), new TypeReference<List<BigInteger>>() {
-                });
-        return resultFields.get(0);
-    }
 
     public static Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(JSONRPC2Session jsonRpcSession, String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         BigInteger stakedLiquidity = tokenSwapFarmQueryTotalStake(jsonRpcSession, farmAddress, tokenX, tokenY);
