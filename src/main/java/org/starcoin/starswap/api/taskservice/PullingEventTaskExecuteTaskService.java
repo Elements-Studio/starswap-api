@@ -15,7 +15,10 @@ import org.starcoin.starswap.api.service.StarcoinEventFilter;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.starcoin.starswap.api.data.model.PullingEventTask.PULLING_BLOCK_MAX_COUNT;
 
@@ -44,43 +47,66 @@ public class PullingEventTaskExecuteTaskService {
 
     @Scheduled(fixedDelayString = "${starswap.pulling-event-task-execute.fixed-delay}")
     public void task() {
-        List<PullingEventTask> pullingEventTasks = pullingEventTaskService.getPullingEventTaskToProcess();
-        if (pullingEventTasks == null || pullingEventTasks.isEmpty()) {
+        PullingEventTask pullingEventTask = pullingEventTaskService.getPullingEventTaskToProcess();
+        if (pullingEventTask == null) {
             return;
         }
-        for (PullingEventTask t : pullingEventTasks) {
-            executeTask(t);
-        }
+        executeTask(pullingEventTask);
     }
 
     private void executeTask(PullingEventTask t) {
         BigInteger fromBlockNumber = t.getFromBlockNumber();
-        // use a new individual nodeId to record heartbeats.
-        NodeHeartbeatService nodeHeartbeatService = new NodeHeartbeatService(nodeHeartbeatRepository);
-        nodeHeartbeatService.beat(t.getFromBlockNumber());
         while (fromBlockNumber.compareTo(t.getToBlockNumber()) <= 0) {
-            BigInteger toBlockNumber = fromBlockNumber.add(BigInteger.valueOf(PULLING_BLOCK_MAX_COUNT));
-            if (toBlockNumber.compareTo(t.getToBlockNumber()) > 0) {
-                toBlockNumber = t.getToBlockNumber();
-            }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("JSON RPC getting events... from block: " + fromBlockNumber + ", to block: " + toBlockNumber);
-            }
+            BigInteger toBlockNumber = getFilterToBlockNumber(fromBlockNumber, t.getToBlockNumber());
             Map<String, Object> eventFilter = createEventFilterMap(fromBlockNumber, toBlockNumber);
             Event[] events = jsonRpcClient.getEvents(eventFilter);
-            if (events == null) {
-                break;
-            }
-            for (Event e : events) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Processing a event: " + e);
+            if (events != null) {
+                for (Event e : events) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Processing a event: " + e);
+                    }
+                    try {
+                        handleEventService.handleEvent(e, Event.getFromAddressFromEventKey(e.getEventKey()));//note：Get address from eventKey?
+                    } catch (RuntimeException exception) {
+                        LOG.error("Error handling event: " + e, exception);
+                        throw exception;
+                    }
                 }
-                handleEventService.handleEvent(e, Event.getFromAddressFromEventKey(e.getEventKey()));//note：Get address from eventKey?
             }
             fromBlockNumber = toBlockNumber.add(BigInteger.ONE);
+            try {
+                pullingEventTaskService.updateProcessing(t.getFromBlockNumber());
+            } catch (RuntimeException exception) {
+                LOG.error("Updating processing information error: " + t, exception);
+                throw exception;
+            }
         }
-        pullingEventTaskService.updateStatusDone(t);
-        nodeHeartbeatService.beat(t.getToBlockNumber());
+        try {
+            pullingEventTaskService.updateStatusDone(t.getFromBlockNumber());
+        } catch (RuntimeException exception) {
+            LOG.error("Updating status to done error: " + t, exception);
+            throw exception;
+        }
+        try {
+            // use a new individual nodeId to record heartbeats.
+            NodeHeartbeatService nodeHeartbeatService = new NodeHeartbeatService(nodeHeartbeatRepository);
+            nodeHeartbeatService.beat(t.getFromBlockNumber());
+            nodeHeartbeatService.beat(t.getToBlockNumber());
+        } catch (RuntimeException exception) {
+            LOG.error("Updating node heartbeat error: " + t, exception);
+            throw exception;
+        }
+    }
+
+    private static BigInteger getFilterToBlockNumber(BigInteger fromBlockNumber, BigInteger maxToBlockNumber) {
+        BigInteger toBlockNumber = fromBlockNumber.add(BigInteger.valueOf(PULLING_BLOCK_MAX_COUNT));
+        if (toBlockNumber.compareTo(maxToBlockNumber) > 0) {
+            toBlockNumber = maxToBlockNumber;
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("JSON RPC getting events... from block: " + fromBlockNumber + ", to block: " + toBlockNumber);
+        }
+        return toBlockNumber;
     }
 
 
