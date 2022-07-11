@@ -79,7 +79,7 @@ starswap:
     fixed-delay: 30000
   pulling-event-task-execute:
     fixed-delay: 20000
-  pulling-event-task-auto-add:
+  pulling-event-task-auto-create:
     fixed-delay: 60000
   liquidity-pool-refresh-task-service:
     fixed-delay: 30000

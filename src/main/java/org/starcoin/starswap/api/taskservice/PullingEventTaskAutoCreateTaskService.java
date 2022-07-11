@@ -27,7 +27,7 @@ public class PullingEventTaskAutoCreateTaskService {
         this.nodeHeartbeatService = nodeHeartbeatService;
     }
 
-    @Scheduled(fixedDelayString = "${starswap.pulling-event-task-auto-add.fixed-delay}")
+    @Scheduled(fixedDelayString = "${starswap.pulling-event-task-auto-create.fixed-delay}")
     public void task() {
         List<Pair<BigInteger, BigInteger>> breaks = nodeHeartbeatService.findBreakIntervals();
         for (Pair<BigInteger, BigInteger> b : breaks) {

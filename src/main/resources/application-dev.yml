@@ -15,9 +15,9 @@ starswap:
   farming-boost:
     whitelist: "${FARMING_BOOST_WHITELIST}"
   pulling-event-task-execute:
-    fixed-delay: 3000
-  pulling-event-task-auto-add:
-    fixed-delay: 3000
+    fixed-delay: 300000
+  pulling-event-task-auto-create:
+    fixed-delay: 300000
 
 logging:
   level:
