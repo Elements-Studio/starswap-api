@@ -17,22 +17,19 @@ public class StarcoinEventSubscribeHandler implements Runnable {
 
     private final String webSocketSeed;
 
-    //private final String network;
-
     private final HandleEventService handleEventService;
 
     private final StarcoinEventFilter starcoinEventFilter;
 
-    public StarcoinEventSubscribeHandler(String seed, //String network,
+    public StarcoinEventSubscribeHandler(String seed,
                                          HandleEventService handleEventService,
                                          StarcoinEventFilter starcoinEventFilter) {
         this.webSocketSeed = seed;
-        //this.network = network;
         this.handleEventService = handleEventService;
         this.starcoinEventFilter = starcoinEventFilter;
     }
 
-    private String getWebSocketSeed() {
+    private String getWebSocketServerUrl() {
         String wsUrl = webSocketSeed;
         String wsPrefix1 = "ws://";
         String wsPrefix2 = "wss://";
@@ -49,9 +46,9 @@ public class StarcoinEventSubscribeHandler implements Runnable {
     @Override
     public void run() {
         try {
-            WebSocketService service = new WebSocketService(getWebSocketSeed(), true);
+            WebSocketService service = new WebSocketService(getWebSocketServerUrl(), true);
             service.connect();
-            LOG.info("WebSocket connected. " + this.getWebSocketSeed());
+            LOG.info("WebSocket connected. " + this.getWebSocketServerUrl());
             StarcoinEventSubscriber subscriber = new StarcoinEventSubscriber(service, starcoinEventFilter);
             Flowable<EventNotification> flowableEvents = subscriber.eventNotificationFlowable();
 
