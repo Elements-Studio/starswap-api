@@ -18,6 +18,7 @@ starswap:
     fixed-delay: 300000
   pulling-event-task-auto-create:
     fixed-delay: 300000
+  invisible-token-pairs: '["BX_USDT,STC"]'
 
 logging:
   level:

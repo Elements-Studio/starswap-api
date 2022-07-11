@@ -64,6 +64,26 @@ public class StarswapController {
     @Resource
     private TokenPriceService tokenPriceService;
 
+    @Resource
+    private List<Pair<String, String>> invisibleTokenPairs;
+
+    private boolean isVisibleTokenPair(String tokenXId, String tokenYId) {
+        return !isInvisibleTokenPair(tokenXId, tokenYId);
+    }
+
+    private boolean isInvisibleTokenPair(String tokenXId, String tokenYId) {
+        if (invisibleTokenPairs == null) {
+            return false;
+        }
+        for (Pair<String, String> pair : invisibleTokenPairs) {
+            if (pair.getItem1().equals(tokenXId) && pair.getItem2().equals(tokenYId)
+                    || pair.getItem1().equals(tokenYId) && pair.getItem2().equals(tokenXId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @GetMapping(path = "farmingBoostWhitelist")
     public Map<String, String> getFarmingBoostWhitelist() {
         return this.farmingBoostWhitelist;
@@ -82,8 +102,11 @@ public class StarswapController {
 
     @GetMapping(path = "liquidityTokens")
     public List<LiquidityToken> getLiquidityTokens() {
-        return liquidityTokenService.findByDeactivedIsFalse();
+        return liquidityTokenService.findByDeactivedIsFalse().stream().filter(
+                p -> isVisibleTokenPair(p.getLiquidityTokenId().getTokenXId(), p.getLiquidityTokenId().getTokenYId())
+        ).collect(java.util.stream.Collectors.toList());
     }
+
 
     @GetMapping(path = "liquidityTokens/{id}")
     public LiquidityToken getLiquidityToken(@PathVariable(name = "id") @ApiParam("Token pair Id., for example 'BTC:STC'") String id) {
@@ -93,7 +116,10 @@ public class StarswapController {
 
     @GetMapping(path = "liquidityPools")
     public List<LiquidityPool> getLiquidityPools() {
-        return liquidityPoolService.findByDeactivedIsFalse();
+        return liquidityPoolService.findByDeactivedIsFalse().stream().filter(
+                p -> isVisibleTokenPair(p.getLiquidityPoolId().getLiquidityTokenId().getTokenXId(),
+                        p.getLiquidityPoolId().getLiquidityTokenId().getTokenYId())
+        ).collect(java.util.stream.Collectors.toList());
     }
 
     @GetMapping(path = "liquidityPools/{id}")
@@ -111,7 +137,10 @@ public class StarswapController {
     @ApiOperation("Get LP Token farm list")
     @GetMapping(path = "lpTokenFarms")
     public List<LiquidityTokenFarm> getLiquidityTokenFarms() {
-        return liquidityTokenFarmService.findByDeactivedIsFalse();
+        return liquidityTokenFarmService.findByDeactivedIsFalse().stream().filter(
+                p -> isVisibleTokenPair(p.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(),
+                        p.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId())
+        ).collect(java.util.stream.Collectors.toList());
     }
 
     @ApiOperation("Get LP Token farm info.")
@@ -195,7 +224,7 @@ public class StarswapController {
             BigInteger veStarAmount = onChainService.getAccountVeStarAmountByStakeId(accountAddress, s.getId(), s.getTokenTypeTag());
             s.setVeStarAmount(veStarAmount);
         });
-        return  stakeList;
+        return stakeList;
     }
 
     @GetMapping(path = "getAccountVeStarAmount")

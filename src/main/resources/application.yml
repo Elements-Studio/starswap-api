@@ -92,6 +92,7 @@ starswap:
 #    get-pair-price-url: ${starswap.token-price-service.base-url}/priceFeeds/{pairId}
 #  to-usd-pair-id-mappings:
 #    STC: "STCUSD"
+  invisible-token-pairs: '[]'
 
 
 #elasticsearch:
