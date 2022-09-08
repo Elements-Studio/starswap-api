@@ -89,6 +89,10 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 //                ">" +
 //                ">";
 //        System.out.println(HexUtils.byteArrayToHex(MiscUtils.parseStructTag(resourceStructTag2).type_params.get(0).bcsSerialize()));
+
+        String structTag2 = "0x00000000000000000000000000000001::IdentifierNFT::IdentifierNFT<0x6bfb460477adf9dd0455d3de2fc7f211::SBTModule::DaoMember<0x6bfb460477adf9dd0455d3de2fc7f211::SBTModule::SbtTestDAO>, 0x6bfb460477adf9dd0455d3de2fc7f211::SBTModule::DaoMemberBody<0x6bfb460477adf9dd0455d3de2fc7f211::SBTModule::SbtTestDAO>>";
+        StructTag parsed2 = MiscUtils.parseStructTag(structTag2);
+        System.out.println(HexUtils.byteArrayToHex(parsed2.bcsSerialize()));
     }
 
     @Test
