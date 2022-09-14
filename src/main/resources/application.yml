@@ -69,6 +69,7 @@ starcoin:
     add-farm-event-type-tag: "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarm::AddFarmEvent"
     stake-event-type-tag: "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapFarm::StakeEvent"
     syrup-pool-stake-event-type-tag: "0x8c109349c6bd91411d6bc962e080c4a3::TokenSwapSyrup::StakeEvent"
+  event-subscription-enabled: true
 
 starswap:
   contract-address: "0x8c109349c6bd91411d6bc962e080c4a3"

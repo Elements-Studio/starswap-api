@@ -3,6 +3,7 @@ package org.starcoin.starswap.api.taskservice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.Pair;
@@ -13,6 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Service
+@ConditionalOnProperty(value = "starcoin.event-subscription-enabled", havingValue = "true", matchIfMissing = true)
 public class PullingEventTaskAutoCreateTaskService {
     private static final Logger LOG = LoggerFactory.getLogger(PullingEventTaskAutoCreateTaskService.class);
 

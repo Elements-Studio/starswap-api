@@ -29,6 +29,9 @@ public class StarswapApiApplication {
     @Value("${starcoin.network}")
     private String network;
 
+    @Value("${starcoin.event-subscription-enabled}")
+    private boolean eventSubscriptionEnabled;
+
     @Autowired
     private HandleEventService handleEventService;
 
@@ -47,6 +50,9 @@ public class StarswapApiApplication {
 
     @EventListener(ApplicationReadyEvent.class)
     public void runEventSubscribeHandler() {
+        if (!eventSubscriptionEnabled) {
+            return;
+        }
         LOG.info("EXECUTING : EventsSubscribeHandler");
         //LOG.info("es url is " + esUrl);
         for (String seed : seeds) {
