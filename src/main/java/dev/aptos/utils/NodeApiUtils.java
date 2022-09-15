@@ -3,6 +3,7 @@ package dev.aptos.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aptos.bean.Event;
+import dev.aptos.bean.LedgerInfo;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -15,6 +16,18 @@ import java.util.stream.Collectors;
 
 public class NodeApiUtils {
     private NodeApiUtils() {
+    }
+
+    public static LedgerInfo getLedgerInfo(String baseUrl) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        HttpUrl url = HttpUrl.parse(baseUrl);
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        String body = response.body().string();
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(body, LedgerInfo.class);
     }
 
     public static List<Event<?>> getEvents(String baseUrl, String accountAddress,

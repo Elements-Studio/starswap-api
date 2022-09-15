@@ -21,6 +21,9 @@ public class EventTests {
         });
         List<Event<HelloBlockchainMessageChangeEvent>> events_2 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, HelloBlockchainMessageChangeEvent.class);
         System.out.println(events_2);
+
+        LedgerInfo ledgerInfo = NodeApiUtils.getLedgerInfo(baseUrl);
+        System.out.println(ledgerInfo);
     }
 
 
