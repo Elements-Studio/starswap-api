@@ -31,8 +31,9 @@ public class NodeApiUtils {
     }
 
     public static List<Event<?>> getEvents(String baseUrl, String accountAddress,
-                                             String eventHandleStruct, String eventHandleFieldName) throws IOException {
-        Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName);
+                                           String eventHandleStruct, String eventHandleFieldName,
+                                           Long start, Integer limit) throws IOException {
+        Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -44,8 +45,8 @@ public class NodeApiUtils {
 
     public static <TData> List<Event<TData>> getEvents(String baseUrl, String accountAddress,
                                                        String eventHandleStruct, String eventHandleFieldName,
-                                                       Class<TData> eventDataType) throws IOException {
-        Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName);
+                                                       Class<TData> eventDataType, Long start, Integer limit) throws IOException {
+        Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -57,14 +58,22 @@ public class NodeApiUtils {
         }
     }
 
-    private static Request newGetEventsRequest(String baseUrl, String accountAddress, String eventHandleStruct, String eventHandleFieldName) {
-        HttpUrl url = HttpUrl.parse(baseUrl).newBuilder()
+    private static Request newGetEventsRequest(String baseUrl, String accountAddress,
+                                               String eventHandleStruct, String eventHandleFieldName,
+                                               Long start, Integer limit) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("accounts")
                 .addPathSegment(accountAddress)
                 .addPathSegment("events")
                 .addPathSegment(eventHandleStruct)
-                .addPathSegment(eventHandleFieldName)
-                .build();
+                .addPathSegment(eventHandleFieldName);
+        if (start != null) {
+            builder.addQueryParameter("start", start.toString());
+        }
+        if (limit != null) {
+            builder.addQueryParameter("limit", limit.toString());
+        }
+        HttpUrl url = builder.build();
         return new Request.Builder()
                 .url(url)
                 .build();
