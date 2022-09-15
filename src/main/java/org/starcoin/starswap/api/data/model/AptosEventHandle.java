@@ -112,11 +112,20 @@ public class AptosEventHandle {
         this.version = version;
     }
 
+    public String getEventJavaType() {
+        return eventJavaType;
+    }
+
+    public void setEventJavaType(String eventJavaType) {
+        this.eventJavaType = eventJavaType;
+    }
+
     @Override
     public String toString() {
         return "AptosEventHandle{" +
                 "aptosEventHandleId=" + aptosEventHandleId +
                 ", eventKey='" + eventKey + '\'' +
+                ", eventJavaType='" + eventJavaType + '\'' +
                 ", nextSequenceNumber=" + nextSequenceNumber +
                 ", createdBy='" + createdBy + '\'' +
                 ", updatedBy='" + updatedBy + '\'' +
