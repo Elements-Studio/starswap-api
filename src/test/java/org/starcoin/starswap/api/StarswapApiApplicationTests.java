@@ -63,16 +63,14 @@ class StarswapApiApplicationTests {
     @Autowired
     LiquidityTokenFarmService liquidityTokenFarmService;
 
-    public static void addNodeHeartbeat(NodeHeartbeatRepository nodeHeartbeatRepository, NodeHeartbeat b7) {
-        b7.setCreatedAt(System.currentTimeMillis());
-        b7.setCreatedBy("admin");
-        b7.setUpdatedAt(b7.getCreatedAt());
-        b7.setUpdatedBy(b7.getCreatedBy());
-        nodeHeartbeatRepository.save(b7);
-    }
+    @Autowired
+    AptosEventHandleRepository aptosEventHandleRepository;
 
     @Test
     void contextLoads() {
+        AptosEventHandle h = aptosEventHandleRepository.findFirstByEventJavaType("HelloBlockchainMessageChangeEvent");
+        System.out.println(h);
+        if (true) return;
 
         try {
             JsonRpcClient jsonRpcClient = new JsonRpcClient("https://main-seed.starcoin.org");
@@ -214,6 +212,14 @@ class StarswapApiApplicationTests {
         // test queries...
         System.out.println(liquidityTokenService.findOneByTokenIdPair("Bot", "Ddd"));
         System.out.println(liquidityPoolService.findOneByTokenIdPair("Bot", "Ddd"));
+    }
+
+    private static void addNodeHeartbeat(NodeHeartbeatRepository nodeHeartbeatRepository, NodeHeartbeat b7) {
+        b7.setCreatedAt(System.currentTimeMillis());
+        b7.setCreatedBy("admin");
+        b7.setUpdatedAt(b7.getCreatedAt());
+        b7.setUpdatedBy(b7.getCreatedBy());
+        nodeHeartbeatRepository.save(b7);
     }
 
     private void addTestNodeHeartbeats() {
