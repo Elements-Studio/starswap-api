@@ -12,6 +12,13 @@ public class EventTests {
         String accountAddress = "2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14";
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
+
+        AccountResource<TestTableHolder> resource = NodeApiUtils.getAccountResource(baseUrl, accountAddress,
+                "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::hello_table::TableHolder",
+                TestTableHolder.class, null);
+        System.out.println(resource.getData().getTable().getHandle());
+        if (true) return;
+
         List<Event<?>> events_1 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
         System.out.println(events_1);
         events_1.forEach(event -> {
@@ -24,8 +31,29 @@ public class EventTests {
 
         LedgerInfo ledgerInfo = NodeApiUtils.getLedgerInfo(baseUrl);
         System.out.println(ledgerInfo);
+
+
     }
 
+
+    public static class TestTableHolder {
+        private Table table;
+
+        public Table getTable() {
+            return table;
+        }
+
+        public void setTable(Table table) {
+            this.table = table;
+        }
+
+        @Override
+        public String toString() {
+            return "TestTableHolder{" +
+                    "table=" + table +
+                    '}';
+        }
+    }
 
     public static class HelloBlockchainMessageChangeEvent {
         public String from_message;

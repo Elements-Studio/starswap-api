@@ -2,6 +2,7 @@ package dev.aptos.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.aptos.bean.AccountResource;
 import dev.aptos.bean.Event;
 import dev.aptos.bean.LedgerInfo;
 import okhttp3.HttpUrl;
@@ -56,6 +57,32 @@ public class NodeApiUtils {
                             objectMapper.getTypeFactory().constructParametricType(Event.class, eventDataType)))
                     .collect(Collectors.toList());
         }
+    }
+
+    public static <TData> AccountResource<TData> getAccountResource(String baseUrl, String accountAddress, String resourceType,
+                                                                    Class<TData> dataType, String ledgerVersion) throws IOException {
+        Request request = newGetAccountResourceRequest(baseUrl, accountAddress, resourceType, ledgerVersion);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(),
+                    objectMapper.getTypeFactory().constructParametricType(AccountResource.class, dataType));
+        }
+    }
+
+    private static Request newGetAccountResourceRequest(String baseUrl, String accountAddress, String resourceType, String ledgerVersion) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("accounts")
+                .addPathSegment(accountAddress)
+                .addPathSegment("resource")
+                .addPathSegment(resourceType);
+        if (ledgerVersion != null) {
+            builder.addQueryParameter("ledger_version", ledgerVersion);
+        }
+        HttpUrl url = builder.build();
+        return new Request.Builder()
+                .url(url)
+                .build();
     }
 
     private static Request newGetEventsRequest(String baseUrl, String accountAddress,
