@@ -3,6 +3,7 @@ package dev.aptos.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.aptos.bean.Account;
 import dev.aptos.bean.AccountResource;
 import dev.aptos.bean.Event;
 import dev.aptos.bean.LedgerInfo;
@@ -75,6 +76,19 @@ public class NodeApiUtils {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves high level information about an account such as its sequence number and authentication key.
+     */
+    public static Account getAccount(String baseUrl, String accountAddress) {
+        Request request = newGetAccountRequest(baseUrl, accountAddress);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(), Account.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static <TData> AccountResource<TData> getAccountResource(String baseUrl, String accountAddress, String resourceType,
                                                                     Class<TData> dataType, String ledgerVersion) throws IOException {
@@ -150,6 +164,14 @@ public class NodeApiUtils {
         if (ledgerVersion != null) {
             builder.addQueryParameter("ledger_version", ledgerVersion);
         }
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
+
+    private static Request newGetAccountRequest(String baseUrl, String accountAddress) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("accounts")
+                .addPathSegment(accountAddress);
         HttpUrl url = builder.build();
         return new Request.Builder().url(url).build();
     }
