@@ -14,9 +14,15 @@ public class EventTests {
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
 
+        List<Event<HelloBlockchainMessageChangeEvent>> eventList = NodeApiUtils.getEvents(baseUrl,
+                "0x04000000000000002b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14",
+                HelloBlockchainMessageChangeEvent.class, null, null);
+        System.out.println(eventList);
+        //if (true) return;
+
         List<AccountResource<Object>> resources = NodeApiUtils.getAccountResources(baseUrl, accountAddress, null);
         System.out.println(resources);
-        if (true) return;
+        //if (true) return;
 
         String hex = NodeApiUtils.getTableItem(baseUrl,
                 "0xb0239bb1d99e33fd9897f219b9767fd68b7b486f1fda4628765ab91e3851b364",
@@ -24,13 +30,13 @@ public class EventTests {
                 HexUtils.byteArrayToHexWithPrefix("hello".getBytes()), String.class, null);
         System.out.println(hex);
         System.out.println(new String(HexUtils.hexToByteArray(hex)));
-        if (true) return;
+        //if (true) return;
 
         AccountResource<TestTableHolder> resource = NodeApiUtils.getAccountResource(baseUrl, accountAddress,
                 "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::hello_table::TableHolder",
                 TestTableHolder.class, null);
         System.out.println(resource.getData().getTable().getHandle());
-        if (true) return;
+        //if (true) return;
 
         List<Event<?>> events_1 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
         System.out.println(events_1);

@@ -49,14 +49,32 @@ public class NodeApiUtils {
         Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<Map<String, Object>> mapList = objectMapper.readValue(response.body().string(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
-            return mapList.stream().map(map -> (Event<TData>) objectMapper.convertValue(map,
-                            objectMapper.getTypeFactory().constructParametricType(Event.class, eventDataType)))
-                    .collect(Collectors.toList());
+            return readEventList(response.body().string(), eventDataType);
         }
     }
+
+    /**
+     * Get events by event key.
+     */
+    public static <TData> List<Event<TData>> getEvents(String baseUrl, String eventKey,
+                                                       Class<TData> eventDataType,
+                                                       Long start, Integer limit) throws IOException {
+        Request request = newGetEventsRequest(baseUrl, eventKey, start, limit);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            return readEventList(response.body().string(), eventDataType);
+        }
+    }
+
+    private static <TData> List<Event<TData>> readEventList(String json, Class<TData> eventDataType) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Map<String, Object>> mapList = objectMapper.readValue(json,
+                objectMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+        return mapList.stream().map(map -> (Event<TData>) objectMapper.convertValue(map,
+                        objectMapper.getTypeFactory().constructParametricType(Event.class, eventDataType)))
+                .collect(Collectors.toList());
+    }
+
 
     public static <TData> AccountResource<TData> getAccountResource(String baseUrl, String accountAddress, String resourceType,
                                                                     Class<TData> dataType, String ledgerVersion) throws IOException {
@@ -155,4 +173,17 @@ public class NodeApiUtils {
         return new Request.Builder().url(url).build();
     }
 
+    private static Request newGetEventsRequest(String baseUrl, String eventKey, Long start, Integer limit) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("events")
+                .addPathSegment(eventKey);
+        if (start != null) {
+            builder.addQueryParameter("start", start.toString());
+        }
+        if (limit != null) {
+            builder.addQueryParameter("limit", limit.toString());
+        }
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
 }

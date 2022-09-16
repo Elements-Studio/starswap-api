@@ -31,6 +31,15 @@ public class Event<TData> {
     @JsonProperty("data")
     private TData data;
 
+    /*
+    "guid": {
+      "creation_number": "4",
+      "account_address": "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14"
+    },
+     */
+    @JsonProperty("guid")
+    private Guid guid;
+
     public String getVersion() {
         return version;
     }
@@ -80,5 +89,28 @@ public class Event<TData> {
                 ", type='" + type + '\'' +
                 ", data=" + data +
                 '}';
+    }
+
+    public static class Guid {
+        @JsonProperty("creation_number")
+        private String creationNumber;
+        @JsonProperty("account_address")
+        private String accountAddress;
+
+        public String getCreationNumber() {
+            return creationNumber;
+        }
+
+        public void setCreationNumber(String creationNumber) {
+            this.creationNumber = creationNumber;
+        }
+
+        public String getAccountAddress() {
+            return accountAddress;
+        }
+
+        public void setAccountAddress(String accountAddress) {
+            this.accountAddress = accountAddress;
+        }
     }
 }
