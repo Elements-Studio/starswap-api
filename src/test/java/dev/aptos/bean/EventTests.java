@@ -14,6 +14,10 @@ public class EventTests {
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
 
+        List<AccountResource<Object>> resources = NodeApiUtils.getAccountResources(baseUrl, accountAddress, null);
+        System.out.println(resources);
+        if (true) return;
+
         String hex = NodeApiUtils.getTableItem(baseUrl,
                 "0xb0239bb1d99e33fd9897f219b9767fd68b7b486f1fda4628765ab91e3851b364",
                 "vector<u8>", "vector<u8>",
