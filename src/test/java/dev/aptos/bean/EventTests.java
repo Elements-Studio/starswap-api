@@ -1,6 +1,7 @@
 package dev.aptos.bean;
 
 import dev.aptos.utils.NodeApiUtils;
+import org.starcoin.utils.HexUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,6 +13,14 @@ public class EventTests {
         String accountAddress = "2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14";
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
+
+        String hex = NodeApiUtils.getTableItem(baseUrl,
+                "0xb0239bb1d99e33fd9897f219b9767fd68b7b486f1fda4628765ab91e3851b364",
+                "vector<u8>", "vector<u8>",
+                HexUtils.byteArrayToHexWithPrefix("hello".getBytes()), String.class, null);
+        System.out.println(hex);
+        System.out.println(new String(HexUtils.hexToByteArray(hex)));
+        if (true) return;
 
         AccountResource<TestTableHolder> resource = NodeApiUtils.getAccountResource(baseUrl, accountAddress,
                 "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::hello_table::TableHolder",

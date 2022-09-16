@@ -1,16 +1,15 @@
 package dev.aptos.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aptos.bean.AccountResource;
 import dev.aptos.bean.Event;
 import dev.aptos.bean.LedgerInfo;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -70,6 +69,35 @@ public class NodeApiUtils {
         }
     }
 
+    public static <T> T getTableItem(String baseUrl, String tableHandle, String keyType, String valueType, Object key,
+                                     Class<T> valueJavaType, String ledgerVersion) throws IOException {
+        Request request = newGetTableItemRequest(baseUrl, tableHandle, keyType, valueType, key, ledgerVersion);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(), valueJavaType);
+        }
+    }
+
+    private static Request newGetTableItemRequest(String baseUrl, String tableHandle,
+                                                  String keyType, String valueType, Object key, String ledgerVersion) throws JsonProcessingException {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("tables")
+                .addPathSegment(tableHandle)
+                .addPathSegment("item");
+        if (ledgerVersion != null) {
+            builder.addQueryParameter("ledger_version", ledgerVersion);
+        }
+        HttpUrl url = builder.build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> bodyMap = new LinkedHashMap<>();
+        bodyMap.put("key_type", keyType);
+        bodyMap.put("value_type", valueType);
+        bodyMap.put("key", key);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), objectMapper.writeValueAsString(bodyMap));
+        return new Request.Builder().url(url).post(body).build();
+    }
+
     private static Request newGetAccountResourceRequest(String baseUrl, String accountAddress, String resourceType, String ledgerVersion) {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("accounts")
@@ -80,9 +108,7 @@ public class NodeApiUtils {
             builder.addQueryParameter("ledger_version", ledgerVersion);
         }
         HttpUrl url = builder.build();
-        return new Request.Builder()
-                .url(url)
-                .build();
+        return new Request.Builder().url(url).build();
     }
 
     private static Request newGetEventsRequest(String baseUrl, String accountAddress,
@@ -101,9 +127,7 @@ public class NodeApiUtils {
             builder.addQueryParameter("limit", limit.toString());
         }
         HttpUrl url = builder.build();
-        return new Request.Builder()
-                .url(url)
-                .build();
+        return new Request.Builder().url(url).build();
     }
 
 }
