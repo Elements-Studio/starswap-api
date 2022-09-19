@@ -3,10 +3,7 @@ package dev.aptos.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.aptos.bean.Account;
-import dev.aptos.bean.AccountResource;
-import dev.aptos.bean.Event;
-import dev.aptos.bean.LedgerInfo;
+import dev.aptos.bean.*;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -20,15 +17,33 @@ public class NodeApiUtils {
     }
 
     public static LedgerInfo getLedgerInfo(String baseUrl) throws IOException {
-        OkHttpClient client = new OkHttpClient();
         HttpUrl url = HttpUrl.parse(baseUrl);
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = client.newCall(request).execute();
-        String body = response.body().string();
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(body, LedgerInfo.class);
+        Request request = new Request.Builder().url(url).build();
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            String body = response.body().string();
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(body, LedgerInfo.class);
+        }
+    }
+
+    public static Transaction getTransactionByHash(String baseUrl, String hash) throws IOException {
+        Request request = newGetTransactionByHash(baseUrl, hash);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            String body = response.body().string();
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(body, Transaction.class);
+        }
+    }
+
+    private static Request newGetTransactionByHash(String baseUrl, String hash) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("by_hash")
+                .addPathSegment(hash);
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
     }
 
     public static List<Event<?>> getEvents(String baseUrl, String accountAddress,
