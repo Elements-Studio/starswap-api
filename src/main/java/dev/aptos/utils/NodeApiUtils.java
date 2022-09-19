@@ -47,23 +47,17 @@ public class NodeApiUtils {
         }
     }
 
-    private static Request newGetTransactionByHash(String baseUrl, String hash) {
-        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
-                .addPathSegment("transactions")
-                .addPathSegment("by_hash")
-                .addPathSegment(hash);
-        HttpUrl url = builder.build();
-        return new Request.Builder().url(url).build();
+    public static List<Transaction> getAccountTransactions(String baseUrl, String address, Long start, Integer limit) throws IOException {
+        Request request = newGetAccountTransactions(baseUrl, address, start, limit);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            String body = response.body().string();
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(body, new TypeReference<List<Transaction>>() {
+            });
+        }
     }
 
-    private static Request newGetTransactionByVersion(String baseUrl, String version) {
-        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
-                .addPathSegment("transactions")
-                .addPathSegment("by_version")
-                .addPathSegment(version);
-        HttpUrl url = builder.build();
-        return new Request.Builder().url(url).build();
-    }
 
     public static List<Event<?>> getEvents(String baseUrl, String accountAddress,
                                            String eventHandleStruct, String eventHandleFieldName,
@@ -242,4 +236,39 @@ public class NodeApiUtils {
         HttpUrl url = builder.build();
         return new Request.Builder().url(url).build();
     }
+
+
+    private static Request newGetTransactionByHash(String baseUrl, String hash) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("by_hash")
+                .addPathSegment(hash);
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
+
+    private static Request newGetTransactionByVersion(String baseUrl, String version) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("by_version")
+                .addPathSegment(version);
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
+
+    private static Request newGetAccountTransactions(String baseUrl, String address, Long start, Integer limit) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("accounts")
+                .addPathSegment(address)
+                .addPathSegment("transactions");
+        if (start != null) {
+            builder.addQueryParameter("start", start.toString());
+        }
+        if (limit != null) {
+            builder.addQueryParameter("limit", limit.toString());
+        }
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
+
 }
