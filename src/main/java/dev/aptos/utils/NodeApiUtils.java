@@ -37,11 +37,30 @@ public class NodeApiUtils {
         }
     }
 
+    public static Transaction getTransactionByVersion(String baseUrl, String version) throws IOException {
+        Request request = newGetTransactionByVersion(baseUrl, version);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            String body = response.body().string();
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(body, Transaction.class);
+        }
+    }
+
     private static Request newGetTransactionByHash(String baseUrl, String hash) {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("transactions")
                 .addPathSegment("by_hash")
                 .addPathSegment(hash);
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
+
+    private static Request newGetTransactionByVersion(String baseUrl, String version) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("by_version")
+                .addPathSegment(version);
         HttpUrl url = builder.build();
         return new Request.Builder().url(url).build();
     }

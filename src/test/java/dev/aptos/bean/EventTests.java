@@ -16,6 +16,8 @@ public class EventTests {
 
         Transaction transaction = NodeApiUtils.getTransactionByHash(baseUrl, "0xbcaac6583ecd9ce75ed65b1fbef6f530d4d40c57b0d6c1672d5f2584e7ca9752");
         System.out.println(transaction);
+        Transaction transaction2 = NodeApiUtils.getTransactionByVersion(baseUrl, "11742804");
+        System.out.println(transaction2);
         if (true) return;
 
         Account account = NodeApiUtils.getAccount(baseUrl, accountAddress);
