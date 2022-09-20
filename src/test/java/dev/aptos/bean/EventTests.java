@@ -43,6 +43,8 @@ public class EventTests {
         System.out.println(transaction);
         System.out.println(transaction.getSuccess());
         System.out.println(transaction.getVmStatus());
+//        List<Event<?>> events_0 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
+//        System.out.println(events_0);
         if (true) return;
 
         Block block = NodeApiUtils.getBlocksByHeight(baseUrl, "1", true);

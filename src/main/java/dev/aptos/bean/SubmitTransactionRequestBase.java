@@ -66,7 +66,7 @@ public abstract class SubmitTransactionRequestBase {
 
     @Override
     public String toString() {
-        return "TransactionSubmissionRequestBase{" +
+        return "SubmitTransactionRequestBase{" +
                 "sender='" + sender + '\'' +
                 ", sequenceNumber='" + sequenceNumber + '\'' +
                 ", maxGasAmount='" + maxGasAmount + '\'' +
