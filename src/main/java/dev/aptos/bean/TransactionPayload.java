@@ -2,9 +2,12 @@ package dev.aptos.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 public class TransactionPayload {
+    public static String TYPE_ENTRY_FUNCTION_PAYLOAD = "entry_function_payload";
+
     @JsonProperty("type")//:"entry_function_payload",
     private String type;
 
@@ -12,7 +15,7 @@ public class TransactionPayload {
     private String function;
 
     @JsonProperty("type_arguments")//:[
-    private List<String> typeArguments;
+    private List<String> typeArguments = Collections.emptyList();
 
     @JsonProperty("arguments")//:[
     private List<Object> arguments;

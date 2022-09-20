@@ -1,18 +1,49 @@
 package dev.aptos.bean;
 
 import dev.aptos.utils.NodeApiUtils;
+import org.starcoin.starswap.api.utils.SignatureUtils;
 import org.starcoin.utils.HexUtils;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 public class EventTests {
 
     public static void main(String[] args) throws IOException {
         String baseUrl = "https://fullnode.devnet.aptoslabs.com/v1";
-        String accountAddress = "2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14";
+        String accountAddress = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14";
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
+
+
+        TransactionPayload transactionPayload = new TransactionPayload();
+        transactionPayload.setType(TransactionPayload.TYPE_ENTRY_FUNCTION_PAYLOAD);
+        transactionPayload.setFunction("0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::set_message");
+        List<Object> transactionArgs = Collections.singletonList("hello world!");
+        transactionPayload.setArguments(transactionArgs);
+        //transactionPayload.setTypeArguments();
+        EncodeSubmissionRequest encodeSubmissionRequest = NodeApiUtils.newEncodeSubmissionRequest(baseUrl, accountAddress,
+                System.currentTimeMillis() / 1000L + 600, transactionPayload, null);
+        String toSign = NodeApiUtils.encodeSubmission(baseUrl, encodeSubmissionRequest);
+        System.out.println(toSign);
+        byte[] publicKey = HexUtils.hexToByteArray("0xa76e9dd1a2d9101de47e69e52e0232060b95cd7d80265d61c3fa25e406389b75");
+        byte[] privateKey = HexUtils.hexToByteArray("0x09cc77f21e471431df54280da75749069b54bfe42e3cd2b532a1024262339090");
+        byte[] signature = SignatureUtils.ed25519Sign(privateKey, HexUtils.hexToByteArray(toSign));
+        Signature s = new Signature();
+        s.setType(Signature.TYPE_ED25519_SIGNATURE);
+        s.setPublicKey(HexUtils.byteArrayToHexWithPrefix(publicKey));
+        s.setSignature(HexUtils.byteArrayToHexWithPrefix(signature));
+        SubmitTransactionRequest submitTransactionRequest = NodeApiUtils.toSubmitTransactionRequest(encodeSubmissionRequest);
+        submitTransactionRequest.setSignature(s);
+        System.out.println(submitTransactionRequest);
+        Transaction submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
+        System.out.println(submitTransactionResult);
+        Transaction transaction = NodeApiUtils.getTransactionByHash(baseUrl, submitTransactionResult.getHash());
+        System.out.println(transaction);
+        System.out.println(transaction.getSuccess());
+        System.out.println(transaction.getVmStatus());
+        if (true) return;
 
         Block block = NodeApiUtils.getBlocksByHeight(baseUrl, "1", true);
         System.out.println(block);
@@ -28,8 +59,6 @@ public class EventTests {
         System.out.println(transactions);
         //if (true) return;
 
-        Transaction transaction = NodeApiUtils.getTransactionByHash(baseUrl, "0xbcaac6583ecd9ce75ed65b1fbef6f530d4d40c57b0d6c1672d5f2584e7ca9752");
-        System.out.println(transaction);
         Transaction transaction2 = NodeApiUtils.getTransactionByVersion(baseUrl, "11742804");
         System.out.println(transaction2);
         //if (true) return;

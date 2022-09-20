@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aptos.bean.*;
 import okhttp3.*;
+import okio.ByteString;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -13,7 +14,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class NodeApiUtils {
+    private static final long DEFAULT_MAX_GAS_AMOUNT = 2000L;
+
     private NodeApiUtils() {
+    }
+
+    public static SubmitTransactionRequest toSubmitTransactionRequest(EncodeSubmissionRequest encodeSubmissionRequest) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> map = objectMapper.convertValue(encodeSubmissionRequest, new TypeReference<Map<String, Object>>() {
+        });
+        return objectMapper.convertValue(map, SubmitTransactionRequest.class);
     }
 
     public static LedgerInfo getLedgerInfo(String baseUrl) throws IOException {
@@ -172,15 +182,80 @@ public class NodeApiUtils {
         }
     }
 
-    public static GasEstimation estimateGasPrice(String baseUrl) {
+    public static GasEstimation estimateGasPrice(String baseUrl) throws IOException {
         Request request = newEstimateGasPriceRequest(baseUrl);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(response.body().string(), GasEstimation.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+    }
+
+    public static Transaction submitTransaction(String baseUrl, SubmitTransactionRequest submitTransactionRequest) throws IOException {
+        Request httpRequest = newSubmitTransactionHttpRequest(baseUrl, submitTransactionRequest);
+        //HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor(new HttpLogger());
+        //logInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        OkHttpClient client = new OkHttpClient.Builder()
+                //        .addNetworkInterceptor(logInterceptor)
+                .build();
+        try (Response response = client.newCall(httpRequest).execute()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(), Transaction.class);
+        }
+    }
+
+    //    public static class HttpLogger implements HttpLoggingInterceptor.Logger {
+    //        @Override
+    //        public void log(String message) {
+    //            System.out.println("HttpLogInfo\t" + message);
+    //        }
+    //    }
+
+    public static String encodeSubmission(String baseUrl, EncodeSubmissionRequest r) throws IOException {
+        Request httpRequest = newEncodeSubmissionHttpRequest(baseUrl, r);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(httpRequest).execute()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(), String.class);
+        }
+    }
+
+    public static EncodeSubmissionRequest newEncodeSubmissionRequest(String baseUrl, String sender, Long expirationTimestampSecs, Object payload, Long maxGasAmount) throws IOException {
+        EncodeSubmissionRequest r = new EncodeSubmissionRequest();
+        r.setSender(sender);
+        r.setExpirationTimestampSecs(expirationTimestampSecs.toString());
+        r.setMaxGasAmount("" + (maxGasAmount != null ? maxGasAmount : DEFAULT_MAX_GAS_AMOUNT));//todo
+        r.setSequenceNumber(getAccountSequenceNumber(baseUrl, sender));
+        r.setGasUnitPrice(estimateGasPrice(baseUrl).getGasEstimate().toString());
+        r.setPayload(payload);
+        return r;
+    }
+
+    private static Request newEncodeSubmissionHttpRequest(String baseUrl, EncodeSubmissionRequest request) throws JsonProcessingException {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("encode_submission");
+        HttpUrl url = builder.build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(request);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), ByteString.encodeUtf8(json));
+        return new Request.Builder().url(url).post(body).build();
+    }
+
+    private static Request newSubmitTransactionHttpRequest(String baseUrl, SubmitTransactionRequest request) throws JsonProcessingException {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions");
+        HttpUrl url = builder.build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(request);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), ByteString.encodeUtf8(json));
+        return new Request.Builder().url(url).post(body)
+                //.header("Content-Type", "application/json")
+                .build();
+    }
+
+    private static String getAccountSequenceNumber(String baseUrl, String sender) {
+        return getAccount(baseUrl, sender).getSequenceNumber();
     }
 
     private static Request newEstimateGasPriceRequest(String baseUrl) {
