@@ -1,6 +1,6 @@
 package dev.aptos.bean;
 
-public class EncodeSubmissionRequest extends TransactionSubmissionRequestBase {
+public class EncodeSubmissionRequest extends SubmitTransactionRequestBase {
 
     @Override
     public String toString() {

@@ -2,7 +2,7 @@ package dev.aptos.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SubmitTransactionRequest extends TransactionSubmissionRequestBase {
+public class SubmitTransactionRequest extends SubmitTransactionRequestBase {
 
     @JsonProperty("signature")
     private Signature signature;

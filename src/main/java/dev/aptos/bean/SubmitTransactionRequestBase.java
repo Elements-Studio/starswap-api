@@ -2,7 +2,7 @@ package dev.aptos.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public abstract class TransactionSubmissionRequestBase {
+public abstract class SubmitTransactionRequestBase {
     @JsonProperty("sender")//: f"{sender.address()}",
     private String sender;
     @JsonProperty("sequence_number")//: str(self.account_sequence_number(sender.address())),
