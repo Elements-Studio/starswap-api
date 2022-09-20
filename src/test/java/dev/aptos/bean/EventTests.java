@@ -13,9 +13,16 @@ public class EventTests {
         String accountAddress = "2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14";
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
+
+        Block block = NodeApiUtils.getBlocksByHeight(baseUrl, "1", true);
+        System.out.println(block);
+        Block block2 = NodeApiUtils.getBlocksByVersion(baseUrl, "1", true);
+        System.out.println(block2);
+        if (true) return;
+
         GasEstimation gasEstimation = NodeApiUtils.estimateGasPrice(baseUrl);
         System.out.println(gasEstimation);
-        if (true) return;
+        //if (true) return;
 
         List<Transaction> transactions = NodeApiUtils.getAccountTransactions(baseUrl, accountAddress, null, 100);
         System.out.println(transactions);

@@ -47,6 +47,23 @@ public class Transaction {
     @JsonProperty("type")//:"user_transaction"
     private String type;
 
+    @JsonProperty("id")//:"0x66bdfab31d6fed23f1e0afaf714e421f605c2c74840782ceb004165584449e73",
+    private String id;
+    @JsonProperty("epoch")//:"1",
+    private String epoch;
+    @JsonProperty("round")//:"2",
+    private String round;
+
+    @JsonProperty("previous_block_votes_bitvec")
+    private List<Integer> previousBlockVotesBitvec;
+
+    @JsonProperty("proposer")
+    private String proposer;
+
+    @JsonProperty("failed_proposer_indices")
+    private List<Integer> failedProposerIndices;
+
+
     public String getVersion() {
         return version;
     }
@@ -207,6 +224,54 @@ public class Transaction {
         this.type = type;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getEpoch() {
+        return epoch;
+    }
+
+    public void setEpoch(String epoch) {
+        this.epoch = epoch;
+    }
+
+    public String getRound() {
+        return round;
+    }
+
+    public void setRound(String round) {
+        this.round = round;
+    }
+
+    public List<Integer> getPreviousBlockVotesBitvec() {
+        return previousBlockVotesBitvec;
+    }
+
+    public void setPreviousBlockVotesBitvec(List<Integer> previousBlockVotesBitvec) {
+        this.previousBlockVotesBitvec = previousBlockVotesBitvec;
+    }
+
+    public String getProposer() {
+        return proposer;
+    }
+
+    public void setProposer(String proposer) {
+        this.proposer = proposer;
+    }
+
+    public List<Integer> getFailedProposerIndices() {
+        return failedProposerIndices;
+    }
+
+    public void setFailedProposerIndices(List<Integer> failedProposerIndices) {
+        this.failedProposerIndices = failedProposerIndices;
+    }
+
     @Override
     public String toString() {
         return "Transaction{" +
@@ -230,6 +295,12 @@ public class Transaction {
                 ", events=" + events +
                 ", timestamp='" + timestamp + '\'' +
                 ", type='" + type + '\'' +
+                ", id='" + id + '\'' +
+                ", epoch='" + epoch + '\'' +
+                ", round='" + round + '\'' +
+                ", previousBlockVotesBitvec=" + previousBlockVotesBitvec +
+                ", proposer='" + proposer + '\'' +
+                ", failedProposerIndices=" + failedProposerIndices +
                 '}';
     }
 }
