@@ -151,6 +151,24 @@ public class NodeApiUtils {
         }
     }
 
+    public static GasEstimation estimateGasPrice(String baseUrl) {
+        Request request = newEstimateGasPriceRequest(baseUrl);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(), GasEstimation.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Request newEstimateGasPriceRequest(String baseUrl) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("estimate_gas_price");
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
+
     private static Request newGetTableItemRequest(String baseUrl, String tableHandle,
                                                   String keyType, String valueType, Object key, String ledgerVersion) throws JsonProcessingException {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()

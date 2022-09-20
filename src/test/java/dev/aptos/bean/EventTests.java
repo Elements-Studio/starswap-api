@@ -13,20 +13,23 @@ public class EventTests {
         String accountAddress = "2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14";
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
+        GasEstimation gasEstimation = NodeApiUtils.estimateGasPrice(baseUrl);
+        System.out.println(gasEstimation);
+        if (true) return;
 
         List<Transaction> transactions = NodeApiUtils.getAccountTransactions(baseUrl, accountAddress, null, 100);
         System.out.println(transactions);
-        if (true) return;
+        //if (true) return;
 
         Transaction transaction = NodeApiUtils.getTransactionByHash(baseUrl, "0xbcaac6583ecd9ce75ed65b1fbef6f530d4d40c57b0d6c1672d5f2584e7ca9752");
         System.out.println(transaction);
         Transaction transaction2 = NodeApiUtils.getTransactionByVersion(baseUrl, "11742804");
         System.out.println(transaction2);
-        if (true) return;
+        //if (true) return;
 
         Account account = NodeApiUtils.getAccount(baseUrl, accountAddress);
         System.out.println(account);
-        if (true) return;
+        //if (true) return;
 
         List<Event<HelloBlockchainMessageChangeEvent>> eventList = NodeApiUtils.getEvents(baseUrl,
                 "0x04000000000000002b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14",
