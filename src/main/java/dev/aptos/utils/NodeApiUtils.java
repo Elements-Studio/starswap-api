@@ -20,6 +20,11 @@ public class NodeApiUtils {
     private NodeApiUtils() {
     }
 
+    public static byte[] rawTransactionToSign(byte[] m) {
+        return com.google.common.primitives.Bytes
+                .concat(HashUtils.hashWithAptosPrefix("RawTransaction"), m);
+    }
+
     public static SubmitTransactionRequest toSubmitTransactionRequest(EncodeSubmissionRequest encodeSubmissionRequest) {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> map = objectMapper.convertValue(encodeSubmissionRequest, new TypeReference<Map<String, Object>>() {

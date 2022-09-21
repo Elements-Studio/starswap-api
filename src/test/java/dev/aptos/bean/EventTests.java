@@ -1,11 +1,15 @@
 package dev.aptos.bean;
 
+import com.novi.bcs.BcsSerializer;
+import com.novi.serde.Bytes;
+import com.novi.serde.SerializationError;
+import dev.aptos.types.*;
 import dev.aptos.utils.NodeApiUtils;
 import org.starcoin.starswap.api.utils.SignatureUtils;
 import org.starcoin.utils.HexUtils;
 
 import java.io.IOException;
-import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,9 +20,19 @@ public class EventTests {
         String accountAddress = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14";
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
+        //byte chainId = 32;
+        long maxGasAmount = 4003243L;
+
+        long expirationTimestampSecs = System.currentTimeMillis() / 1000L + 600;
+        ChainId chainId = new ChainId((byte) 32);
+
+//        LedgerInfo ledgerInfo = NodeApiUtils.getLedgerInfo(baseUrl);
+//        System.out.println(ledgerInfo);
+//        if (true) return;
 
 //        BigInteger balance = NodeApiUtils.getAccountBalance(baseUrl, accountAddress);
 //        System.out.println(balance);
+//        if (true) return;
 
         TransactionPayload transactionPayload = new TransactionPayload();
         transactionPayload.setType(TransactionPayload.TYPE_ENTRY_FUNCTION_PAYLOAD);
@@ -27,9 +41,34 @@ public class EventTests {
         transactionPayload.setArguments(transactionArgs);
         //transactionPayload.setTypeArguments();
         EncodeSubmissionRequest encodeSubmissionRequest = NodeApiUtils.newEncodeSubmissionRequest(baseUrl, accountAddress,
-                System.currentTimeMillis() / 1000L + 600, transactionPayload, null);
+                expirationTimestampSecs, transactionPayload, maxGasAmount);
         String toSign = NodeApiUtils.encodeSubmission(baseUrl, encodeSubmissionRequest);
         System.out.println(toSign);
+
+        ModuleId module = new ModuleId(AccountAddress.valueOf(HexUtils.hexToByteArray(accountAddress)), new Identifier("message"));
+        Identifier function = new Identifier("set_message");
+        List<TypeTag> typeArgs = Collections.emptyList();
+        List<Bytes> set_message_args = Collections.singletonList(encode_u8vector_argument(Bytes.valueOf("hello world!".getBytes(StandardCharsets.UTF_8))));
+        EntryFunction entryFunction = new EntryFunction(module, function, typeArgs, set_message_args);
+        dev.aptos.types.TransactionPayload.EntryFunction typesTransactionPayload = new dev.aptos.types.TransactionPayload.EntryFunction(entryFunction);
+        RawTransaction rawTransaction = new RawTransaction(
+                AccountAddress.valueOf(HexUtils.hexToByteArray(accountAddress)),
+                Long.parseLong(encodeSubmissionRequest.getSequenceNumber()),
+                typesTransactionPayload,
+                Long.parseLong(encodeSubmissionRequest.getMaxGasAmount()),
+                Long.parseLong(encodeSubmissionRequest.getGasUnitPrice()),
+                Long.parseLong(encodeSubmissionRequest.getExpirationTimestampSecs()),
+                chainId
+        );
+        try {
+            byte[] rawTxnToSign = NodeApiUtils.rawTransactionToSign(rawTransaction.bcsSerialize());
+            System.out.println(HexUtils.byteArrayToHexWithPrefix(rawTxnToSign));
+            //System.out.println(HexUtils.byteArrayToHexWithPrefix(HashUtils.sha3Hash(rawTxnToSign)));
+        } catch (SerializationError e) {
+            throw new RuntimeException(e);
+        }
+        //if (true) return;
+
         byte[] publicKey = HexUtils.hexToByteArray("0xa76e9dd1a2d9101de47e69e52e0232060b95cd7d80265d61c3fa25e406389b75");
         byte[] privateKey = HexUtils.hexToByteArray("0x09cc77f21e471431df54280da75749069b54bfe42e3cd2b532a1024262339090");
         byte[] signature = SignatureUtils.ed25519Sign(privateKey, HexUtils.hexToByteArray(toSign));
@@ -107,10 +146,17 @@ public class EventTests {
         List<Event<HelloBlockchainMessageChangeEvent>> events_2 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, HelloBlockchainMessageChangeEvent.class, 1L, 1);
         System.out.println(events_2);
 
-        LedgerInfo ledgerInfo = NodeApiUtils.getLedgerInfo(baseUrl);
-        System.out.println(ledgerInfo);
 
+    }
 
+    private static Bytes encode_u8vector_argument(Bytes arg) {
+        try {
+            BcsSerializer s = new BcsSerializer();
+            s.serialize_bytes(arg);
+            return Bytes.valueOf(s.get_bytes());
+        } catch (SerializationError e) {
+            throw new IllegalArgumentException("Unable to serialize argument of type u8vector");
+        }
     }
 
 
