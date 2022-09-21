@@ -14,7 +14,7 @@ public abstract class SubmitTransactionRequestBase {
     @JsonProperty("expiration_timestamp_secs")//: str(int(time.time()) + 600),
     private String expirationTimestampSecs;
     @JsonProperty("payload")//: payload,
-    private Object payload;
+    private TransactionPayload payload;
 
     public String getSender() {
         return sender;
@@ -56,11 +56,11 @@ public abstract class SubmitTransactionRequestBase {
         this.expirationTimestampSecs = expirationTimestampSecs;
     }
 
-    public Object getPayload() {
+    public TransactionPayload getPayload() {
         return payload;
     }
 
-    public void setPayload(Object payload) {
+    public void setPayload(TransactionPayload payload) {
         this.payload = payload;
     }
 

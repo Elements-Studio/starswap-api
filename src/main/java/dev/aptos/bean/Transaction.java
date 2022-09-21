@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Transaction {
+    public static String TYPE_PENDING_TRANSACTION = "pending_transaction";
+
     @JsonProperty("version")//: "11742804",
     private String version;
     @JsonProperty("hash")//:"0xbcaac6583ecd9ce75ed65b1fbef6f530d4d40c57b0d6c1672d5f2584e7ca9752",

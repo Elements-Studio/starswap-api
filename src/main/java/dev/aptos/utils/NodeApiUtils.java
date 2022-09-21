@@ -8,6 +8,7 @@ import okhttp3.*;
 import okio.ByteString;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +38,45 @@ public class NodeApiUtils {
         }
     }
 
+    /**
+     * Get transaction by hash.
+     *
+     * @return If the transaction is not found, return null.
+     * @throws IOException
+     */
     public static Transaction getTransactionByHash(String baseUrl, String hash) throws IOException {
         Request request = newGetTransactionByHashRequest(baseUrl, hash);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() == 404) {
+                return null;
+            }
+            if (response.code() >= 400) {
+                throw new IOException("Failed to get transaction by hash: " + response.body().string());
+            }
             String body = response.body().string();
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(body, Transaction.class);
+        }
+    }
+
+    public static boolean isTransactionPending(String baseUrl, String hash) throws IOException {
+        Transaction transaction = getTransactionByHash(baseUrl, hash);
+        return transaction == null
+                || Transaction.TYPE_PENDING_TRANSACTION.equals(transaction.getType());
+    }
+
+    public static void waitForTransaction(String baseUrl, String hash) throws IOException {
+        while (isTransactionPending(baseUrl, hash)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Transaction transaction = getTransactionByHash(baseUrl, hash);
+        if (!(transaction.getSuccess() != null && transaction.getSuccess())) {
+            throw new IOException("Transaction is not success.");
         }
     }
 
@@ -149,6 +182,13 @@ public class NodeApiUtils {
         }
     }
 
+    public static BigInteger getAccountBalance(String baseUrl, String accountAddress) throws IOException {
+        String resourceType = "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>";
+        AccountResource<Map> accountResource = getAccountResource(baseUrl, accountAddress, resourceType,
+                Map.class, null);
+        return new BigInteger(((Map) accountResource.getData().get("coin")).get("value").toString());
+    }
+
     public static <TData> AccountResource<TData> getAccountResource(String baseUrl, String accountAddress, String resourceType,
                                                                     Class<TData> dataType, String ledgerVersion) throws IOException {
         Request request = newGetAccountResourceRequest(baseUrl, accountAddress, resourceType, ledgerVersion);
@@ -220,7 +260,7 @@ public class NodeApiUtils {
         }
     }
 
-    public static EncodeSubmissionRequest newEncodeSubmissionRequest(String baseUrl, String sender, Long expirationTimestampSecs, Object payload, Long maxGasAmount) throws IOException {
+    public static EncodeSubmissionRequest newEncodeSubmissionRequest(String baseUrl, String sender, Long expirationTimestampSecs, TransactionPayload payload, Long maxGasAmount) throws IOException {
         EncodeSubmissionRequest r = new EncodeSubmissionRequest();
         r.setSender(sender);
         r.setExpirationTimestampSecs(expirationTimestampSecs.toString());

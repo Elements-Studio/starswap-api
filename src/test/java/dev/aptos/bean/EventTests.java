@@ -5,6 +5,7 @@ import org.starcoin.starswap.api.utils.SignatureUtils;
 import org.starcoin.utils.HexUtils;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,6 +17,8 @@ public class EventTests {
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
 
+//        BigInteger balance = NodeApiUtils.getAccountBalance(baseUrl, accountAddress);
+//        System.out.println(balance);
 
         TransactionPayload transactionPayload = new TransactionPayload();
         transactionPayload.setType(TransactionPayload.TYPE_ENTRY_FUNCTION_PAYLOAD);
@@ -39,6 +42,7 @@ public class EventTests {
         System.out.println(submitTransactionRequest);
         Transaction submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
         System.out.println(submitTransactionResult);
+        NodeApiUtils.waitForTransaction(baseUrl, submitTransactionResult.getHash());
         Transaction transaction = NodeApiUtils.getTransactionByHash(baseUrl, submitTransactionResult.getHash());
         System.out.println(transaction);
         System.out.println(transaction.getSuccess());
