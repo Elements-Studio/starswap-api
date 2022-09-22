@@ -30,9 +30,13 @@ public class EventTests {
 //        System.out.println(ledgerInfo);
 //        if (true) return;
 
-//        BigInteger balance = NodeApiUtils.getAccountBalance(baseUrl, accountAddress);
+//        java.math.BigInteger balance = NodeApiUtils.getAccountBalance(baseUrl, accountAddress + "1");
 //        System.out.println(balance);
 //        if (true) return;
+
+//        List<Transaction> transactions = NodeApiUtils.getAccountTransactions(baseUrl, accountAddress, null, 100);
+//        System.out.println(transactions);
+        //if (true) return;
 
         TransactionPayload transactionPayload = new TransactionPayload();
         transactionPayload.setType(TransactionPayload.TYPE_ENTRY_FUNCTION_PAYLOAD);
@@ -113,53 +117,49 @@ public class EventTests {
         System.out.println(transaction.getVmStatus());
         //        List<Event<?>> events_0 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
         //        System.out.println(events_0);
-        if (true) return;
+        //if (true) return;
 
         Block block = NodeApiUtils.getBlocksByHeight(baseUrl, "1", true);
         System.out.println(block);
         Block block2 = NodeApiUtils.getBlocksByVersion(baseUrl, "1", true);
         System.out.println(block2);
-        if (true) return;
+        //if (true) return;
 
         GasEstimation gasEstimation = NodeApiUtils.estimateGasPrice(baseUrl);
         System.out.println(gasEstimation);
         //if (true) return;
 
-        List<Transaction> transactions = NodeApiUtils.getAccountTransactions(baseUrl, accountAddress, null, 100);
-        System.out.println(transactions);
-        //if (true) return;
-
-        Transaction transaction2 = NodeApiUtils.getTransactionByVersion(baseUrl, "11742804");
-        System.out.println(transaction2);
-        //if (true) return;
+//        Transaction transaction2 = NodeApiUtils.getTransactionByVersion(baseUrl, "1");
+//        System.out.println(transaction2);
+//        //if (true) return;
 
         Account account = NodeApiUtils.getAccount(baseUrl, accountAddress);
         System.out.println(account);
         //if (true) return;
 
-        List<Event<HelloBlockchainMessageChangeEvent>> eventList = NodeApiUtils.getEvents(baseUrl,
-                "0x04000000000000002b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14",
-                HelloBlockchainMessageChangeEvent.class, null, null);
-        System.out.println(eventList);
-        //if (true) return;
+//        List<Event<HelloBlockchainMessageChangeEvent>> eventList = NodeApiUtils.getEvents(baseUrl,
+//                "0x04000000000000002b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14",
+//                HelloBlockchainMessageChangeEvent.class, null, null);
+//        System.out.println(eventList);
+//        //if (true) return;
 
         List<AccountResource<Object>> resources = NodeApiUtils.getAccountResources(baseUrl, accountAddress, null);
         System.out.println(resources);
         //if (true) return;
 
-        String hex = NodeApiUtils.getTableItem(baseUrl,
-                "0xb0239bb1d99e33fd9897f219b9767fd68b7b486f1fda4628765ab91e3851b364",
-                "vector<u8>", "vector<u8>",
-                HexUtils.byteArrayToHexWithPrefix("hello".getBytes()), String.class, null);
-        System.out.println(hex);
-        System.out.println(new String(HexUtils.hexToByteArray(hex)));
-        //if (true) return;
+//        String hex = NodeApiUtils.getTableItem(baseUrl,
+//                "0xb0239bb1d99e33fd9897f219b9767fd68b7b486f1fda4628765ab91e3851b364",
+//                "vector<u8>", "vector<u8>",
+//                HexUtils.byteArrayToHexWithPrefix("hello".getBytes()), String.class, null);
+//        System.out.println(hex);
+//        System.out.println(new String(HexUtils.hexToByteArray(hex)));
+//        //if (true) return;
 
-        AccountResource<TestTableHolder> resource = NodeApiUtils.getAccountResource(baseUrl, accountAddress,
-                "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::hello_table::TableHolder",
-                TestTableHolder.class, null);
-        System.out.println(resource.getData().getTable().getHandle());
-        //if (true) return;
+//        AccountResource<TestTableHolder> resource = NodeApiUtils.getAccountResource(baseUrl, accountAddress,
+//                "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::hello_table::TableHolder",
+//                TestTableHolder.class, null);
+//        System.out.println(resource.getData().getTable().getHandle());
+//        //if (true) return;
 
         List<Event<?>> events_1 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
         System.out.println(events_1);
@@ -171,7 +171,7 @@ public class EventTests {
         List<Event<HelloBlockchainMessageChangeEvent>> events_2 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, HelloBlockchainMessageChangeEvent.class, 1L, 1);
         System.out.println(events_2);
 
-
+        System.out.println("Seem all Ok.");
     }
 
     private static Bytes encode_u8vector_argument(Bytes arg) {

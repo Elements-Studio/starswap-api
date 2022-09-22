@@ -22,6 +22,12 @@ public class NodeApiUtils {
     private NodeApiUtils() {
     }
 
+    /**
+     * Get bytes to sign from a RawTransaction.
+     *
+     * @param rawTransaction BCS bytes of {@link dev.aptos.types.RawTransaction RawTransaction}
+     * @return Bytes to be signed
+     */
     public static byte[] rawTransactionToSign(byte[] rawTransaction) {
         return com.google.common.primitives.Bytes
                 .concat(HashUtils.hashWithAptosPrefix("RawTransaction"), rawTransaction);
@@ -45,6 +51,9 @@ public class NodeApiUtils {
         Request request = new Request.Builder().url(url).build();
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             String body = response.body().string();
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(body, LedgerInfo.class);
@@ -97,6 +106,9 @@ public class NodeApiUtils {
         Request request = newGetTransactionByVersionRequest(baseUrl, version);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             String body = response.body().string();
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(body, Transaction.class);
@@ -107,6 +119,9 @@ public class NodeApiUtils {
         Request request = newGetAccountTransactionsRequest(baseUrl, address, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             String body = response.body().string();
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(body, new TypeReference<List<Transaction>>() {
@@ -114,11 +129,13 @@ public class NodeApiUtils {
         }
     }
 
-
     public static Block getBlocksByHeight(String baseUrl, String height, Boolean withTransactions) throws IOException {
         Request request = newGetBlocksByHeightRequest(baseUrl, height, withTransactions);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             String body = response.body().string();
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(body, Block.class);
@@ -129,6 +146,9 @@ public class NodeApiUtils {
         Request request = newGetBlocksByVersionRequest(baseUrl, version, withTransactions);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             String body = response.body().string();
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(body, Block.class);
@@ -142,6 +162,9 @@ public class NodeApiUtils {
         Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(response.body().string(),
                     new TypeReference<List<Event<?>>>() {
@@ -155,6 +178,9 @@ public class NodeApiUtils {
         Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             return readEventList(response.body().string(), eventDataType);
         }
     }
@@ -168,6 +194,9 @@ public class NodeApiUtils {
         Request request = newGetEventsRequest(baseUrl, eventKey, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             return readEventList(response.body().string(), eventDataType);
         }
     }
@@ -188,8 +217,10 @@ public class NodeApiUtils {
         Request request = newGetAccountRequest(baseUrl, accountAddress);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(), Account.class);
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, Account.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -207,6 +238,9 @@ public class NodeApiUtils {
         Request request = newGetAccountResourceRequest(baseUrl, accountAddress, resourceType, ledgerVersion);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(response.body().string(),
                     objectMapper.getTypeFactory().constructParametricType(AccountResource.class, dataType));
@@ -218,6 +252,9 @@ public class NodeApiUtils {
         Request request = newGetAccountResourcesRequest(baseUrl, accountAddress, ledgerVersion);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(response.body().string(),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, AccountResource.class));
@@ -230,8 +267,10 @@ public class NodeApiUtils {
         Request request = newGetTableItemRequest(baseUrl, tableHandle, keyType, valueType, key, ledgerVersion);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(), valueJavaType);
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, valueJavaType);
         }
     }
 
@@ -239,8 +278,10 @@ public class NodeApiUtils {
         Request request = newEstimateGasPriceRequest(baseUrl);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(), GasEstimation.class);
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, GasEstimation.class);
         }
     }
 
@@ -248,8 +289,10 @@ public class NodeApiUtils {
         Request httpRequest = newSubmitBcsTransactionHttpRequest(baseUrl, signedTransaction);
         OkHttpClient client = new OkHttpClient.Builder().build();
         try (Response response = client.newCall(httpRequest).execute()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(), Transaction.class);
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, Transaction.class);
         }
     }
 
@@ -261,8 +304,10 @@ public class NodeApiUtils {
                 //        .addNetworkInterceptor(logInterceptor)
                 .build();
         try (Response response = client.newCall(httpRequest).execute()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(), Transaction.class);
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, Transaction.class);
         }
     }
 
@@ -277,8 +322,10 @@ public class NodeApiUtils {
         Request httpRequest = newEncodeSubmissionHttpRequest(baseUrl, r);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(httpRequest).execute()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(), String.class);
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, String.class);
         }
     }
 
@@ -482,4 +529,22 @@ public class NodeApiUtils {
         HttpUrl url = builder.build();
         return new Request.Builder().url(url).build();
     }
+
+
+    private static <T> T readResponseBody(Response response, Class<T> clazz) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(response.body().string(), clazz);
+    }
+
+    private static void throwNodeApiException(Response response) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        AptosError aptosError;
+        try {
+            aptosError = objectMapper.readValue(response.body().string(), AptosError.class);
+        } catch (IOException e) {
+            throw new NodeApiException(response.code());
+        }
+        throw new NodeApiException(response.code(), aptosError);
+    }
+
 }
