@@ -320,6 +320,20 @@ public class NodeApiUtils {
         }
     }
 
+    public static List<Transaction> simulateBcsTransaction(String baseUrl, SignedUserTransaction signedTransaction,
+                                                           Boolean estimateGasUnitPrice, Boolean estimateMaxGasAmount) throws IOException, SerializationError {
+        Request httpRequest = newSimulateBcsTransactionHttpRequest(baseUrl, signedTransaction, estimateGasUnitPrice, estimateMaxGasAmount);
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        try (Response response = client.newCall(httpRequest).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, Transaction.class));
+        }
+    }
+
     public static Transaction submitTransaction(String baseUrl, SubmitTransactionRequest submitTransactionRequest) throws IOException {
         Request httpRequest = newSubmitTransactionHttpRequest(baseUrl, submitTransactionRequest);
         //HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor(new HttpLogger());
@@ -335,7 +349,8 @@ public class NodeApiUtils {
         }
     }
 
-    public static List<Transaction> simulateTransaction(String baseUrl, SubmitTransactionRequest submitTransactionRequest, Boolean estimateGasUnitPrice, Boolean estimateMaxGasAmount) throws IOException {
+    public static List<Transaction> simulateTransaction(String baseUrl, SubmitTransactionRequest submitTransactionRequest,
+                                                        Boolean estimateGasUnitPrice, Boolean estimateMaxGasAmount) throws IOException {
         Request httpRequest = newSimulateTransactionHttpRequest(baseUrl, submitTransactionRequest, estimateGasUnitPrice, estimateMaxGasAmount);
         OkHttpClient client = new OkHttpClient.Builder().build();
         try (Response response = client.newCall(httpRequest).execute()) {
@@ -427,6 +442,24 @@ public class NodeApiUtils {
     private static Request newSubmitBcsTransactionHttpRequest(String baseUrl, SignedUserTransaction signedTransaction) throws SerializationError {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("transactions");
+        HttpUrl url = builder.build();
+        RequestBody body = RequestBody.create(MediaType.parse("application/x.aptos.signed_transaction+bcs"),
+                signedTransaction.bcsSerialize());
+        return new Request.Builder().url(url).post(body)
+                .build();
+    }
+
+    private static Request newSimulateBcsTransactionHttpRequest(String baseUrl, SignedUserTransaction signedTransaction,
+                                                                Boolean estimateGasUnitPrice, Boolean estimateMaxGasAmount) throws SerializationError {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("simulate");
+        if (estimateGasUnitPrice != null) {
+            builder.addQueryParameter("estimate_gas_unit_price", estimateGasUnitPrice.toString());
+        }
+        if (estimateMaxGasAmount != null) {
+            builder.addQueryParameter("estimate_max_gas_amount", estimateMaxGasAmount.toString());
+        }
         HttpUrl url = builder.build();
         RequestBody body = RequestBody.create(MediaType.parse("application/x.aptos.signed_transaction+bcs"),
                 signedTransaction.bcsSerialize());

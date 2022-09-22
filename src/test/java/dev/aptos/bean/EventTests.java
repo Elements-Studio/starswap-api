@@ -85,9 +85,24 @@ public class EventTests {
         byte[] privateKey = HexUtils.hexToByteArray("0x09cc77f21e471431df54280da75749069b54bfe42e3cd2b532a1024262339090");
         byte[] signature = SignatureUtils.ed25519Sign(privateKey, HexUtils.hexToByteArray(toSign));
 
-        boolean submitBcsTxn = false;
+        boolean submitBcsTxn = true;
         Transaction submitTransactionResult;
         if (submitBcsTxn) {
+            // ///////////////////////// Simulate transaction //////////////////////////
+            SignedUserTransaction signedTransactionToSimulate = new SignedUserTransaction(rawTransaction,
+                    new TransactionAuthenticator.Ed25519(
+                            new Ed25519PublicKey(Bytes.valueOf(publicKey)),
+                            new Ed25519Signature(Bytes.valueOf(NodeApiUtils.ZERO_PADDED_SIGNATURE))
+                    ));
+            try {
+                List<Transaction> simulatedTransactions = NodeApiUtils.simulateBcsTransaction(baseUrl,
+                        signedTransactionToSimulate, null, null);
+                //System.out.println(simulatedTransactions);
+                System.out.println("Simulated transaction: " + simulatedTransactions.get(0));
+            } catch (SerializationError e) {
+                throw new RuntimeException(e);
+            }
+            // /////////////////////////////////////////////////////////////////////////
             SignedUserTransaction signedTransaction = new SignedUserTransaction(rawTransaction,
                     new TransactionAuthenticator.Ed25519(
                             new Ed25519PublicKey(Bytes.valueOf(publicKey)),
@@ -108,13 +123,16 @@ public class EventTests {
             SubmitTransactionRequest submitTransactionRequest = NodeApiUtils.toSubmitTransactionRequest(encodeSubmissionRequest);
             submitTransactionRequest.setSignature(s);
             System.out.println(submitTransactionRequest);
-//            // ////////////////////// Simulate transaction //////////////////////
-//            submitTransactionRequest.getSignature().setSignature(HexUtils.byteArrayToHexWithPrefix( NodeApiUtils.ZERO_PADDED_SIGNATURE));
-//            List<Transaction> simulatedTransactions = NodeApiUtils.simulateTransaction(baseUrl, submitTransactionRequest, true, true);
-//            System.out.println(simulatedTransactions);
-//            if (true) return;
-//            // //////////////////////////////////////////////////////////////////
-            submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
+            if (false) {
+                // ////////////////////// Simulate transaction //////////////////////
+                submitTransactionRequest.getSignature().setSignature(HexUtils.byteArrayToHexWithPrefix(NodeApiUtils.ZERO_PADDED_SIGNATURE));
+                List<Transaction> simulatedTransactions = NodeApiUtils.simulateTransaction(baseUrl, submitTransactionRequest, true, true);
+                System.out.println(simulatedTransactions.get(0));
+                submitTransactionResult = simulatedTransactions.get(0);
+                // //////////////////////////////////////////////////////////////////
+            } else {
+                submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
+            }
         }
         System.out.println(submitTransactionResult);
         NodeApiUtils.waitForTransaction(baseUrl, submitTransactionResult.getHash());
