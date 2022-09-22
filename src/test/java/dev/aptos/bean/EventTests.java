@@ -22,7 +22,6 @@ public class EventTests {
         String eventHandleFieldName = "message_change_events";
         //byte chainId = 32;
         long maxGasAmount = 4003243L;
-
         long expirationTimestampSecs = System.currentTimeMillis() / 1000L + 600;
         ChainId chainId = new ChainId((byte) 32);
 
@@ -48,7 +47,7 @@ public class EventTests {
                 expirationTimestampSecs, transactionPayload, maxGasAmount, null, null);
         String toSign = NodeApiUtils.encodeSubmission(baseUrl, encodeSubmissionRequest);
         System.out.println(toSign);
-        if (true) return;
+        //if (true) return;
 
         ModuleId module = new ModuleId(AccountAddress.valueOf(HexUtils.hexToByteArray(accountAddress)), new Identifier("message"));
         Identifier function = new Identifier("set_message");
@@ -85,7 +84,8 @@ public class EventTests {
         byte[] publicKey = HexUtils.hexToByteArray("0xa76e9dd1a2d9101de47e69e52e0232060b95cd7d80265d61c3fa25e406389b75");
         byte[] privateKey = HexUtils.hexToByteArray("0x09cc77f21e471431df54280da75749069b54bfe42e3cd2b532a1024262339090");
         byte[] signature = SignatureUtils.ed25519Sign(privateKey, HexUtils.hexToByteArray(toSign));
-        boolean submitBcsTxn = true;
+
+        boolean submitBcsTxn = false;
         Transaction submitTransactionResult;
         if (submitBcsTxn) {
             SignedUserTransaction signedTransaction = new SignedUserTransaction(rawTransaction,
@@ -108,6 +108,12 @@ public class EventTests {
             SubmitTransactionRequest submitTransactionRequest = NodeApiUtils.toSubmitTransactionRequest(encodeSubmissionRequest);
             submitTransactionRequest.setSignature(s);
             System.out.println(submitTransactionRequest);
+//            // ////////////////////// Simulate transaction //////////////////////
+//            submitTransactionRequest.getSignature().setSignature(HexUtils.byteArrayToHexWithPrefix( NodeApiUtils.ZERO_PADDED_SIGNATURE));
+//            List<Transaction> simulatedTransactions = NodeApiUtils.simulateTransaction(baseUrl, submitTransactionRequest, true, true);
+//            System.out.println(simulatedTransactions);
+//            if (true) return;
+//            // //////////////////////////////////////////////////////////////////
             submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
         }
         System.out.println(submitTransactionResult);

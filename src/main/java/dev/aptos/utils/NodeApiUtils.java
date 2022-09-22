@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class NodeApiUtils {
+    public static final byte[] ZERO_PADDED_SIGNATURE = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,};
     private static final long DEFAULT_MAX_GAS_AMOUNT = 2000L;
 
     private NodeApiUtils() {
@@ -334,6 +335,19 @@ public class NodeApiUtils {
         }
     }
 
+    public static List<Transaction> simulateTransaction(String baseUrl, SubmitTransactionRequest submitTransactionRequest, Boolean estimateGasUnitPrice, Boolean estimateMaxGasAmount) throws IOException {
+        Request httpRequest = newSimulateTransactionHttpRequest(baseUrl, submitTransactionRequest, estimateGasUnitPrice, estimateMaxGasAmount);
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        try (Response response = client.newCall(httpRequest).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, Transaction.class));
+        }
+    }
+
     //    public static class HttpLogger implements HttpLoggingInterceptor.Logger {
     //        @Override
     //        public void log(String message) {
@@ -379,16 +393,35 @@ public class NodeApiUtils {
         return new Request.Builder().url(url).post(body).build();
     }
 
-    private static Request newSubmitTransactionHttpRequest(String baseUrl, SubmitTransactionRequest request) throws JsonProcessingException {
+    private static Request newSubmitTransactionHttpRequest(String baseUrl, SubmitTransactionRequest submitTransactionRequest) throws JsonProcessingException {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("transactions");
         HttpUrl url = builder.build();
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(request);
+        String json = objectMapper.writeValueAsString(submitTransactionRequest);
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), ByteString.encodeUtf8(json));
         return new Request.Builder().url(url).post(body)
                 //.header("Content-Type", "application/json")
                 .build();
+    }
+
+    private static Request newSimulateTransactionHttpRequest(String baseUrl, SubmitTransactionRequest submitTransactionRequest,
+                                                             Boolean estimateGasUnitPrice, Boolean estimateMaxGasAmount) throws JsonProcessingException {
+
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("simulate");
+        if (estimateGasUnitPrice != null) {
+            builder.addQueryParameter("estimate_gas_unit_price", estimateGasUnitPrice.toString());
+        }
+        if (estimateMaxGasAmount != null) {
+            builder.addQueryParameter("estimate_max_gas_amount", estimateMaxGasAmount.toString());
+        }
+        HttpUrl url = builder.build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(submitTransactionRequest);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), ByteString.encodeUtf8(json));
+        return new Request.Builder().url(url).post(body).build();
     }
 
     private static Request newSubmitBcsTransactionHttpRequest(String baseUrl, SignedUserTransaction signedTransaction) throws SerializationError {
