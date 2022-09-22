@@ -4,6 +4,7 @@ import com.novi.bcs.BcsSerializer;
 import com.novi.serde.Bytes;
 import com.novi.serde.SerializationError;
 import dev.aptos.types.*;
+import dev.aptos.utils.HashUtils;
 import dev.aptos.utils.NodeApiUtils;
 import org.starcoin.starswap.api.utils.SignatureUtils;
 import org.starcoin.utils.HexUtils;
@@ -62,7 +63,15 @@ public class EventTests {
         );
         try {
             byte[] rawTxnToSign = NodeApiUtils.rawTransactionToSign(rawTransaction.bcsSerialize());
-            System.out.println(HexUtils.byteArrayToHexWithPrefix(rawTxnToSign));
+            //System.out.println(HexUtils.byteArrayToHexWithPrefix(HashUtils.sha3Hash(rawTxnToSign)));
+            String rawTxnToSignHex = HexUtils.byteArrayToHexWithPrefix(rawTxnToSign);
+            System.out.println(rawTxnToSignHex);
+            if (toSign.equals(rawTxnToSignHex)) {
+                System.out.println("Node encoded toSign equals rawTxnToSignHex");
+            } else {
+                System.out.println("Node encoded toSign not equals rawTxnToSignHex");
+                throw new RuntimeException("Node encoded toSign not equals rawTxnToSignHex");
+            }
             //System.out.println(HexUtils.byteArrayToHexWithPrefix(HashUtils.sha3Hash(rawTxnToSign)));
         } catch (SerializationError e) {
             throw new RuntimeException(e);
@@ -72,22 +81,37 @@ public class EventTests {
         byte[] publicKey = HexUtils.hexToByteArray("0xa76e9dd1a2d9101de47e69e52e0232060b95cd7d80265d61c3fa25e406389b75");
         byte[] privateKey = HexUtils.hexToByteArray("0x09cc77f21e471431df54280da75749069b54bfe42e3cd2b532a1024262339090");
         byte[] signature = SignatureUtils.ed25519Sign(privateKey, HexUtils.hexToByteArray(toSign));
-        Signature s = new Signature();
-        s.setType(Signature.TYPE_ED25519_SIGNATURE);
-        s.setPublicKey(HexUtils.byteArrayToHexWithPrefix(publicKey));
-        s.setSignature(HexUtils.byteArrayToHexWithPrefix(signature));
-        SubmitTransactionRequest submitTransactionRequest = NodeApiUtils.toSubmitTransactionRequest(encodeSubmissionRequest);
-        submitTransactionRequest.setSignature(s);
-        System.out.println(submitTransactionRequest);
-        Transaction submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
+        boolean submitBcsTxn = true;
+        Transaction submitTransactionResult;
+        if (submitBcsTxn) {
+            SignedTransaction signedTransaction = new SignedTransaction(rawTransaction,
+                    new TransactionAuthenticator.Ed25519(
+                            new Ed25519PublicKey(Bytes.valueOf(publicKey)),
+                            new Ed25519Signature(Bytes.valueOf(signature))
+                    ));
+            try {
+                submitTransactionResult = NodeApiUtils.submitBcsTransaction(baseUrl, signedTransaction);
+            } catch (SerializationError e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            Signature s = new Signature();
+            s.setType(Signature.TYPE_ED25519_SIGNATURE);
+            s.setPublicKey(HexUtils.byteArrayToHexWithPrefix(publicKey));
+            s.setSignature(HexUtils.byteArrayToHexWithPrefix(signature));
+            SubmitTransactionRequest submitTransactionRequest = NodeApiUtils.toSubmitTransactionRequest(encodeSubmissionRequest);
+            submitTransactionRequest.setSignature(s);
+            System.out.println(submitTransactionRequest);
+            submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
+        }
         System.out.println(submitTransactionResult);
         NodeApiUtils.waitForTransaction(baseUrl, submitTransactionResult.getHash());
         Transaction transaction = NodeApiUtils.getTransactionByHash(baseUrl, submitTransactionResult.getHash());
         System.out.println(transaction);
         System.out.println(transaction.getSuccess());
         System.out.println(transaction.getVmStatus());
-//        List<Event<?>> events_0 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
-//        System.out.println(events_0);
+        //        List<Event<?>> events_0 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
+        //        System.out.println(events_0);
         if (true) return;
 
         Block block = NodeApiUtils.getBlocksByHeight(baseUrl, "1", true);

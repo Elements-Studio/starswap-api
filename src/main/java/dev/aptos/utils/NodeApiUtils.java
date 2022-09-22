@@ -3,7 +3,9 @@ package dev.aptos.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.novi.serde.SerializationError;
 import dev.aptos.bean.*;
+import dev.aptos.types.SignedTransaction;
 import okhttp3.*;
 import okio.ByteString;
 
@@ -20,10 +22,16 @@ public class NodeApiUtils {
     private NodeApiUtils() {
     }
 
-    public static byte[] rawTransactionToSign(byte[] m) {
+    public static byte[] rawTransactionToSign(byte[] rawTransaction) {
         return com.google.common.primitives.Bytes
-                .concat(HashUtils.hashWithAptosPrefix("RawTransaction"), m);
+                .concat(HashUtils.hashWithAptosPrefix("RawTransaction"), rawTransaction);
     }
+
+//    public static byte[] hashTransaction(byte[] signedTransaction) {
+//        byte[] bytesToHash = com.google.common.primitives.Bytes
+//                .concat(HashUtils.hashWithAptosPrefix("SignedTransaction"), signedTransaction);
+//        return HashUtils.sha3Hash(bytesToHash);
+//    }
 
     public static SubmitTransactionRequest toSubmitTransactionRequest(EncodeSubmissionRequest encodeSubmissionRequest) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -236,6 +244,15 @@ public class NodeApiUtils {
         }
     }
 
+    public static Transaction submitBcsTransaction(String baseUrl, SignedTransaction signedTransaction) throws IOException, SerializationError {
+        Request httpRequest = newSubmitBcsTransactionHttpRequest(baseUrl, signedTransaction);
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        try (Response response = client.newCall(httpRequest).execute()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(), Transaction.class);
+        }
+    }
+
     public static Transaction submitTransaction(String baseUrl, SubmitTransactionRequest submitTransactionRequest) throws IOException {
         Request httpRequest = newSubmitTransactionHttpRequest(baseUrl, submitTransactionRequest);
         //HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor(new HttpLogger());
@@ -296,6 +313,16 @@ public class NodeApiUtils {
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), ByteString.encodeUtf8(json));
         return new Request.Builder().url(url).post(body)
                 //.header("Content-Type", "application/json")
+                .build();
+    }
+
+    private static Request newSubmitBcsTransactionHttpRequest(String baseUrl, SignedTransaction signedTransaction) throws SerializationError {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions");
+        HttpUrl url = builder.build();
+        RequestBody body = RequestBody.create(MediaType.parse("application/x.aptos.signed_transaction+bcs"),
+                signedTransaction.bcsSerialize());
+        return new Request.Builder().url(url).post(body)
                 .build();
     }
 
