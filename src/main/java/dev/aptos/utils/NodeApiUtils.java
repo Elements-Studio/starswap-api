@@ -352,13 +352,18 @@ public class NodeApiUtils {
         }
     }
 
-    public static EncodeSubmissionRequest newEncodeSubmissionRequest(String baseUrl, String sender, Long expirationTimestampSecs, TransactionPayload payload, Long maxGasAmount) throws IOException {
+    public static EncodeSubmissionRequest newEncodeSubmissionRequest(String baseUrl, String sender,
+                                                                     Long expirationTimestampSecs,
+                                                                     TransactionPayload payload,
+                                                                     Long maxGasAmount,
+                                                                     String sequenceNumber,
+                                                                     String gasUnitPrice) throws IOException {
         EncodeSubmissionRequest r = new EncodeSubmissionRequest();
         r.setSender(sender);
         r.setExpirationTimestampSecs(expirationTimestampSecs.toString());
         r.setMaxGasAmount("" + (maxGasAmount != null ? maxGasAmount : DEFAULT_MAX_GAS_AMOUNT));//todo
-        r.setSequenceNumber(getAccountSequenceNumber(baseUrl, sender));
-        r.setGasUnitPrice(estimateGasPrice(baseUrl).getGasEstimate().toString());
+        r.setSequenceNumber(sequenceNumber == null ? getAccountSequenceNumber(baseUrl, sender) : sequenceNumber);
+        r.setGasUnitPrice(gasUnitPrice == null ? estimateGasPrice(baseUrl).getGasEstimate().toString() : gasUnitPrice);
         r.setPayload(payload);
         return r;
     }

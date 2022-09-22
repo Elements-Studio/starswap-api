@@ -45,9 +45,10 @@ public class EventTests {
         transactionPayload.setArguments(transactionArgs);
         //transactionPayload.setTypeArguments();
         EncodeSubmissionRequest encodeSubmissionRequest = NodeApiUtils.newEncodeSubmissionRequest(baseUrl, accountAddress,
-                expirationTimestampSecs, transactionPayload, maxGasAmount);
+                expirationTimestampSecs, transactionPayload, maxGasAmount, null, null);
         String toSign = NodeApiUtils.encodeSubmission(baseUrl, encodeSubmissionRequest);
         System.out.println(toSign);
+        if (true) return;
 
         ModuleId module = new ModuleId(AccountAddress.valueOf(HexUtils.hexToByteArray(accountAddress)), new Identifier("message"));
         Identifier function = new Identifier("set_message");
