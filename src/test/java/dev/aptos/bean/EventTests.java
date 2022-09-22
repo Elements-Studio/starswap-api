@@ -136,6 +136,13 @@ public class EventTests {
         Account account = NodeApiUtils.getAccount(baseUrl, accountAddress);
         System.out.println(account);
         //if (true) return;
+        List<MoveModuleBytecode> moveModuleBytecodeList = NodeApiUtils.getAccountModules(baseUrl, accountAddress, null);
+        System.out.println(moveModuleBytecodeList);
+        //if (true) return;
+
+        MoveModuleBytecode moveModuleBytecode = NodeApiUtils.getAccountModule(baseUrl, accountAddress, "message", null);
+        System.out.println(moveModuleBytecode);
+        //if (true) return;
 
 //        List<Event<HelloBlockchainMessageChangeEvent>> eventList = NodeApiUtils.getEvents(baseUrl,
 //                "0x04000000000000002b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14",

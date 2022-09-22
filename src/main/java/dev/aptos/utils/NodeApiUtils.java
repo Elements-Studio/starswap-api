@@ -247,6 +247,17 @@ public class NodeApiUtils {
         }
     }
 
+    public static MoveModuleBytecode getAccountModule(String baseUrl, String accountAddress, String moduleName, String ledgerVersion) throws IOException {
+        Request request = newGetAccountModuleRequest(baseUrl, accountAddress, moduleName, ledgerVersion);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, MoveModuleBytecode.class);
+        }
+    }
+
     public static List<AccountResource<Object>> getAccountResources(String baseUrl, String accountAddress,
                                                                     String ledgerVersion) throws IOException {
         Request request = newGetAccountResourcesRequest(baseUrl, accountAddress, ledgerVersion);
@@ -261,6 +272,18 @@ public class NodeApiUtils {
         }
     }
 
+    public static List<MoveModuleBytecode> getAccountModules(String baseUrl, String accountAddress, String ledgerVersion) throws IOException {
+        Request request = newGetAccountModulesRequest(baseUrl, accountAddress, ledgerVersion);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body().string(),
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, MoveModuleBytecode.class));
+        }
+    }
 
     public static <T> T getTableItem(String baseUrl, String tableHandle, String keyType, String valueType, Object key,
                                      Class<T> valueJavaType, String ledgerVersion) throws IOException {
@@ -416,12 +439,36 @@ public class NodeApiUtils {
         return new Request.Builder().url(url).build();
     }
 
+    private static Request newGetAccountModuleRequest(String baseUrl, String accountAddress, String moduleName, String ledgerVersion) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("accounts")
+                .addPathSegment(accountAddress)
+                .addPathSegment("module")
+                .addPathSegment(moduleName);
+        if (ledgerVersion != null) {
+            builder.addQueryParameter("ledger_version", ledgerVersion);
+        }
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
 
     private static Request newGetAccountResourcesRequest(String baseUrl, String accountAddress, String ledgerVersion) {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("accounts")
                 .addPathSegment(accountAddress)
                 .addPathSegment("resources");
+        if (ledgerVersion != null) {
+            builder.addQueryParameter("ledger_version", ledgerVersion);
+        }
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
+
+    private static Request newGetAccountModulesRequest(String baseUrl, String accountAddress, String ledgerVersion) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("accounts")
+                .addPathSegment(accountAddress)
+                .addPathSegment("modules");
         if (ledgerVersion != null) {
             builder.addQueryParameter("ledger_version", ledgerVersion);
         }
