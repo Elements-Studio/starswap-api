@@ -1,18 +1,18 @@
 package dev.aptos.types;
 
 
-public final class SignedTransaction {
+public final class SignedUserTransaction {
     public final RawTransaction raw_txn;
     public final TransactionAuthenticator authenticator;
 
-    public SignedTransaction(RawTransaction raw_txn, TransactionAuthenticator authenticator) {
+    public SignedUserTransaction(RawTransaction raw_txn, TransactionAuthenticator authenticator) {
         java.util.Objects.requireNonNull(raw_txn, "raw_txn must not be null");
         java.util.Objects.requireNonNull(authenticator, "authenticator must not be null");
         this.raw_txn = raw_txn;
         this.authenticator = authenticator;
     }
 
-    public static SignedTransaction deserialize(com.novi.serde.Deserializer deserializer) throws com.novi.serde.DeserializationError {
+    public static SignedUserTransaction deserialize(com.novi.serde.Deserializer deserializer) throws com.novi.serde.DeserializationError {
         deserializer.increase_container_depth();
         Builder builder = new Builder();
         builder.raw_txn = RawTransaction.deserialize(deserializer);
@@ -21,12 +21,12 @@ public final class SignedTransaction {
         return builder.build();
     }
 
-    public static SignedTransaction bcsDeserialize(byte[] input) throws com.novi.serde.DeserializationError {
+    public static SignedUserTransaction bcsDeserialize(byte[] input) throws com.novi.serde.DeserializationError {
         if (input == null) {
             throw new com.novi.serde.DeserializationError("Cannot deserialize null array");
         }
         com.novi.serde.Deserializer deserializer = new com.novi.bcs.BcsDeserializer(input);
-        SignedTransaction value = deserialize(deserializer);
+        SignedUserTransaction value = deserialize(deserializer);
         if (deserializer.get_buffer_offset() < input.length) {
             throw new com.novi.serde.DeserializationError("Some input bytes were not read");
         }
@@ -50,7 +50,7 @@ public final class SignedTransaction {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        SignedTransaction other = (SignedTransaction) obj;
+        SignedUserTransaction other = (SignedUserTransaction) obj;
         if (!java.util.Objects.equals(this.raw_txn, other.raw_txn)) {
             return false;
         }
@@ -68,8 +68,8 @@ public final class SignedTransaction {
         public RawTransaction raw_txn;
         public TransactionAuthenticator authenticator;
 
-        public SignedTransaction build() {
-            return new SignedTransaction(
+        public SignedUserTransaction build() {
+            return new SignedUserTransaction(
                     raw_txn,
                     authenticator
             );

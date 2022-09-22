@@ -4,7 +4,6 @@ import com.novi.bcs.BcsSerializer;
 import com.novi.serde.Bytes;
 import com.novi.serde.SerializationError;
 import dev.aptos.types.*;
-import dev.aptos.utils.HashUtils;
 import dev.aptos.utils.NodeApiUtils;
 import org.starcoin.starswap.api.utils.SignatureUtils;
 import org.starcoin.utils.HexUtils;
@@ -84,12 +83,14 @@ public class EventTests {
         boolean submitBcsTxn = true;
         Transaction submitTransactionResult;
         if (submitBcsTxn) {
-            SignedTransaction signedTransaction = new SignedTransaction(rawTransaction,
+            SignedUserTransaction signedTransaction = new SignedUserTransaction(rawTransaction,
                     new TransactionAuthenticator.Ed25519(
                             new Ed25519PublicKey(Bytes.valueOf(publicKey)),
                             new Ed25519Signature(Bytes.valueOf(signature))
                     ));
             try {
+                System.out.println("Client got transaction_hash: " + HexUtils.byteArrayToHexWithPrefix(
+                        NodeApiUtils.getTransactionHash(signedTransaction)));
                 submitTransactionResult = NodeApiUtils.submitBcsTransaction(baseUrl, signedTransaction);
             } catch (SerializationError e) {
                 throw new RuntimeException(e);

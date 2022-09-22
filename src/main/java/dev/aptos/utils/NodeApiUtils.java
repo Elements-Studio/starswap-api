@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novi.serde.SerializationError;
 import dev.aptos.bean.*;
-import dev.aptos.types.SignedTransaction;
+import dev.aptos.types.SignedUserTransaction;
 import okhttp3.*;
 import okio.ByteString;
 
@@ -27,11 +27,11 @@ public class NodeApiUtils {
                 .concat(HashUtils.hashWithAptosPrefix("RawTransaction"), rawTransaction);
     }
 
-//    public static byte[] hashTransaction(byte[] signedTransaction) {
-//        byte[] bytesToHash = com.google.common.primitives.Bytes
-//                .concat(HashUtils.hashWithAptosPrefix("SignedTransaction"), signedTransaction);
-//        return HashUtils.sha3Hash(bytesToHash);
-//    }
+    public static byte[] getTransactionHash(SignedUserTransaction signedTransaction) throws SerializationError {
+        dev.aptos.types.Transaction t = new dev.aptos.types.Transaction.UserTransaction(signedTransaction);
+        return HashUtils.sha3Hash(com.google.common.primitives.Bytes.concat(
+                HashUtils.hashWithAptosPrefix("Transaction"), t.bcsSerialize()));
+    }
 
     public static SubmitTransactionRequest toSubmitTransactionRequest(EncodeSubmissionRequest encodeSubmissionRequest) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -244,7 +244,7 @@ public class NodeApiUtils {
         }
     }
 
-    public static Transaction submitBcsTransaction(String baseUrl, SignedTransaction signedTransaction) throws IOException, SerializationError {
+    public static Transaction submitBcsTransaction(String baseUrl, SignedUserTransaction signedTransaction) throws IOException, SerializationError {
         Request httpRequest = newSubmitBcsTransactionHttpRequest(baseUrl, signedTransaction);
         OkHttpClient client = new OkHttpClient.Builder().build();
         try (Response response = client.newCall(httpRequest).execute()) {
@@ -316,7 +316,7 @@ public class NodeApiUtils {
                 .build();
     }
 
-    private static Request newSubmitBcsTransactionHttpRequest(String baseUrl, SignedTransaction signedTransaction) throws SerializationError {
+    private static Request newSubmitBcsTransactionHttpRequest(String baseUrl, SignedUserTransaction signedTransaction) throws SerializationError {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("transactions");
         HttpUrl url = builder.build();

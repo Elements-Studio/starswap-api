@@ -1,6 +1,8 @@
 package dev.aptos.types;
 
-
+/**
+ * RawTransaction is the portion of a transaction that a client signs.
+ */
 public final class RawTransaction {
     public final AccountAddress sender;
     public final @com.novi.serde.Unsigned Long sequence_number;
