@@ -70,7 +70,7 @@ public class AptosEventHandleTaskService {
         // System.out.println("To handle aptos event by scheduled aptos.event-handle.fixed-delay.");
         List<AptosEventHandle> handles = aptosEventHandleRepository.findAll();
         for (AptosEventHandle h : handles) {
-            Pair<Function<AptosEventHandle, List>, BiConsumer<AptosEventHandle, Event>> p = eventFetcherAndHandlerMap.get(h.getEventJavaType());
+            Pair<Function<AptosEventHandle, List>, BiConsumer<AptosEventHandle, Event>> p = eventFetcherAndHandlerMap.get(h.getEventDataType());
             p.getItem1().apply(h).forEach(
                     e -> {
                         p.getItem2().accept(h, (Event) e);

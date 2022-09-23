@@ -9,7 +9,7 @@ import java.math.BigInteger;
 
 @Entity
 @Table(name = "aptos_event_handle", uniqueConstraints = {
-        @UniqueConstraint(name = "UniqueEventJavaType", columnNames = {"event_java_type"})
+        @UniqueConstraint(name = "UniqueEventDataType", columnNames = {"event_data_type"})
 })
 @DynamicInsert
 @DynamicUpdate
@@ -27,8 +27,8 @@ public class AptosEventHandle {
      */
     private String eventKey;
 
-    @Column(name = "event_java_type", length = 50)
-    private String eventJavaType;
+    @Column(name = "event_data_type", length = 50)
+    private String eventDataType;
 
     @Column(precision = 31, scale = 0)
     private BigInteger nextSequenceNumber;
@@ -112,12 +112,12 @@ public class AptosEventHandle {
         this.version = version;
     }
 
-    public String getEventJavaType() {
-        return eventJavaType;
+    public String getEventDataType() {
+        return eventDataType;
     }
 
-    public void setEventJavaType(String eventJavaType) {
-        this.eventJavaType = eventJavaType;
+    public void setEventDataType(String eventDataType) {
+        this.eventDataType = eventDataType;
     }
 
     @Override
@@ -125,7 +125,7 @@ public class AptosEventHandle {
         return "AptosEventHandle{" +
                 "aptosEventHandleId=" + aptosEventHandleId +
                 ", eventKey='" + eventKey + '\'' +
-                ", eventJavaType='" + eventJavaType + '\'' +
+                ", eventDataType='" + eventDataType + '\'' +
                 ", nextSequenceNumber=" + nextSequenceNumber +
                 ", createdBy='" + createdBy + '\'' +
                 ", updatedBy='" + updatedBy + '\'' +

@@ -68,7 +68,7 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
-        AptosEventHandle h = aptosEventHandleRepository.findFirstByEventJavaType("HelloBlockchainMessageChangeEvent");
+        AptosEventHandle h = aptosEventHandleRepository.findFirstByEventDataType("HelloBlockchainMessageChangeEvent");
         System.out.println(h);
         if (true) return;
 

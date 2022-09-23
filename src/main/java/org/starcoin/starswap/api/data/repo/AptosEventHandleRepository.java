@@ -6,6 +6,6 @@ import org.starcoin.starswap.api.data.model.AptosEventHandleId;
 
 public interface AptosEventHandleRepository extends JpaRepository<AptosEventHandle, AptosEventHandleId> {
 
-    AptosEventHandle findFirstByEventJavaType(String eventJavaType);
+    AptosEventHandle findFirstByEventDataType(String eventDataType);
 
 }
