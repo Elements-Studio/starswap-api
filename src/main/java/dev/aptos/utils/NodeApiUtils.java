@@ -467,7 +467,7 @@ public class NodeApiUtils {
                 .build();
     }
 
-    private static String getAccountSequenceNumber(String baseUrl, String sender) {
+    public static String getAccountSequenceNumber(String baseUrl, String sender) {
         return getAccount(baseUrl, sender).getSequenceNumber();
     }
 

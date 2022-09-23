@@ -24,6 +24,8 @@ aptos:
   enabled: true
   event-handle:
     fixed-delay: 5000
+  node-api:
+    base-url: "https://fullnode.devnet.aptoslabs.com/v1"
 
 logging:
   level:

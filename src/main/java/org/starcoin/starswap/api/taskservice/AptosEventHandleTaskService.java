@@ -5,6 +5,7 @@ import dev.aptos.utils.NodeApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,8 @@ public class AptosEventHandleTaskService {
 
     private final AptosEventHandleRepository aptosEventHandleRepository;
 
-    //todo config here
-    private final String aptosNodeApiBaseUrl = "https://fullnode.devnet.aptoslabs.com/v1";
+    @Value("${aptos.node-api.base-url}")
+    private String aptosNodeApiBaseUrl;
 
     private final int eventFetchLimit = 2;
 
