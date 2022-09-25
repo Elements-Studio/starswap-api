@@ -24,7 +24,7 @@ public class NodeApiUtils {
     }
 
     /**
-     * Get bytes to sign from a RawTransaction.
+     * Get bytes to sign from BCS bytes of RawTransaction.
      *
      * @param rawTransaction BCS bytes of {@link dev.aptos.types.RawTransaction RawTransaction}
      * @return Bytes to be signed
@@ -184,6 +184,23 @@ public class NodeApiUtils {
             }
             return readEventList(response.body().string(), eventDataType);
         }
+    }
+
+    /**
+     * Get events by creation number.
+     */
+    public static <TData> List<Event<TData>> getEventsByCreationNumber(String baseUrl, String accountAddress,
+                                                                       String creationNumber,
+                                                                       Class<TData> eventDataType, Long start, Integer limit) throws IOException {
+        Request request = newGetEventsByCreationNumberRequest(baseUrl, accountAddress, creationNumber, start, limit);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readEventList(response.body().string(), eventDataType);
+        }
+
     }
 
     /**
@@ -564,6 +581,23 @@ public class NodeApiUtils {
                 .addPathSegment("events")
                 .addPathSegment(eventHandleStruct)
                 .addPathSegment(eventHandleFieldName);
+        if (start != null) {
+            builder.addQueryParameter("start", start.toString());
+        }
+        if (limit != null) {
+            builder.addQueryParameter("limit", limit.toString());
+        }
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
+
+    private static Request newGetEventsByCreationNumberRequest(String baseUrl, String accountAddress,
+                                                               String creationNumber, Long start, Integer limit) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("accounts")
+                .addPathSegment(accountAddress)
+                .addPathSegment("events")
+                .addPathSegment(creationNumber);
         if (start != null) {
             builder.addQueryParameter("start", start.toString());
         }

@@ -88,6 +88,7 @@ public class Event<TData> {
                 ", sequenceNumber='" + sequenceNumber + '\'' +
                 ", type='" + type + '\'' +
                 ", data=" + data +
+                ", guid=" + guid +
                 '}';
     }
 
@@ -111,6 +112,14 @@ public class Event<TData> {
 
         public void setAccountAddress(String accountAddress) {
             this.accountAddress = accountAddress;
+        }
+
+        @Override
+        public String toString() {
+            return "Guid{" +
+                    "creationNumber='" + creationNumber + '\'' +
+                    ", accountAddress='" + accountAddress + '\'' +
+                    '}';
         }
     }
 }
