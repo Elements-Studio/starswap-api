@@ -62,9 +62,18 @@ public class NodeApiUtils {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            String body = response.body().string();
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(body, LedgerInfo.class);
+            return readResponseBody(response, LedgerInfo.class);
+        }
+    }
+
+    public static HealthCheckSuccess checkBasicNodeHealth(String baseUrl, Integer durationSecs) throws IOException {
+        Request request = newCheckBasicNodeHealthRequest(baseUrl, durationSecs);
+        OkHttpClient client = new OkHttpClient();
+        try (Response response = client.newCall(request).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, HealthCheckSuccess.class);
         }
     }
 
@@ -84,9 +93,7 @@ public class NodeApiUtils {
             if (response.code() >= 400) {
                 throw new IOException("Failed to get transaction by hash: " + response.body().string());
             }
-            String body = response.body().string();
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(body, Transaction.class);
+            return readResponseBody(response, Transaction.class);
         }
     }
 
@@ -117,9 +124,7 @@ public class NodeApiUtils {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            String body = response.body().string();
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(body, Transaction.class);
+            return readResponseBody(response, Transaction.class);
         }
     }
 
@@ -137,29 +142,25 @@ public class NodeApiUtils {
         }
     }
 
-    public static Block getBlocksByHeight(String baseUrl, String height, Boolean withTransactions) throws IOException {
-        Request request = newGetBlocksByHeightRequest(baseUrl, height, withTransactions);
+    public static Block getBlockByHeight(String baseUrl, String height, Boolean withTransactions) throws IOException {
+        Request request = newGetBlockByHeightRequest(baseUrl, height, withTransactions);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            String body = response.body().string();
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(body, Block.class);
+            return readResponseBody(response, Block.class);
         }
     }
 
-    public static Block getBlocksByVersion(String baseUrl, String version, Boolean withTransactions) throws IOException {
-        Request request = newGetBlocksByVersionRequest(baseUrl, version, withTransactions);
+    public static Block getBlockByVersion(String baseUrl, String version, Boolean withTransactions) throws IOException {
+        Request request = newGetBlockByVersionRequest(baseUrl, version, withTransactions);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            String body = response.body().string();
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(body, Block.class);
+            return readResponseBody(response, Block.class);
         }
     }
 
@@ -664,7 +665,7 @@ public class NodeApiUtils {
     }
 
 
-    private static Request newGetBlocksByHeightRequest(String baseUrl, String height, Boolean withTransactions) {
+    private static Request newGetBlockByHeightRequest(String baseUrl, String height, Boolean withTransactions) {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("blocks")
                 .addPathSegment("by_height")
@@ -677,7 +678,7 @@ public class NodeApiUtils {
     }
 
 
-    private static Request newGetBlocksByVersionRequest(String baseUrl, String height, Boolean withTransactions) {
+    private static Request newGetBlockByVersionRequest(String baseUrl, String height, Boolean withTransactions) {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("blocks")
                 .addPathSegment("by_version")
@@ -689,6 +690,17 @@ public class NodeApiUtils {
         return new Request.Builder().url(url).build();
     }
 
+
+    private static Request newCheckBasicNodeHealthRequest(String baseUrl, Integer durationSecs) {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("-")
+                .addPathSegment("healthy");
+        if (durationSecs != null) {
+            builder.addQueryParameter("duration_secs", durationSecs.toString());
+        }
+        HttpUrl url = builder.build();
+        return new Request.Builder().url(url).build();
+    }
 
     private static <T> T readResponseBody(Response response, Class<T> clazz) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();

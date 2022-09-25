@@ -25,6 +25,16 @@ public class EventTests {
         long expirationTimestampSecs = System.currentTimeMillis() / 1000L + 600;
         ChainId chainId = new ChainId((byte) 32);
 
+
+        List<Transaction> transactions = NodeApiUtils.getAccountTransactions(baseUrl, accountAddress, null, 100);
+        System.out.println(transactions);
+        transactions.forEach(t -> {
+            System.out.println(t);
+        });
+        HealthCheckSuccess healthCheckSuccess = NodeApiUtils.checkBasicNodeHealth(baseUrl, 100);
+        System.out.println(healthCheckSuccess);
+        //if (true) return;
+
 //        LedgerInfo ledgerInfo = NodeApiUtils.getLedgerInfo(baseUrl);
 //        System.out.println(ledgerInfo);
 //        if (true) return;
@@ -33,9 +43,6 @@ public class EventTests {
 //        System.out.println(balance);
 //        if (true) return;
 
-//        List<Transaction> transactions = NodeApiUtils.getAccountTransactions(baseUrl, accountAddress, null, 100);
-//        System.out.println(transactions);
-        //if (true) return;
 
         List<Event<?>> events_1 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
         System.out.println(events_1);
@@ -49,7 +56,7 @@ public class EventTests {
 //        String creationNumber = "4";
 //        List<Event<HelloBlockchainMessageChangeEvent>> events_3 = NodeApiUtils.getEventsByCreationNumber(baseUrl, accountAddress, creationNumber, HelloBlockchainMessageChangeEvent.class, 0L, 1);
 //        System.out.println(events_3);
-        if (true) return;
+        //if (true) return;
 
         TransactionPayload transactionPayload = new TransactionPayload();
         transactionPayload.setType(TransactionPayload.TYPE_ENTRY_FUNCTION_PAYLOAD);
@@ -158,9 +165,9 @@ public class EventTests {
         //        System.out.println(events_0);
         //if (true) return;
 
-        Block block = NodeApiUtils.getBlocksByHeight(baseUrl, "1", true);
+        Block block = NodeApiUtils.getBlockByHeight(baseUrl, "1", true);
         System.out.println(block);
-        Block block2 = NodeApiUtils.getBlocksByVersion(baseUrl, "1", true);
+        Block block2 = NodeApiUtils.getBlockByVersion(baseUrl, "1", true);
         System.out.println(block2);
         //if (true) return;
 
