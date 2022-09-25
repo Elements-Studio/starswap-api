@@ -4,18 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Event<TData> {
 
-    /*
-      {
-        "version": "19923694",
-        "key": "0x04000000000000002b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14",
-        "sequence_number": "0",
-        "type": "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageChangeEvent",
-        "data": {
-          "from_message": "hello, blockchain",
-          "to_message": "hello, blockchain, again"
-        }
-      }
-     */
     @JsonProperty("version")
     private String version;
 

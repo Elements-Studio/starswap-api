@@ -34,6 +34,13 @@ public class NodeApiUtils {
                 .concat(HashUtils.hashWithAptosPrefix("RawTransaction"), rawTransaction);
     }
 
+    /**
+     * Compute transaction hash locally.
+     *
+     * @param signedTransaction Instance of {@link dev.aptos.types.SignedUserTransaction SignedUserTransaction}
+     * @return Transaction hash
+     * @throws SerializationError if BCS serialization error
+     */
     public static byte[] getTransactionHash(SignedUserTransaction signedTransaction) throws SerializationError {
         dev.aptos.types.Transaction t = new dev.aptos.types.Transaction.UserTransaction(signedTransaction);
         return HashUtils.sha3Hash(com.google.common.primitives.Bytes.concat(
