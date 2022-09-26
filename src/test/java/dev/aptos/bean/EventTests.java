@@ -106,7 +106,7 @@ public class EventTests {
         byte[] privateKey = HexUtils.hexToByteArray("0x09cc77f21e471431df54280da75749069b54bfe42e3cd2b532a1024262339090");
         byte[] signature = SignatureUtils.ed25519Sign(privateKey, HexUtils.hexToByteArray(toSign));
 
-        boolean submitBcsTxn = false;
+        boolean submitBcsTxn = true;
         Transaction submitTransactionResult;
         if (submitBcsTxn) {
             // ///////////////////////// Simulate transaction //////////////////////////
@@ -132,6 +132,13 @@ public class EventTests {
             try {
                 System.out.println("Client got transaction_hash: " + HexUtils.byteArrayToHexWithPrefix(
                         NodeApiUtils.getTransactionHash(signedTransaction)));
+                // //////////////// Test submit batch transactions ///////////////////////
+                if (false) {
+                    TransactionsBatchSubmissionResult batchSubmissionResult =
+                            NodeApiUtils.submitBatchBcsTransactions(baseUrl, Collections.singletonList(signedTransaction));
+                    System.out.println("Client got batch_submission_result: " + batchSubmissionResult);
+                    if (true) return;
+                }
                 submitTransactionResult = NodeApiUtils.submitBcsTransaction(baseUrl, signedTransaction);
             } catch (SerializationError e) {
                 throw new RuntimeException(e);
@@ -152,9 +159,13 @@ public class EventTests {
                 submitTransactionResult = simulatedTransactions.get(0);
                 // //////////////////////////////////////////////////////////////////
             } else {
-                TransactionsBatchSubmissionResult transactionsBatchSubmissionResult = NodeApiUtils.submitBatchTransaction(baseUrl, Collections.singletonList(submitTransactionRequest));
-                System.out.println(transactionsBatchSubmissionResult);
-                if (true) return;
+                if (false) {
+                    // ///////// Test submit batch transactions ////////
+                    TransactionsBatchSubmissionResult transactionsBatchSubmissionResult = NodeApiUtils.submitBatchTransactions(baseUrl, Collections.singletonList(submitTransactionRequest));
+                    System.out.println(transactionsBatchSubmissionResult);
+                    if (true) return;
+                }
+                // /////////////////////////////////////////////////
                 submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
             }
         }

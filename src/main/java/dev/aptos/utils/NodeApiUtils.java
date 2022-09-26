@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novi.serde.SerializationError;
 import dev.aptos.bean.*;
+import dev.aptos.types.RawTransaction;
 import dev.aptos.types.SignedUserTransaction;
 import okhttp3.*;
 import okio.ByteString;
@@ -32,6 +33,14 @@ public class NodeApiUtils {
     public static byte[] rawTransactionToSign(byte[] rawTransaction) {
         return com.google.common.primitives.Bytes
                 .concat(HashUtils.hashWithAptosPrefix("RawTransaction"), rawTransaction);
+    }
+
+    /**
+     * Get bytes to sign from RawTransaction.
+     */
+    public static byte[] rawTransactionToSign(RawTransaction rawTransaction) throws SerializationError {
+        return com.google.common.primitives.Bytes
+                .concat(HashUtils.hashWithAptosPrefix("RawTransaction"), rawTransaction.bcsSerialize());
     }
 
     /**
@@ -345,6 +354,17 @@ public class NodeApiUtils {
         }
     }
 
+    public static TransactionsBatchSubmissionResult submitBatchBcsTransactions(String baseUrl, List<SignedUserTransaction> signedTransactionList) throws IOException, SerializationError {
+        Request httpRequest = newSubmitBatchBcsTransactionsHttpRequest(baseUrl, signedTransactionList);
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        try (Response response = client.newCall(httpRequest).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, TransactionsBatchSubmissionResult.class);
+        }
+    }
+
     public static List<Transaction> simulateBcsTransaction(String baseUrl, SignedUserTransaction signedTransaction,
                                                            Boolean estimateGasUnitPrice, Boolean estimateMaxGasAmount) throws IOException, SerializationError {
         Request httpRequest = newSimulateBcsTransactionHttpRequest(baseUrl, signedTransaction, estimateGasUnitPrice, estimateMaxGasAmount);
@@ -378,8 +398,8 @@ public class NodeApiUtils {
     /**
      * Submit batch transactions.
      */
-    public static TransactionsBatchSubmissionResult submitBatchTransaction(String baseUrl, List<SubmitTransactionRequest> submitTransactionRequestList) throws IOException {
-        Request httpRequest = newSubmitBatchTransactionHttpRequest(baseUrl, submitTransactionRequestList);
+    public static TransactionsBatchSubmissionResult submitBatchTransactions(String baseUrl, List<SubmitTransactionRequest> submitTransactionRequestList) throws IOException {
+        Request httpRequest = newSubmitBatchTransactionsHttpRequest(baseUrl, submitTransactionRequestList);
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
         try (Response response = client.newCall(httpRequest).execute()) {
@@ -461,7 +481,7 @@ public class NodeApiUtils {
                 .build();
     }
 
-    private static Request newSubmitBatchTransactionHttpRequest(String baseUrl, List<SubmitTransactionRequest> submitTransactionRequestList) throws JsonProcessingException {
+    private static Request newSubmitBatchTransactionsHttpRequest(String baseUrl, List<SubmitTransactionRequest> submitTransactionRequestList) throws JsonProcessingException {
         HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
                 .addPathSegment("transactions")
                 .addPathSegment("batch");
@@ -500,6 +520,27 @@ public class NodeApiUtils {
                 signedTransaction.bcsSerialize());
         return new Request.Builder().url(url).post(body)
                 .build();
+    }
+
+
+    private static Request newSubmitBatchBcsTransactionsHttpRequest(String baseUrl, List<SignedUserTransaction> signedTransactionList) throws SerializationError {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("batch");
+        HttpUrl url = builder.build();
+        RequestBody body = RequestBody.create(MediaType.parse("application/x.aptos.signed_transaction+bcs"),
+                bcsSerializeSignedUserTransactionList(signedTransactionList));
+        return new Request.Builder().url(url).post(body)
+                .build();
+    }
+
+    public static byte[] bcsSerializeSignedUserTransactionList(java.util.List<SignedUserTransaction> transactions) throws com.novi.serde.SerializationError {
+        com.novi.serde.Serializer serializer = new com.novi.bcs.BcsSerializer();
+        serializer.serialize_len(transactions.size());
+        for (SignedUserTransaction transaction : transactions) {
+            transaction.serialize(serializer);
+        }
+        return serializer.get_bytes();
     }
 
     private static Request newSimulateBcsTransactionHttpRequest(String baseUrl, SignedUserTransaction signedTransaction,
