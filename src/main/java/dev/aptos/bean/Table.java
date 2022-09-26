@@ -1,10 +1,7 @@
 package dev.aptos.bean;
 
 public class Table {
-    ///// Type of tables
-    //    struct Table<phantom K: copy + drop, phantom V> has store {
-    //        handle: address,
-    //    }
+
     private String handle;
 
     public String getHandle() {

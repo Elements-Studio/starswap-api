@@ -3,18 +3,6 @@ package dev.aptos.bean;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LedgerInfo {
-    /*
-    {
-      "chain_id": 27,
-      "epoch": "72",
-      "ledger_version": "33439307",
-      "oldest_ledger_version": "0",
-      "ledger_timestamp": "1663215097891147",
-      "node_role": "full_node",
-      "oldest_block_height": "0",
-      "block_height": "5824914"
-    }
-     */
 
     @JsonProperty("chain_id")
     private Integer chainId;

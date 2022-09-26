@@ -172,8 +172,8 @@ public class NodeApiUtils {
     }
 
     public static List<Event> getEventsByEventHandle(String baseUrl, String accountAddress,
-                                                        String eventHandleStruct, String eventHandleFieldName,
-                                                        Long start, Integer limit) throws IOException {
+                                                     String eventHandleStruct, String eventHandleFieldName,
+                                                     Long start, Integer limit) throws IOException {
         Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {

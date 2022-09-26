@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class MoveFunction {
-    @JsonProperty("name")//: "string",
+    @JsonProperty("name")
     private String name;
     @JsonProperty("visibility")//: "private",
     private String visibility;
-    @JsonProperty("is_entry")//: true,
+    @JsonProperty("is_entry")
     private Boolean isEntry;
     @JsonProperty("generic_type_params")
     private List<MoveFunctionGenericTypeParam> genericTypeParams;
