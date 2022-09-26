@@ -106,7 +106,7 @@ public class EventTests {
         byte[] privateKey = HexUtils.hexToByteArray("0x09cc77f21e471431df54280da75749069b54bfe42e3cd2b532a1024262339090");
         byte[] signature = SignatureUtils.ed25519Sign(privateKey, HexUtils.hexToByteArray(toSign));
 
-        boolean submitBcsTxn = true;
+        boolean submitBcsTxn = false;
         Transaction submitTransactionResult;
         if (submitBcsTxn) {
             // ///////////////////////// Simulate transaction //////////////////////////
@@ -152,6 +152,9 @@ public class EventTests {
                 submitTransactionResult = simulatedTransactions.get(0);
                 // //////////////////////////////////////////////////////////////////
             } else {
+                TransactionsBatchSubmissionResult transactionsBatchSubmissionResult = NodeApiUtils.submitBatchTransaction(baseUrl, Collections.singletonList(submitTransactionRequest));
+                System.out.println(transactionsBatchSubmissionResult);
+                if (true) return;
                 submitTransactionResult = NodeApiUtils.submitTransaction(baseUrl, submitTransactionRequest);
             }
         }

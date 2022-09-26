@@ -374,6 +374,22 @@ public class NodeApiUtils {
         }
     }
 
+
+    /**
+     * Submit batch transactions.
+     */
+    public static TransactionsBatchSubmissionResult submitBatchTransaction(String baseUrl, List<SubmitTransactionRequest> submitTransactionRequestList) throws IOException {
+        Request httpRequest = newSubmitBatchTransactionHttpRequest(baseUrl, submitTransactionRequestList);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .build();
+        try (Response response = client.newCall(httpRequest).execute()) {
+            if (response.code() >= 400) {
+                throwNodeApiException(response);
+            }
+            return readResponseBody(response, TransactionsBatchSubmissionResult.class);
+        }
+    }
+
     public static List<Transaction> simulateTransaction(String baseUrl, SubmitTransactionRequest submitTransactionRequest,
                                                         Boolean estimateGasUnitPrice, Boolean estimateMaxGasAmount) throws IOException {
         Request httpRequest = newSimulateTransactionHttpRequest(baseUrl, submitTransactionRequest, estimateGasUnitPrice, estimateMaxGasAmount);
@@ -442,6 +458,18 @@ public class NodeApiUtils {
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), ByteString.encodeUtf8(json));
         return new Request.Builder().url(url).post(body)
                 //.header("Content-Type", "application/json")
+                .build();
+    }
+
+    private static Request newSubmitBatchTransactionHttpRequest(String baseUrl, List<SubmitTransactionRequest> submitTransactionRequestList) throws JsonProcessingException {
+        HttpUrl.Builder builder = HttpUrl.parse(baseUrl).newBuilder()
+                .addPathSegment("transactions")
+                .addPathSegment("batch");
+        HttpUrl url = builder.build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(submitTransactionRequestList);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), ByteString.encodeUtf8(json));
+        return new Request.Builder().url(url).post(body)
                 .build();
     }
 
