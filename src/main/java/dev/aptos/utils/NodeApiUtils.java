@@ -144,12 +144,10 @@ public class NodeApiUtils {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            String body = response.body().string();
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(body, new TypeReference<List<Transaction>>() {
-            });
+            return readResponseBodyAsList(response, Transaction.class);
         }
     }
+
 
     public static Block getBlockByHeight(String baseUrl, String height, Boolean withTransactions) throws IOException {
         Request request = newGetBlockByHeightRequest(baseUrl, height, withTransactions);
@@ -173,10 +171,9 @@ public class NodeApiUtils {
         }
     }
 
-
-    public static List<Event<?>> getEvents(String baseUrl, String accountAddress,
-                                           String eventHandleStruct, String eventHandleFieldName,
-                                           Long start, Integer limit) throws IOException {
+    public static List<Event> getEventsByEventHandle(String baseUrl, String accountAddress,
+                                                        String eventHandleStruct, String eventHandleFieldName,
+                                                        Long start, Integer limit) throws IOException {
         Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
@@ -184,15 +181,13 @@ public class NodeApiUtils {
                 throwNodeApiException(response);
             }
             ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(),
-                    new TypeReference<List<Event<?>>>() {
-                    });
+            return readResponseBodyAsList(response, Event.class);
         }
     }
 
-    public static <TData> List<Event<TData>> getEvents(String baseUrl, String accountAddress,
-                                                       String eventHandleStruct, String eventHandleFieldName,
-                                                       Class<TData> eventDataType, Long start, Integer limit) throws IOException {
+    public static <TData> List<Event<TData>> getEventsByEventHandle(String baseUrl, String accountAddress,
+                                                                    String eventHandleStruct, String eventHandleFieldName,
+                                                                    Class<TData> eventDataType, Long start, Integer limit) throws IOException {
         Request request = newGetEventsRequest(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
@@ -223,9 +218,9 @@ public class NodeApiUtils {
     /**
      * Get events by event key.
      */
-    public static <TData> List<Event<TData>> getEvents(String baseUrl, String eventKey,
-                                                       Class<TData> eventDataType,
-                                                       Long start, Integer limit) throws IOException {
+    public static <TData> List<Event<TData>> getEventsByEventKey(String baseUrl, String eventKey,
+                                                                 Class<TData> eventDataType,
+                                                                 Long start, Integer limit) throws IOException {
         Request request = newGetEventsRequest(baseUrl, eventKey, start, limit);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
@@ -276,9 +271,7 @@ public class NodeApiUtils {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(),
-                    objectMapper.getTypeFactory().constructParametricType(AccountResource.class, dataType));
+            return (AccountResource<TData>) readResponseBodyAsParametricType(response, AccountResource.class, dataType);
         }
     }
 
@@ -293,17 +286,15 @@ public class NodeApiUtils {
         }
     }
 
-    public static List<AccountResource<Object>> getAccountResources(String baseUrl, String accountAddress,
-                                                                    String ledgerVersion) throws IOException {
+    public static List<AccountResource> getAccountResources(String baseUrl, String accountAddress,
+                                                            String ledgerVersion) throws IOException {
         Request request = newGetAccountResourcesRequest(baseUrl, accountAddress, ledgerVersion);
         OkHttpClient client = new OkHttpClient();
         try (Response response = client.newCall(request).execute()) {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, AccountResource.class));
+            return readResponseBodyAsList(response, AccountResource.class);
         }
     }
 
@@ -314,9 +305,7 @@ public class NodeApiUtils {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, MoveModuleBytecode.class));
+            return readResponseBodyAsList(response, MoveModuleBytecode.class);
         }
     }
 
@@ -373,9 +362,7 @@ public class NodeApiUtils {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Transaction.class));
+            return readResponseBodyAsList(response, Transaction.class);
         }
     }
 
@@ -418,11 +405,10 @@ public class NodeApiUtils {
             if (response.code() >= 400) {
                 throwNodeApiException(response);
             }
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response.body().string(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, Transaction.class));
+            return readResponseBodyAsList(response, Transaction.class);
         }
     }
+
 
     //    public static class HttpLogger implements HttpLoggingInterceptor.Logger {
     //        @Override
@@ -774,6 +760,18 @@ public class NodeApiUtils {
     private static <T> T readResponseBody(Response response, Class<T> clazz) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(response.body().string(), clazz);
+    }
+
+    private static <T> List<T> readResponseBodyAsList(Response response, Class<T> elementType) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(response.body().string(),
+                objectMapper.getTypeFactory().constructCollectionType(List.class, elementType));
+    }
+
+    private static Object readResponseBodyAsParametricType(Response response, Class<?> parametrized, Class<?>... parameterClasses) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(response.body().string(),
+                objectMapper.getTypeFactory().constructParametricType(parametrized, parameterClasses));
     }
 
     private static void throwNodeApiException(Response response) {

@@ -35,23 +35,22 @@ public class EventTests {
         System.out.println(healthCheckSuccess);
         //if (true) return;
 
-//        LedgerInfo ledgerInfo = NodeApiUtils.getLedgerInfo(baseUrl);
-//        System.out.println(ledgerInfo);
-//        if (true) return;
+        LedgerInfo ledgerInfo = NodeApiUtils.getLedgerInfo(baseUrl);
+        System.out.println(ledgerInfo);
+        //if (true) return;
 
-//        java.math.BigInteger balance = NodeApiUtils.getAccountBalance(baseUrl, accountAddress + "1");
-//        System.out.println(balance);
-//        if (true) return;
+        java.math.BigInteger balance = NodeApiUtils.getAccountBalance(baseUrl, accountAddress);
+        System.out.println(balance);
+        //if (true) return;
 
-
-        List<Event<?>> events_1 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
+        List<Event> events_1 = NodeApiUtils.getEventsByEventHandle(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
         System.out.println(events_1);
         events_1.forEach(event -> {
             //java.util.LinkedHashMap cannot be cast to dev.aptos.bean.EventTests$HelloBlockchainMessageChangeEvent!
             //System.out.println(event.getData().getClass());
             System.out.println(event.getData().getClass());
         });
-        List<Event<HelloBlockchainMessageChangeEvent>> events_2 = NodeApiUtils.getEvents(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, HelloBlockchainMessageChangeEvent.class, 1L, 1);
+        List<Event<HelloBlockchainMessageChangeEvent>> events_2 = NodeApiUtils.getEventsByEventHandle(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, HelloBlockchainMessageChangeEvent.class, 1L, 1);
         System.out.println(events_2);
 //        String creationNumber = "4";
 //        List<Event<HelloBlockchainMessageChangeEvent>> events_3 = NodeApiUtils.getEventsByCreationNumber(baseUrl, accountAddress, creationNumber, HelloBlockchainMessageChangeEvent.class, 0L, 1);
@@ -210,7 +209,7 @@ public class EventTests {
 //        System.out.println(eventList);
 //        //if (true) return;
 
-        List<AccountResource<Object>> resources = NodeApiUtils.getAccountResources(baseUrl, accountAddress, null);
+        List<AccountResource> resources = NodeApiUtils.getAccountResources(baseUrl, accountAddress, null);
         System.out.println(resources);
         //if (true) return;
 

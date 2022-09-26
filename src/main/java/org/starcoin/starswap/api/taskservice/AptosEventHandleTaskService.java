@@ -48,7 +48,7 @@ public class AptosEventHandleTaskService {
                 h -> {
                     AptosEventHandleId hId = h.getAptosEventHandleId();
                     try {
-                        return NodeApiUtils.getEvents(aptosNodeApiBaseUrl,
+                        return NodeApiUtils.getEventsByEventHandle(aptosNodeApiBaseUrl,
                                 hId.getAccountAddress(), hId.getEventHandleStruct(), hId.getEventHandleFieldName(),
                                 HelloBlockchainMessageChangeEvent.class,
                                 h.getNextSequenceNumber() != null ? h.getNextSequenceNumber().longValue() : 0,
