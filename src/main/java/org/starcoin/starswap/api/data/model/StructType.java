@@ -4,10 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.util.Objects;
 
+/**
+ * Type information of a Move struct.
+ */
 @Embeddable
 public class StructType {
 
-    @Column(length = 34, nullable = false)
+    @Column(length = 66, nullable = false)
     private String address;
 
     @Column(nullable = false)

@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Embeddable
 public class SyrupPoolAccountId implements Serializable {
-    @Column(length = 34)
+    @Column(length = 66)
     private String accountAddress;
 
     private SyrupPoolId syrupPoolId = new SyrupPoolId();
@@ -20,7 +20,7 @@ public class SyrupPoolAccountId implements Serializable {
         this.syrupPoolId = syrupPoolId;
     }
 
-    @Column(length = 34)
+    @Column(length = 66)
     protected String getPoolAddress() {
         return getSyrupPoolId().getPoolAddress();
     }

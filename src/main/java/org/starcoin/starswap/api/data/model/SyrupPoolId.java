@@ -10,7 +10,7 @@ public class SyrupPoolId implements Serializable {
     /**
      * 池子的地址。
      */
-    @Column(length = 34)
+    @Column(length = 66)
     private String poolAddress;
 
     @Column(name = "token_id", length = 15, nullable = false)

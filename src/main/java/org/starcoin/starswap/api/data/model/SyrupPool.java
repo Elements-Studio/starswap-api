@@ -19,7 +19,7 @@ public class SyrupPool {
      */
     @EmbeddedId
     @AttributeOverride(name = "tokenId", column = @Column(name = "token_id", nullable = false))
-    @AttributeOverride(name = "poolAddress", column = @Column(name = "pool_address", length = 34, nullable = false))
+    @AttributeOverride(name = "poolAddress", column = @Column(name = "pool_address", length = 66, nullable = false))
     private SyrupPoolId syrupPoolId;
 
     @Column(length = 1000, nullable = true)

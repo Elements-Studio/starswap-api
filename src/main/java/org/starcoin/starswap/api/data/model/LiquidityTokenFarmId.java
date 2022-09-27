@@ -8,7 +8,7 @@ import java.util.Objects;
 @Embeddable
 public class LiquidityTokenFarmId implements Serializable {
 
-    @Column(length = 34)
+    @Column(length = 66)
     private String farmAddress;
 
     private LiquidityTokenId liquidityTokenId = new LiquidityTokenId();
@@ -44,7 +44,7 @@ public class LiquidityTokenFarmId implements Serializable {
         this.getLiquidityTokenId().setTokenYId(tokenYId);
     }
 
-    @Column(length = 34)
+    @Column(length = 66)
     protected String getLiquidityTokenAddress() {
         return this.getLiquidityTokenId().getLiquidityTokenAddress();
     }

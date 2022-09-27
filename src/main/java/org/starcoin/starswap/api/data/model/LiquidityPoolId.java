@@ -11,7 +11,7 @@ public class LiquidityPoolId implements Serializable {
     /**
      * 池子的地址。（流动性存放在哪里。）
      */
-    @Column(length = 34)
+    @Column(length = 66)
     private String poolAddress;
 
     private LiquidityTokenId liquidityTokenId = new LiquidityTokenId();
@@ -47,7 +47,7 @@ public class LiquidityPoolId implements Serializable {
         this.getLiquidityTokenId().setTokenYId(tokenYId);
     }
 
-    @Column(length = 34)
+    @Column(length = 66)
     protected String getLiquidityTokenAddress() {
         return this.getLiquidityTokenId().getLiquidityTokenAddress();
     }

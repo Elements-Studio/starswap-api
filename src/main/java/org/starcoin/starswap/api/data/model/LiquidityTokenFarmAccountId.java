@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Embeddable
 public class LiquidityTokenFarmAccountId implements Serializable {
-    @Column(length = 34)
+    @Column(length = 66)
     private String accountAddress;
 
     private LiquidityTokenFarmId liquidityTokenFarmId = new LiquidityTokenFarmId();
@@ -20,7 +20,7 @@ public class LiquidityTokenFarmAccountId implements Serializable {
         this.liquidityTokenFarmId = liquidityTokenFarmId;
     }
 
-    @Column(length = 34)
+    @Column(length = 66)
     protected String getLiquidityTokenAddress() {
         return getLiquidityTokenFarmId().getLiquidityTokenAddress();
     }
@@ -29,7 +29,7 @@ public class LiquidityTokenFarmAccountId implements Serializable {
         this.getLiquidityTokenFarmId().setLiquidityTokenAddress(address);
     }
 
-    @Column(length = 34)
+    @Column(length = 66)
     protected String getFarmAddress() {
         return getLiquidityTokenFarmId().getFarmAddress();
     }

@@ -17,7 +17,7 @@ public class LiquidityTokenId implements Serializable {
     @Column(name = "token_y_id", length = 15, nullable = false)
     private String tokenYId;
 
-    @Column(name = "liquidity_token_address", length = 34, nullable = false)
+    @Column(name = "liquidity_token_address", length = 66, nullable = false)
     private String liquidityTokenAddress;
 
     public LiquidityTokenId() {
