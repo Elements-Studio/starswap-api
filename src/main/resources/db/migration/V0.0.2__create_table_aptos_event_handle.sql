@@ -65,7 +65,7 @@ CREATE TABLE `aptos_event_handle` (
   `event_data_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`account_address`,`event_handle_field_name`,`event_handle_struct`),
   UNIQUE KEY `UniqueEventDataType` (`event_data_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
