@@ -4,16 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.aptos.bean.TypeInfo;
 
 public class AddLiquidityEvent {
-    /// liquidity value by user X and Y type
     @JsonProperty("liquidity")//: u128,
     private String liquidity;
-    /// type info of X type
     @JsonProperty("x_type_info")//: type_info::TypeInfo,
     private TypeInfo xTypeInfo;
-    /// type info of Y type
     @JsonProperty("y_type_info")//: type_info::TypeInfo,
     private TypeInfo yTypeInfo;
-    /// signer of add liquidity
     @JsonProperty("signer")//: address,
     private String signer;
     @JsonProperty("amount_x_desired")//: u128,
