@@ -43,6 +43,13 @@ public class EventTests {
         System.out.println(balance);
         //if (true) return;
 
+//        String eventHandleStruct_3 = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::hello_table::EventStore";
+//        String eventHandleFieldName_3 = "add_liquidity_event_handle";
+//        List<Event<AddLiquidityEvent>> events_3 = NodeApiUtils.getEventsByEventHandle(baseUrl, accountAddress,
+//                eventHandleStruct_3, eventHandleFieldName_3, AddLiquidityEvent.class, null, null);
+//        System.out.println(events_3);
+//        if (true) return;
+
         List<Event> events_1 = NodeApiUtils.getEventsByEventHandle(baseUrl, accountAddress, eventHandleStruct, eventHandleFieldName, null, null);
         System.out.println(events_1);
         events_1.forEach(event -> {
@@ -55,7 +62,7 @@ public class EventTests {
 //        String creationNumber = "4";
 //        List<Event<HelloBlockchainMessageChangeEvent>> events_3 = NodeApiUtils.getEventsByCreationNumber(baseUrl, accountAddress, creationNumber, HelloBlockchainMessageChangeEvent.class, 0L, 1);
 //        System.out.println(events_3);
-        //if (true) return;
+        if (true) return;
 
         TransactionPayload transactionPayload = new TransactionPayload();
         transactionPayload.setType(TransactionPayload.TYPE_ENTRY_FUNCTION_PAYLOAD);
