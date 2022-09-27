@@ -68,6 +68,14 @@ public class Event<TData> {
         this.data = data;
     }
 
+    public Guid getGuid() {
+        return guid;
+    }
+
+    public void setGuid(Guid guid) {
+        this.guid = guid;
+    }
+
     @Override
     public String toString() {
         return "Event{" +

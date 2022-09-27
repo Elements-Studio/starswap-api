@@ -33,19 +33,19 @@ public class AddLiquidityEvent {
         this.liquidity = liquidity;
     }
 
-    public TypeInfo getxTypeInfo() {
+    public TypeInfo getXTypeInfo() {
         return xTypeInfo;
     }
 
-    public void setxTypeInfo(TypeInfo xTypeInfo) {
+    public void setXTypeInfo(TypeInfo xTypeInfo) {
         this.xTypeInfo = xTypeInfo;
     }
 
-    public TypeInfo getyTypeInfo() {
+    public TypeInfo getYTypeInfo() {
         return yTypeInfo;
     }
 
-    public void setyTypeInfo(TypeInfo yTypeInfo) {
+    public void setYTypeInfo(TypeInfo yTypeInfo) {
         this.yTypeInfo = yTypeInfo;
     }
 

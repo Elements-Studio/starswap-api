@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.starcoin.starswap.api.data.model.AptosEventHandle;
-import org.starcoin.starswap.api.data.model.AptosEventHandleId;
-import org.starcoin.starswap.api.data.model.Pair;
+import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.data.repo.AptosEventHandleRepository;
+import org.starcoin.starswap.api.service.LiquidityAccountService;
+import org.starcoin.starswap.api.service.TokenService;
+import org.starcoin.starswap.aptos.bean.AddLiquidityEvent;
+import org.starcoin.utils.HexUtils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -31,26 +33,34 @@ public class AptosEventHandleTaskService {
 
     private final AptosEventHandleRepository aptosEventHandleRepository;
 
-    @Value("${aptos.node-api.base-url}")
-    private String aptosNodeApiBaseUrl;
 
-    private final int eventFetchLimit = 2;
+    private final String aptosNodeApiBaseUrl;
+
+    private final int eventFetchLimit = 2; //todo update to larger value
+
+    private final TokenService tokenService;
+    private final LiquidityAccountService liquidityAccountService;
 
     public AptosEventHandleTaskService(
-            @Autowired AptosEventHandleRepository aptosEventHandleRepository) {
+            @Value("${aptos.node-api.base-url}") String aptosNodeApiBaseUrl,
+            @Autowired TokenService tokenService,
+            @Autowired AptosEventHandleRepository aptosEventHandleRepository,
+            @Autowired LiquidityAccountService liquidityAccountService) {
+        this.aptosNodeApiBaseUrl = aptosNodeApiBaseUrl;
+        this.tokenService = tokenService;
         this.aptosEventHandleRepository = aptosEventHandleRepository;
+        this.liquidityAccountService = liquidityAccountService;
         initEventFetcherMap();
     }
 
     private void initEventFetcherMap() {
-        //todo: this a test entry, remove it later
-        eventFetcherAndHandlerMap.put("HelloBlockchainMessageChangeEvent", new Pair<>(
+        eventFetcherAndHandlerMap.put("AddLiquidityEvent", new Pair<>(
                 h -> {
                     AptosEventHandleId hId = h.getAptosEventHandleId();
                     try {
                         return NodeApiUtils.getEventsByEventHandle(aptosNodeApiBaseUrl,
                                 hId.getAccountAddress(), hId.getEventHandleStruct(), hId.getEventHandleFieldName(),
-                                HelloBlockchainMessageChangeEvent.class,
+                                AddLiquidityEvent.class,
                                 h.getNextSequenceNumber() != null ? h.getNextSequenceNumber().longValue() : 0,
                                 this.eventFetchLimit);
                     } catch (IOException e) {
@@ -58,12 +68,74 @@ public class AptosEventHandleTaskService {
                     }
                 },
                 (h, e) -> {
-                    Event<HelloBlockchainMessageChangeEvent> event = (Event<HelloBlockchainMessageChangeEvent>) e;
-                    LOG.info("HelloBlockchainMessageChangeEvent: {}", event);
+                    Event<AddLiquidityEvent> event = (Event<AddLiquidityEvent>) e;
+                    AddLiquidityEvent addLiquidityEvent = event.getData();
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Handle Aptos AddLiquidityEvent: {}", addLiquidityEvent);
+                    }
+                    if (false) { //todo do real job...
+                        handleAddLiquidityEvent(h, addLiquidityEvent);
+                    }
                     h.setNextSequenceNumber(new BigInteger(event.getSequenceNumber()).add(BigInteger.ONE));
                     aptosEventHandleRepository.save(h);
                 }
         ));
+//        // this a test entry, remove it later
+//        eventFetcherAndHandlerMap.put("HelloBlockchainMessageChangeEvent", new Pair<>(
+//                h -> {
+//                    AptosEventHandleId hId = h.getAptosEventHandleId();
+//                    try {
+//                        return NodeApiUtils.getEventsByEventHandle(aptosNodeApiBaseUrl,
+//                                hId.getAccountAddress(), hId.getEventHandleStruct(), hId.getEventHandleFieldName(),
+//                                HelloBlockchainMessageChangeEvent.class,
+//                                h.getNextSequenceNumber() != null ? h.getNextSequenceNumber().longValue() : 0,
+//                                this.eventFetchLimit);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                },
+//                (h, e) -> {
+//                    Event<HelloBlockchainMessageChangeEvent> event = (Event<HelloBlockchainMessageChangeEvent>) e;
+//                    LOG.info("HelloBlockchainMessageChangeEvent: {}", event);
+//                    h.setNextSequenceNumber(new BigInteger(event.getSequenceNumber()).add(BigInteger.ONE));
+//                    aptosEventHandleRepository.save(h);
+//                }
+//        ));
+    }
+
+    private void handleAddLiquidityEvent(AptosEventHandle h, AddLiquidityEvent addLiquidityEvent) {
+        String xTokenTypeAddress = addLiquidityEvent.getXTypeInfo().getAccountAddress();
+        String xTokenTypeModule = HexUtils.hexToString(addLiquidityEvent.getYTypeInfo().getModuleName());
+        String xTokenTypeName = HexUtils.hexToString(addLiquidityEvent.getXTypeInfo().getStructName());
+//        System.out.println(xTokenTypeAddress);
+//        System.out.println(xTokenTypeModule);
+//        System.out.println(xTokenTypeName);
+        String yTokenTypeAddress = addLiquidityEvent.getYTypeInfo().getAccountAddress();
+        String yTokenTypeModule = HexUtils.hexToString(addLiquidityEvent.getYTypeInfo().getModuleName());
+        String yTokenTypeName = HexUtils.hexToString(addLiquidityEvent.getYTypeInfo().getStructName());
+//        System.out.println(yTokenTypeAddress);
+//        System.out.println(yTokenTypeModule);
+//        System.out.println(yTokenTypeName);
+        String accountAddress = addLiquidityEvent.getSigner();
+        //BigInteger liquidity = new BigInteger(addLiquidityEvent.getLiquidity());
+
+        Token xToken = tokenService.getTokenByStructType(xTokenTypeAddress, xTokenTypeModule, xTokenTypeName);
+        if (xToken == null) {
+            throw new RuntimeException("Cannot get token by struct type: " + xTokenTypeName);
+        }
+        Token yToken = tokenService.getTokenByStructType(yTokenTypeAddress, yTokenTypeModule, yTokenTypeName);
+        if (yToken == null) {
+            throw new RuntimeException("Cannot get token by struct type: " + yTokenTypeName);
+        }
+        String liquidityTokenAddress = h.getAptosEventHandleId().getAccountAddress();
+        String liquidityPollAddress = h.getAptosEventHandleId().getAccountAddress();
+
+        LiquidityAccountId liquidityAccountId = new LiquidityAccountId(accountAddress,
+                new LiquidityPoolId(
+                        new LiquidityTokenId(xToken.getTokenId(), yToken.getTokenId(), liquidityTokenAddress),
+                        liquidityPollAddress));
+        this.liquidityAccountService.activeLiquidityAccount(liquidityAccountId);
+
     }
 
     @Scheduled(fixedDelayString = "${aptos.event-handle.fixed-delay}")
@@ -80,18 +152,18 @@ public class AptosEventHandleTaskService {
         }
     }
 
-    //todo: this is a test class, to be removed.
-    public static class HelloBlockchainMessageChangeEvent {
-        public String from_message;
-        public String to_message;
-
-        @Override
-        public String toString() {
-            return "HelloBlockchainMessageChangeEvent{" +
-                    "from_message='" + from_message + '\'' +
-                    ", to_message='" + to_message + '\'' +
-                    '}';
-        }
-    }
+//    // this is a test class, to be removed.
+//    public static class HelloBlockchainMessageChangeEvent {
+//        public String from_message;
+//        public String to_message;
+//
+//        @Override
+//        public String toString() {
+//            return "HelloBlockchainMessageChangeEvent{" +
+//                    "from_message='" + from_message + '\'' +
+//                    ", to_message='" + to_message + '\'' +
+//                    '}';
+//        }
+//    }
 
 }
