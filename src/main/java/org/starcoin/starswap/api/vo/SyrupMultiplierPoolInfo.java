@@ -8,7 +8,7 @@ public class SyrupMultiplierPoolInfo {
     private Long multiplier; //stepwise_multiplier
     private BigInteger assetAmount;
 
-    //stepwise_asset_weight = stepwise_amount * stepwise_multiplier
+    //stepwise_asset_weight = stepwise_asset_amount * stepwise_multiplier
     private BigInteger assetWeight;
 
     //asset_total_weight = Σ(stepwise_asset_weight)

@@ -83,8 +83,12 @@ public class JsonRpcClient {
         return JsonRpcUtils.syrupPoolQueryTotalStake(this.jsonRpcSession, poolAddress, token);
     }
 
-    public BigInteger syrupPoolQueryReleasePerSecond(String poolAddress, String token) {
-        return JsonRpcUtils.syrupPoolQueryReleasePerSecond(this.jsonRpcSession, poolAddress, token);
+//    public BigInteger syrupPoolQueryReleasePerSecond(String poolAddress, String token) {
+//        return JsonRpcUtils.syrupPoolQueryReleasePerSecond(this.jsonRpcSession, poolAddress, token);
+//    }
+
+    public BigInteger syrupPoolQueryReleasePerSecondV2(String poolAddress, String token) {
+        return JsonRpcUtils.syrupPoolQueryReleasePerSecondV2(this.jsonRpcSession, poolAddress, token);
     }
 
 //    public Integer syrupPoolGetRewardMultiplier(String poolAddress, String token) {

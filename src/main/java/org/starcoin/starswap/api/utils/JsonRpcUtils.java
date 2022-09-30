@@ -204,13 +204,13 @@ public class JsonRpcUtils {
         return new BigInteger(resultFields.get(0));
     }
 
-    public static BigInteger syrupPoolQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
-                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_release_per_second",
-                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<String>>() {
-                });
-        return new BigInteger(resultFields.get(0));
-    }
+//    public static BigInteger syrupPoolQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
+//        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+//                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_release_per_second",
+//                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<String>>() {
+//                });
+//        return new BigInteger(resultFields.get(0));
+//    }
 
 
     public static List<Long> syrupPoolQueryStakeList(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress) {
@@ -260,6 +260,54 @@ public class JsonRpcUtils {
         } else {
             return null;
         }
+    }
+
+    public static BigInteger syrupPoolQueryReleasePerSecondV2(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
+        List<BigInteger> syrupTotalInfo = syrupPoolQuerySyrupInfo(jsonRpcSession, poolAddress);
+        BigInteger total_alloc_point = syrupTotalInfo.get(0);
+        BigInteger pool_release_per_second = syrupTotalInfo.get(1);
+        List<BigInteger> poolInfo = syrupPoolQueryPoolInfoV2(jsonRpcSession, poolAddress, token);
+        BigInteger alloc_point = poolInfo.get(0);
+        return pool_release_per_second.multiply(alloc_point).divide(total_alloc_point);
+    }
+
+    /**
+     * @return (total_alloc_point, pool_release_per_second)
+     */
+    public static List<BigInteger> syrupPoolQuerySyrupInfo(JSONRPC2Session jsonRpcSession,
+                                                           String poolAddress) {
+        /*
+        /// Queyry global pool info
+        /// return value: (total_alloc_point, pool_release_per_second)
+        public fun query_syrup_info(): (u128, u128) {
+         */
+        List<BigInteger> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_syrup_info",//
+                Collections.emptyList(),
+                Collections.emptyList(),
+                new TypeReference<List<BigInteger>>() {
+                });
+        return resultFields;
+    }
+
+    /**
+     * @return (alloc_point, asset_total_amount, asset_total_weight, harvest_index)
+     */
+    public static List<BigInteger> syrupPoolQueryPoolInfoV2(JSONRPC2Session jsonRpcSession,
+                                                            String poolAddress,
+                                                            String token) {
+        /*
+        /// Query pool info from pool type v2
+        /// return value: (alloc_point, asset_total_amount, asset_total_weight, harvest_index)
+        public fun query_pool_info_v2<TokenT: store>(): (u128, u128, u128, u128) {
+         */
+        List<BigInteger> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_pool_info_v2",//
+                Collections.singletonList(token),
+                Collections.emptyList(),
+                new TypeReference<List<BigInteger>>() {
+                });
+        return resultFields;
     }
 
     public static Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(JSONRPC2Session jsonRpcSession,

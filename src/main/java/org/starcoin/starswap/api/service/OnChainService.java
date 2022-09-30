@@ -775,7 +775,7 @@ public class OnChainService {
         String rewardTokenId = pool.getRewardTokenId();
         Token rewardToken = tokenService.getTokenOrElseThrow(rewardTokenId, () -> new RuntimeException("Cannot find Token by Id: " + rewardTokenId));
 
-        BigInteger rewardReleasePerSecond = jsonRpcClient.syrupPoolQueryReleasePerSecond(pool.getSyrupPoolId().getPoolAddress(),
+        BigInteger rewardReleasePerSecond = jsonRpcClient.syrupPoolQueryReleasePerSecondV2(pool.getSyrupPoolId().getPoolAddress(),
                 rewardToken.getTokenStructType().toTypeTagString());
         BigInteger rewardPerYear = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_YEAR_SECONDS));
 
@@ -785,13 +785,11 @@ public class OnChainService {
     public BigInteger getSyrupPoolDailyReward(SyrupPool pool) {
         String rewardTokenId = pool.getRewardTokenId();
         Token rewardToken = tokenService.getTokenOrElseThrow(rewardTokenId, () -> new RuntimeException("Cannot find Token by Id: " + rewardTokenId));
-        BigInteger rewardReleasePerSecond = jsonRpcClient.syrupPoolQueryReleasePerSecond(pool.getSyrupPoolId().getPoolAddress(),
+        BigInteger rewardReleasePerSecond = jsonRpcClient.syrupPoolQueryReleasePerSecondV2(pool.getSyrupPoolId().getPoolAddress(),
                 rewardToken.getTokenStructType().toTypeTagString());
         BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
-
-        return rewardPerDay.multiply(BigInteger.valueOf(SYRUP_POOL_TOTAL_REWARD_MULTIPLIER));
+        return rewardPerDay;//.multiply(BigInteger.valueOf(SYRUP_POOL_TOTAL_REWARD_MULTIPLIER));
         //SYRUP_POOL_TOTAL_REWARD_MULTIPLIER = 2 + 3 + 4 + 6 + 8;
-        //todo Is this ok?
     }
 
     public List<SyrupMultiplierPoolInfo> getSyrupMultiplierPools(SyrupPool syrupPool, Boolean estimateApr) {
@@ -809,8 +807,34 @@ public class OnChainService {
             pools.add(p);
         }
         if (estimateApr != null && estimateApr) {
-            // todo estimate APR
+            // estimate APR
+            BigInteger totalAssetWeight = BigInteger.ZERO;
+            for (SyrupMultiplierPoolInfo p : pools) {
+                p.setAssetWeight(p.getAssetAmount().multiply(BigInteger.valueOf(p.getMultiplier())));
+                totalAssetWeight = totalAssetWeight.add(p.getAssetWeight());
+            }
+            for (SyrupMultiplierPoolInfo p : pools) {
+                if (BigInteger.ZERO.compareTo(totalAssetWeight) == 0) {
+                    p.setPoolRatio(BigDecimal.ZERO);
+                } else {
+                    p.setPoolRatio(new BigDecimal(p.getAssetWeight()).divide(new BigDecimal(totalAssetWeight), 9, RoundingMode.HALF_UP));
+                }
+            }
+            BigDecimal totalRewardPerYearInUsd = getSyrupPoolRewardPerYearInUsd(syrupPool);
+            for (SyrupMultiplierPoolInfo p : pools) {
+                BigDecimal assetAmountInUsd = getTokenAmountInUsd(poolToken, p.getAssetAmount());
+                if (BigDecimal.ZERO.compareTo(assetAmountInUsd) == 0) {
+                    p.setEstimatedApr(BigDecimal.ZERO);
+                } else {
+                    p.setEstimatedApr(totalRewardPerYearInUsd
+                            .multiply(p.getPoolRatio())
+                            .divide(assetAmountInUsd, 9, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(100))
+                    );
+                }
+            }
         }
+
         return pools;
     }
 
