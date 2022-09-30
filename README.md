@@ -133,6 +133,11 @@ http://localhost:8600/barnard/v1/syrupPools/STAR
 http://localhost:8600/barnard/v1/syrupPoolTvlInUsd
 ```
 
+查询 syrup 阶梯倍率池的信息（estimateApr = true 时返回 APR 估算信息）：
+
+```
+http://localhost:8600/barnard/v1/syrupMultiplierPools?tokenId=STAR&estimateApr=false
+```
 
 取得某个账号地址参与抵押的 syrup pool 的列表：
 

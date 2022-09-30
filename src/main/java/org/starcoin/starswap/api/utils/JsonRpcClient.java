@@ -7,6 +7,7 @@ import org.starcoin.bean.RpcStateWithProof;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
+import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.utils.JsonRpcClientUtils;
 
@@ -108,6 +109,12 @@ public class JsonRpcClient {
         });
         return stakeList;
     }
+
+    public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress,
+                                                                                             String token) {
+        return JsonRpcUtils.syrupPoolQueryAllMultiplierPools(this.jsonRpcSession, poolAddress, token);
+    }
+
 
     public BigInteger getAccountVeStarAmount(String contractAddress, String accountAddress) {
         return JsonRpcUtils.getAccountVeStarAmount(this.jsonRpcSession, contractAddress, accountAddress);

@@ -1,17 +1,23 @@
 package org.starcoin.starswap.api.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.novi.bcs.BcsDeserializer;
+import com.novi.serde.DeserializationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
+import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.service.LiquidityPoolService;
+import org.starcoin.utils.HexUtils;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.starcoin.utils.JsonRpcClientUtils.contractCallV2;
 
@@ -25,6 +31,7 @@ public class JsonRpcUtils {
     private static final String TOKEN_SWAP_ROUTER_MODULE_NAME = "TokenSwapRouter";
     private static final String TOKEN_SWAP_FARM_SCRIPT_MODULE_NAME = "TokenSwapFarmScript";
     private static final String TOKEN_SWAP_SYRUP_MODULE_NAME = "TokenSwapSyrup";
+    //private static final String TOKEN_SWAP_SYRUP_MULTIPLIER_POOL_MODULE_NAME = "TokenSwapSyrupMultiplierPool";
     private static final String TOKEN_SWAP_ORACLE_LIBRARY_MODULE_NAME = "TokenSwapOracleLibrary";
     private static final String TOKEN_SWAP_FARM_ROUTER_MODULE_NAME = "TokenSwapFarmRouter";
     //private static final String TOKEN_SWAP_SCRIPTS_MODULE_NAME = "TokenSwapScripts";
@@ -253,6 +260,35 @@ public class JsonRpcUtils {
         } else {
             return null;
         }
+    }
+
+    public static Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(JSONRPC2Session jsonRpcSession,
+                                                                                                    String poolAddress,
+                                                                                                    String token) {
+        List<Object> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_all_multiplier_pools",//
+                Collections.singletonList(token),
+                Collections.emptyList(),
+                new TypeReference<List<Object>>() {
+                });
+        String keys = (String) resultFields.get(0);
+        List<Long> multipliers = ((List<Object>) resultFields.get(1)).stream()
+                .map(i -> Long.parseLong(i.toString())).collect(Collectors.toList());
+        List<BigInteger> amounts = ((List<Object>) resultFields.get(2)).stream()
+                .map(i -> new BigInteger(i.toString())).collect(Collectors.toList());
+        byte[] keyBytes = HexUtils.hexToByteArray(keys);
+        int iLen = keyBytes.length / multipliers.size();
+        List<Long> secs = new ArrayList<>();
+        for (int i = 0; i < multipliers.size(); i++) {
+            byte[] item = Arrays.copyOfRange(keyBytes, i * iLen, i * iLen + Math.min(iLen, 8));
+            BcsDeserializer deserializer = new BcsDeserializer(item);
+            try {
+                secs.add(deserializer.deserialize_u64());
+            } catch (DeserializationError e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new Triple<>(secs, multipliers, amounts);
     }
 
     public static BigInteger getAccountVeStarAmount(JSONRPC2Session jsonRpcSession, String contractAddress, String accountAddress) {

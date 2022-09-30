@@ -8,14 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.service.*;
-import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
-import org.starcoin.starswap.api.vo.GetBestPathAndAmountInResult;
-import org.starcoin.starswap.api.vo.GetBestPathResult;
-import org.starcoin.starswap.api.vo.VeStarAmountAndSignature;
+import org.starcoin.starswap.api.vo.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -208,6 +206,17 @@ public class StarswapController {
             return null;
         }
         return onChainService.getSyrupPoolStakeList(syrupPool, accountAddress);
+    }
+
+    @GetMapping("syrupMultiplierPools")
+    public List<SyrupMultiplierPoolInfo> getSyrupMultiplierPools(
+            @RequestParam(value = "tokenId", required = true) String  tokenId,
+            @RequestParam(value = "estimateApr",required = false) Boolean estimateApr) {
+        SyrupPool syrupPool = this.syrupPoolService.findOneByTokenId(tokenId);
+        if (syrupPool == null) {
+            Collections.emptyList();
+        }
+        return onChainService.getSyrupMultiplierPools(syrupPool, estimateApr);
     }
 
     @GetMapping(path = "getAccountSyrupStakes")

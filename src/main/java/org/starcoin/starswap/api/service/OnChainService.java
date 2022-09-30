@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.utils.JsonRpcClient;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
+import org.starcoin.starswap.api.vo.SyrupMultiplierPoolInfo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -510,7 +511,7 @@ public class OnChainService {
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString());
         BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
-                //.multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
+        //.multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
         return rewardPerDay;
     }
 
@@ -789,6 +790,28 @@ public class OnChainService {
         BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
 
         return rewardPerDay.multiply(BigInteger.valueOf(SYRUP_POOL_TOTAL_REWARD_MULTIPLIER));
+        //SYRUP_POOL_TOTAL_REWARD_MULTIPLIER = 2 + 3 + 4 + 6 + 8;
+        //todo Is this ok?
+    }
+
+    public List<SyrupMultiplierPoolInfo> getSyrupMultiplierPools(SyrupPool syrupPool, Boolean estimateApr) {
+        Token poolToken = tokenService.getTokenOrElseThrow(syrupPool.getSyrupPoolId().getTokenId(),
+                () -> new RuntimeException("Cannot find Token by Id: " + syrupPool.getSyrupPoolId().getTokenId()));
+        Triple<List<Long>, List<Long>, List<BigInteger>> triple =
+                jsonRpcClient.syrupPoolQueryAllMultiplierPools(syrupPool.getSyrupPoolId().getPoolAddress(),
+                        poolToken.getTokenStructType().toTypeTagString());
+        List<SyrupMultiplierPoolInfo> pools = new ArrayList<>();
+        for (int i = 0; i < triple.getItem1().size(); i++) {
+            SyrupMultiplierPoolInfo p = new SyrupMultiplierPoolInfo();
+            p.setPledgeTimeSeconds(triple.getItem1().get(i));
+            p.setMultiplier(triple.getItem2().get(i));
+            p.setAssetAmount(triple.getItem3().get(i));
+            pools.add(p);
+        }
+        if (estimateApr != null && estimateApr) {
+            // todo estimate APR
+        }
+        return pools;
     }
 
 //    public Integer getSyrupPoolRewardMultiplier(SyrupPool pool) {

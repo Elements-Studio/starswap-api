@@ -68,6 +68,16 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
+        try {
+            JsonRpcClient jsonRpcClient = new JsonRpcClient("https://barnard-seed.starcoin.org");
+            Triple<List<Long>, List<Long>, List<BigInteger>> pools = jsonRpcClient.syrupPoolQueryAllMultiplierPools(
+                    "0x8c109349c6bd91411d6bc962e080c4a3","0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR");
+            System.out.println(pools);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        if (true) return;
+
         AptosEventHandle h = aptosEventHandleRepository.findFirstByEventDataType("HelloBlockchainMessageChangeEvent");
         System.out.println(h);
         if (true) return;
