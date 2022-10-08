@@ -114,6 +114,8 @@ public class JsonRpcClient {
         return stakeList;
     }
 
+    @Cacheable(cacheNames = "syrupPoolQueryAllMultiplierPoolsCache",
+            key = "#poolAddress + ',' + #token", unless = "#result == null")
     public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress,
                                                                                              String token) {
         return JsonRpcUtils.syrupPoolQueryAllMultiplierPools(this.jsonRpcSession, poolAddress, token);
