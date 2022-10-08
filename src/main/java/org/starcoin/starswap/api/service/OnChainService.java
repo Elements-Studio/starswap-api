@@ -22,6 +22,13 @@ import java.util.function.Function;
 @Service
 public class OnChainService {
 
+    /**
+     * A special token id,
+     * when combined with another token id to form a pair,
+     * means that the token's exchange rate to USD needs to be obtained through the off-chain API.
+     */
+    public static final String TOKEN_ID_OFF_CHAIN_USD = "OFF_CHAIN_USD";
+
     public static final int MAX_SWAP_DEPTH = 3;
 
     private static final long ONE_YEAR_SECONDS = 60L * 60 * 24 * 365;
@@ -687,10 +694,19 @@ public class OnChainService {
             if (toTokenId.isEmpty()) {
                 continue;
             }
-            Token toToken = tokenService.getTokenOrElseThrow(toTokenId, () -> new RuntimeException("Cannot find token by Id. : " + toTokenId));
-            BigDecimal er = getExchangeRate(fromToken, toToken);
-            r = i == 0 ? er : r.multiply(er);
-            fromToken = toToken;
+            BigDecimal er;
+            if (TOKEN_ID_OFF_CHAIN_USD.equals(toTokenId)) {
+                // ////////////////// Get to USD exchange rate by Off-Chain API ////////////////////
+                er = tokenPriceService.getToUsdExchangeRateByTokenId(fromToken.getTokenId());
+                r = i == 0 ? er : r.multiply(er);
+                break;//fromToken = toToken;
+                // /////////////////////////////////////////////////////////////////////////////////
+            } else {
+                Token toToken = tokenService.getTokenOrElseThrow(toTokenId, () -> new RuntimeException("Cannot find token by Id. : " + toTokenId));
+                er = getExchangeRate(fromToken, toToken);
+                r = i == 0 ? er : r.multiply(er);
+                fromToken = toToken;
+            }
         }
         if (r == null) {
             throw new RuntimeException("token.getToUsdExchangeRatePath() is empty. Token Id.: " + token.getTokenId());
