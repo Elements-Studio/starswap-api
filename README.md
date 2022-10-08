@@ -139,6 +139,13 @@ http://localhost:8600/barnard/v1/syrupPoolTvlInUsd
 http://localhost:8600/barnard/v1/syrupMultiplierPools?tokenId=STAR&estimateApr=false
 ```
 
+查询 syrup 池信息的时候，可以一起返回阶梯倍率池（子池）的信息，例子（注意参数 embedSyrupMultiplierPools=true）：
+
+```
+http://localhost:8600/barnard/v1/syrupPools?embedSyrupMultiplierPools=true
+http://localhost:8600/barnard/v1/syrupPools/STAR?embedSyrupMultiplierPools=true
+```
+
 取得某个账号地址参与抵押的 syrup pool 的列表：
 
 ```

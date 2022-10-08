@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Api(tags = {"Starswap RESTful API"})
 @RestController
@@ -175,13 +176,22 @@ public class StarswapController {
     }
 
     @GetMapping(path = "syrupPools")
-    public List<SyrupPool> getSyrupPools() {
-        return syrupPoolService.findByDeactivedIsFalse();
+    public List<SyrupPoolVO> getSyrupPools(
+            @RequestParam(value = "embedSyrupMultiplierPools", required = false) Boolean embedSyrupMultiplierPools) {
+        return syrupPoolService.findByDeactivedIsFalse().stream()
+                .map(s -> SyrupPoolVO.toSyrupPoolVO(s,
+                        (embedSyrupMultiplierPools != null && embedSyrupMultiplierPools) ?
+                                onChainService.getSyrupMultiplierPools(s, true) : null))
+                .collect(Collectors.toList());
     }
 
     @GetMapping(path = "syrupPools/{id}")
-    public SyrupPool getSyrupPool(@PathVariable(name = "id") String id) {
-        return syrupPoolService.findOneByTokenId(id);
+    public SyrupPoolVO getSyrupPool(@PathVariable(name = "id") String id,
+                                    @RequestParam(value = "embedSyrupMultiplierPools", required = false) Boolean embedSyrupMultiplierPools) {
+        SyrupPool s = syrupPoolService.findOneByTokenId(id);
+        return SyrupPoolVO.toSyrupPoolVO(s,
+                (embedSyrupMultiplierPools != null && embedSyrupMultiplierPools) ?
+                        onChainService.getSyrupMultiplierPools(s, true) : null);
     }
 
     @ApiOperation("Get Total Valued Locked in all syrup pools")
@@ -210,8 +220,8 @@ public class StarswapController {
 
     @GetMapping("syrupMultiplierPools")
     public List<SyrupMultiplierPoolInfo> getSyrupMultiplierPools(
-            @RequestParam(value = "tokenId", required = true) String  tokenId,
-            @RequestParam(value = "estimateApr",required = false) Boolean estimateApr) {
+            @RequestParam(value = "tokenId", required = true) String tokenId,
+            @RequestParam(value = "estimateApr", required = false) Boolean estimateApr) {
         SyrupPool syrupPool = this.syrupPoolService.findOneByTokenId(tokenId);
         if (syrupPool == null) {
             Collections.emptyList();
