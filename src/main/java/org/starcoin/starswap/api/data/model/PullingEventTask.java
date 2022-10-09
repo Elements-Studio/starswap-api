@@ -126,4 +126,18 @@ public class PullingEventTask {
     public void resetStatus() {
         this.status = STATUS_CREATED;
     }
+
+    @Override
+    public String toString() {
+        return "PullingEventTask{" +
+                "fromBlockNumber=" + fromBlockNumber +
+                ", toBlockNumber=" + toBlockNumber +
+                ", status='" + status + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", version=" + version +
+                '}';
+    }
 }

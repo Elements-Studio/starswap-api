@@ -204,4 +204,25 @@ public class LiquidityTokenFarm {
     public void setDailyReward(BigInteger dailyReward) {
         this.dailyReward = dailyReward;
     }
+
+    @Override
+    public String toString() {
+        return "LiquidityTokenFarm{" +
+                "liquidityTokenFarmId=" + liquidityTokenFarmId +
+                ", description='" + description + '\'' +
+                ", sequenceNumber=" + sequenceNumber +
+                ", totalStakeAmount=" + totalStakeAmount +
+                ", estimatedApy=" + estimatedApy +
+                ", rewardTokenId='" + rewardTokenId + '\'' +
+                ", rewardMultiplier=" + rewardMultiplier +
+                ", dailyReward=" + dailyReward +
+                ", tvlInUsd=" + tvlInUsd +
+                ", deactived=" + deactived +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", version=" + version +
+                '}';
+    }
 }

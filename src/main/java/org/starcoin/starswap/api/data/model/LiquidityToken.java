@@ -140,4 +140,20 @@ public class LiquidityToken {
         this.tokenYStructType = tokenYStructType;
     }
 
+    @Override
+    public String toString() {
+        return "LiquidityToken{" +
+                "liquidityTokenId=" + liquidityTokenId +
+                ", tokenXStructType=" + tokenXStructType +
+                ", tokenYStructType=" + tokenYStructType +
+                ", description='" + description + '\'' +
+                ", sequenceNumber=" + sequenceNumber +
+                ", deactived=" + deactived +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", version=" + version +
+                '}';
+    }
 }

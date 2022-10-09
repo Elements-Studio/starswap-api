@@ -24,4 +24,8 @@ public class TokenIdPair extends Pair<String, String> {
         return new String[]{tokenXId(), tokenYId()};
     }
 
+    @Override
+    public String toString() {
+        return "TokenIdPair{" + super.toString() + "}";
+    }
 }

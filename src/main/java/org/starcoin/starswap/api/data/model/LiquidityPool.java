@@ -218,4 +218,26 @@ public class LiquidityPool {
     public void setVersion(Long version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "LiquidityPool{" +
+                "liquidityPoolId=" + liquidityPoolId +
+                ", description='" + description + '\'' +
+                ", sequenceNumber=" + sequenceNumber +
+                ", totalLiquidity=" + totalLiquidity +
+                ", tokenXReserve=" + tokenXReserve +
+                ", tokenYReserve=" + tokenYReserve +
+                ", tokenXReserveInUsd=" + tokenXReserveInUsd +
+                ", tokenYReserveInUsd=" + tokenYReserveInUsd +
+                ", deactived=" + deactived +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", poundageRate=" + poundageRate +
+                ", swapFeeOperationRateV2=" + swapFeeOperationRateV2 +
+                ", version=" + version +
+                '}';
+    }
 }

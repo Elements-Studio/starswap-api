@@ -31,4 +31,12 @@ public class SyrupPoolId implements Serializable {
     public void setTokenId(String tokenId) {
         this.tokenId = tokenId;
     }
+
+    @Override
+    public String toString() {
+        return "SyrupPoolId{" +
+                "poolAddress='" + poolAddress + '\'' +
+                ", tokenId='" + tokenId + '\'' +
+                '}';
+    }
 }

@@ -90,4 +90,17 @@ public class NodeHeartbeat {
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "NodeHeartbeat{" +
+                "nodeId='" + nodeId + '\'' +
+                ", startedAt=" + startedAt +
+                ", beatenAt=" + beatenAt +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

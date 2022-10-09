@@ -102,4 +102,18 @@ public class SyrupStake {
     public void setTokenTypeTag(String tokenTypeTag) {
         this.tokenTypeTag = tokenTypeTag;
     }
+
+    @Override
+    public String toString() {
+        return "SyrupStake{" +
+                "id=" + id +
+                ", amount=" + amount +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", stepwiseMultiplier=" + stepwiseMultiplier +
+                ", expectedGain=" + expectedGain +
+                ", veStarAmount=" + veStarAmount +
+                ", tokenTypeTag='" + tokenTypeTag + '\'' +
+                '}';
+    }
 }

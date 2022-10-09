@@ -100,4 +100,16 @@ public class SyrupPoolAccount {
         this.updatedAt = updatedAt;
     }
 
+    @Override
+    public String toString() {
+        return "SyrupPoolAccount{" +
+                "syrupPoolAccountId=" + syrupPoolAccountId +
+                ", deactived=" + deactived +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", version=" + version +
+                '}';
+    }
 }

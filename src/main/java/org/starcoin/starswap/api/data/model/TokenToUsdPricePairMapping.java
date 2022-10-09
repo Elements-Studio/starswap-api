@@ -112,4 +112,17 @@ public class TokenToUsdPricePairMapping {
         this.version = version;
     }
 
+    @Override
+    public String toString() {
+        return "TokenToUsdPricePairMapping{" +
+                "tokenId='" + tokenId + '\'' +
+                ", pairId='" + pairId + '\'' +
+                ", isUsdEquivalentToken=" + isUsdEquivalentToken +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", version=" + version +
+                '}';
+    }
 }
