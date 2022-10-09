@@ -197,11 +197,14 @@ public class JsonRpcUtils {
     // ------------------------
 
     public static BigInteger syrupPoolQueryTotalStake(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
-                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::query_total_stake",
-                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<String>>() {
-                });
-        return new BigInteger(resultFields.get(0));
+        // the 'syrup_pool' fun is deleted!
+//        List<String> resultFields = contractCallV2(jsonRpcSession, poolAddress + "::"
+//                        + TOKEN_SWAP_SYRUP_MODULE_NAME + "::syrup_pool",
+//                Collections.singletonList(token), Collections.emptyList(), new TypeReference<List<String>>() {
+//                });
+//        return new BigInteger(resultFields.get(0));
+        List<BigInteger> info = syrupPoolQueryPoolInfoV2(jsonRpcSession, poolAddress, token);
+        return info.get(1);
     }
 
 //    public static BigInteger syrupPoolQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String poolAddress, String token) {
