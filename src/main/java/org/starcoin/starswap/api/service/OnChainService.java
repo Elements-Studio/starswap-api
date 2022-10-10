@@ -39,7 +39,7 @@ public class OnChainService {
 
     private static final Logger LOG = LoggerFactory.getLogger(OnChainService.class);
 
-    private static final boolean USE_FARM_AVERAGE_APY = false;
+//    private static final boolean USE_FARM_AVERAGE_APY = false;
 
     private final JsonRpcClient jsonRpcClient;
 
@@ -246,17 +246,17 @@ public class OnChainService {
         return stakeAmount;
     }
 
-    public Pair<BigInteger, BigInteger> getFarmStakedReservesByTokenIdPair(String tokenXId, String tokenYId) {
-        //LiquidityToken liquidityToken = liquidityTokenService.findOneByTokenIdPair(tokenXId, tokenYId);
-        Token tokenX = tokenService.getToken(tokenXId);
-        Token tokenY = tokenService.getToken(tokenYId);
-        LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenXId, tokenYId);
-        LiquidityTokenFarmId liquidityTokenFarmId = liquidityTokenFarm.getLiquidityTokenFarmId();
-        return jsonRpcClient.getTokenSwapFarmStakedReserves(liquidityTokenFarmId.getFarmAddress(),
-                liquidityTokenFarmId.getLiquidityTokenId().getLiquidityTokenAddress(),
-                tokenX.getTokenStructType().toTypeTagString(),
-                tokenY.getTokenStructType().toTypeTagString());
-    }
+//    public Pair<BigInteger, BigInteger> getFarmStakedReservesByTokenIdPair(String tokenXId, String tokenYId) {
+//        //LiquidityToken liquidityToken = liquidityTokenService.findOneByTokenIdPair(tokenXId, tokenYId);
+//        Token tokenX = tokenService.getToken(tokenXId);
+//        Token tokenY = tokenService.getToken(tokenYId);
+//        LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenXId, tokenYId);
+//        LiquidityTokenFarmId liquidityTokenFarmId = liquidityTokenFarm.getLiquidityTokenFarmId();
+//        return jsonRpcClient.getTokenSwapFarmStakedReserves(liquidityTokenFarmId.getFarmAddress(),
+//                liquidityTokenFarmId.getLiquidityTokenId().getLiquidityTokenAddress(),
+//                tokenX.getTokenStructType().toTypeTagString(),
+//                tokenY.getTokenStructType().toTypeTagString());
+//    }
 
     public List<BigInteger[]> getReservesListByTokenTypeTagPairs(String[][] tokenTypeTagPairs) {
         BigInteger[] emptyReservePair = new BigInteger[]{BigInteger.ZERO, BigInteger.ZERO};
@@ -323,29 +323,29 @@ public class OnChainService {
                 tokenY.getTokenStructType().toTypeTagString());
     }
 
-    public BigDecimal getFarmEstimatedApy(LiquidityTokenFarm liquidityTokenFarm) {
-        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
-        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        return getFarmEstimatedApyAndTvlInUsd(tokenX, tokenY, liquidityTokenFarm).getItem1();
-    }
+//    public BigDecimal getFarmEstimatedApy(LiquidityTokenFarm liquidityTokenFarm) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        return getFarmEstimatedApyAndTvlInUsd(tokenX, tokenY, liquidityTokenFarm).getItem1();
+//    }
 
-    public BigDecimal getFarmEstimatedApyV2(LiquidityTokenFarm liquidityTokenFarm) {
-        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
-        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        return getFarmEstimatedApyAndTvlInUsdV2(tokenX, tokenY, liquidityTokenFarm).getItem1();
-    }
+//    public BigDecimal getFarmEstimatedApyV2(LiquidityTokenFarm liquidityTokenFarm) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        return getFarmEstimatedApyAndTvlInUsdV2(tokenX, tokenY, liquidityTokenFarm).getItem1();
+//    }
 
-    public Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsd(LiquidityTokenFarm liquidityTokenFarm) {
-        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
-        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        return getFarmEstimatedApyAndTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
-    }
+//    public Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsd(LiquidityTokenFarm liquidityTokenFarm) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        return getFarmEstimatedApyAndTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
+//    }
 
-    public Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsdV2(LiquidityTokenFarm liquidityTokenFarm) {
-        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
-        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        return getFarmEstimatedApyAndTvlInUsdV2(tokenX, tokenY, liquidityTokenFarm);
-    }
+//    public Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsdV2(LiquidityTokenFarm liquidityTokenFarm) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        return getFarmEstimatedApyAndTvlInUsdV2(tokenX, tokenY, liquidityTokenFarm);
+//    }
 
     public BigDecimal getFarmTvlInUsd(LiquidityTokenFarm liquidityTokenFarm) {
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
@@ -353,63 +353,63 @@ public class OnChainService {
         return getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
     }
 
-    public BigDecimal getFarmEstimatedApy(LiquidityTokenFarm liquidityTokenFarm, BigDecimal tvlInUsd) {
-        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
-        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        return getFarmEstimatedApy(tokenX, tokenY, liquidityTokenFarm, tvlInUsd);
-    }
+//    public BigDecimal getFarmEstimatedApy(LiquidityTokenFarm liquidityTokenFarm, BigDecimal tvlInUsd) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        return getFarmEstimatedApy(tokenX, tokenY, liquidityTokenFarm, tvlInUsd);
+//    }
 
     public BigDecimal getFarmEstimatedApyV2(LiquidityTokenFarm liquidityTokenFarm, BigDecimal tvlInUsd) {
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        if (USE_FARM_AVERAGE_APY) {
-            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, tvlInUsd);
-        } else {
-            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
-        }
+//        if (USE_FARM_AVERAGE_APY) {
+//            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, tvlInUsd);
+//        } else {
+        return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
+//        }
     }
 
-    public BigDecimal getFarmEstimatedApyByTokenIdPair(String tokenXId, String tokenYId) {
-        Token tokenX = tokenService.getTokenOrElseThrow(tokenXId, () -> new RuntimeException("Cannot find Token by Id: " + tokenXId));
-        Token tokenY = tokenService.getTokenOrElseThrow(tokenYId, () -> new RuntimeException("Cannot find Token by Id: " + tokenYId));
-        LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
-        if (liquidityTokenFarm == null) {
-            throw new RuntimeException("Cannot find LiquidityTokenFarm by tokenId pair: " + tokenXId + " / " + tokenYId);
-        }
-        return getFarmEstimatedApyAndTvlInUsd(tokenX, tokenY, liquidityTokenFarm).getItem1();
-    }
+//    public BigDecimal getFarmEstimatedApyByTokenIdPair(String tokenXId, String tokenYId) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(tokenXId, () -> new RuntimeException("Cannot find Token by Id: " + tokenXId));
+//        Token tokenY = tokenService.getTokenOrElseThrow(tokenYId, () -> new RuntimeException("Cannot find Token by Id: " + tokenYId));
+//        LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
+//        if (liquidityTokenFarm == null) {
+//            throw new RuntimeException("Cannot find LiquidityTokenFarm by tokenId pair: " + tokenXId + " / " + tokenYId);
+//        }
+//        return getFarmEstimatedApyAndTvlInUsd(tokenX, tokenY, liquidityTokenFarm).getItem1();
+//    }
+//
+//    public BigDecimal getFarmEstimatedApyByTokenIdPairV2(String tokenXId, String tokenYId) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(tokenXId, () -> new RuntimeException("Cannot find Token by Id: " + tokenXId));
+//        Token tokenY = tokenService.getTokenOrElseThrow(tokenYId, () -> new RuntimeException("Cannot find Token by Id: " + tokenYId));
+//        LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
+//        if (liquidityTokenFarm == null) {
+//            throw new RuntimeException("Cannot find LiquidityTokenFarm by tokenId pair: " + tokenXId + " / " + tokenYId);
+//        }
+//        if (USE_FARM_AVERAGE_APY) {
+//            BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
+//            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
+//        } else {
+//            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
+//        }
+//    }
 
-    public BigDecimal getFarmEstimatedApyByTokenIdPairV2(String tokenXId, String tokenYId) {
-        Token tokenX = tokenService.getTokenOrElseThrow(tokenXId, () -> new RuntimeException("Cannot find Token by Id: " + tokenXId));
-        Token tokenY = tokenService.getTokenOrElseThrow(tokenYId, () -> new RuntimeException("Cannot find Token by Id: " + tokenYId));
-        LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
-        if (liquidityTokenFarm == null) {
-            throw new RuntimeException("Cannot find LiquidityTokenFarm by tokenId pair: " + tokenXId + " / " + tokenYId);
-        }
-        if (USE_FARM_AVERAGE_APY) {
-            BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
-            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
-        } else {
-            return getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
-        }
-    }
-
-    private Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsd(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
-        BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
-        BigDecimal estimatedApy = getFarmEstimatedApy(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
-        return new Pair<>(estimatedApy, totalTvlInUsd);
-    }
-
-    private Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsdV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
-        BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
-        BigDecimal estimatedApy;
-        if (USE_FARM_AVERAGE_APY) {
-            estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
-        } else {
-            estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
-        }
-        return new Pair<>(estimatedApy, totalTvlInUsd);
-    }
+//    private Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsd(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
+//        BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
+//        BigDecimal estimatedApy = getFarmEstimatedApy(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
+//        return new Pair<>(estimatedApy, totalTvlInUsd);
+//    }
+//
+//    private Pair<BigDecimal, BigDecimal> getFarmEstimatedApyAndTvlInUsdV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
+//        BigDecimal totalTvlInUsd = getFarmTvlInUsd(tokenX, tokenY, liquidityTokenFarm);
+//        BigDecimal estimatedApy;
+//        if (USE_FARM_AVERAGE_APY) {
+//            estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm, totalTvlInUsd);
+//        } else {
+//            estimatedApy = getFarmEstimatedApyV2(tokenX, tokenY, liquidityTokenFarm);
+//        }
+//        return new Pair<>(estimatedApy, totalTvlInUsd);
+//    }
 
     private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
         Pair<BigDecimal, BigInteger> p = getFarmRewardPerYearInUsdV2AndAssetTotalWeight(tokenX, tokenY, liquidityTokenFarm);
@@ -442,34 +442,34 @@ public class OnChainService {
                 .multiply(BigDecimal.valueOf(100));
     }
 
-    private BigDecimal getFarmEstimatedApy(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
-        BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsd(tokenX, tokenY, liquidityTokenFarm);
-//        Integer m = jsonRpcClient.tokenSwapFarmGetRewardMultiplier(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+//    private BigDecimal getFarmEstimatedApy(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
+//        BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsd(tokenX, tokenY, liquidityTokenFarm);
+////        Integer m = jsonRpcClient.tokenSwapFarmGetRewardMultiplier(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+////                tokenX.getTokenStructType().toTypeTagString(),
+////                tokenY.getTokenStructType().toTypeTagString());
+////        if (m == null || m == 0) {
+////            m = 1;
+////        }
+//        int scale = 10;//Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
+//        return totalTvlInUsd.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rewardPerYearInUsd//.multiply(BigDecimal.valueOf(m))
+//                .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
+//                .multiply(BigDecimal.valueOf(100));
+//    }
+
+
+//    private BigDecimal getFarmRewardPerYearInUsd(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
+//        String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
+//
+//        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
 //                tokenX.getTokenStructType().toTypeTagString(),
 //                tokenY.getTokenStructType().toTypeTagString());
-//        if (m == null || m == 0) {
-//            m = 1;
-//        }
-        int scale = 10;//Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
-        return totalTvlInUsd.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rewardPerYearInUsd//.multiply(BigDecimal.valueOf(m))
-                .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
-    }
-
-
-    private BigDecimal getFarmRewardPerYearInUsd(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
-        String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
-
-        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
-                tokenX.getTokenStructType().toTypeTagString(),
-                tokenY.getTokenStructType().toTypeTagString());
-        BigInteger rewardPerYear = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_YEAR_SECONDS))
-                .multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
-
-        Token rewardToken = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getRewardTokenId(),
-                () -> new RuntimeException("Cannot find Token by Id: " + liquidityTokenFarm.getRewardTokenId()));
-        return getTokenAmountInUsd(rewardToken, rewardPerYear);
-    }
+//        BigInteger rewardPerYear = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_YEAR_SECONDS))
+//                .multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
+//
+//        Token rewardToken = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getRewardTokenId(),
+//                () -> new RuntimeException("Cannot find Token by Id: " + liquidityTokenFarm.getRewardTokenId()));
+//        return getTokenAmountInUsd(rewardToken, rewardPerYear);
+//    }
 
     private Pair<BigDecimal, BigInteger> getFarmRewardPerYearInUsdV2AndAssetTotalWeight(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
@@ -488,17 +488,17 @@ public class OnChainService {
         return new Pair<>(tokenAmountInUsd, p.getItem2());
     }
 
-    public BigInteger getFarmDailyReward(LiquidityTokenFarm liquidityTokenFarm) {
-        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
-        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
-        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
-                tokenX.getTokenStructType().toTypeTagString(),
-                tokenY.getTokenStructType().toTypeTagString());
-        BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS))
-                .multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
-        return rewardPerDay;
-    }
+//    public BigInteger getFarmDailyReward(LiquidityTokenFarm liquidityTokenFarm) {
+//        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
+//        String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
+//        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
+//                tokenX.getTokenStructType().toTypeTagString(),
+//                tokenY.getTokenStructType().toTypeTagString());
+//        BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS))
+//                .multiply(BigInteger.valueOf(liquidityTokenFarm.getRewardMultiplier()));
+//        return rewardPerDay;
+//    }
 
     public BigInteger getFarmDailyRewardV2(LiquidityTokenFarm liquidityTokenFarm) {
 //        Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));

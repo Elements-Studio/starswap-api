@@ -171,14 +171,14 @@ class StarswapApiApplicationTests {
 //        nodeHeartbeatService.beat(BigInteger.valueOf(17));
 //        if (true) return;
 
-        BigDecimal estimatedApy = onChainService.getFarmEstimatedApyByTokenIdPair("Bot", "Ddd");
-        System.out.println(estimatedApy);
-        if (true) return;
-
-        Pair<BigInteger, BigInteger> stakedReserves = onChainService.getFarmStakedReservesByTokenIdPair("Bot", "Ddd");
-        System.out.println(stakedReserves);
-        Pair<BigInteger, BigInteger> stakedReserves2 = onChainService.getFarmStakedReservesByTokenIdPair("Bot", "Usdx");
-        System.out.println(stakedReserves2);
+//        BigDecimal estimatedApy = onChainService.getFarmEstimatedApyByTokenIdPair("Bot", "Ddd");
+//        System.out.println(estimatedApy);
+//        if (true) return;
+//
+//        Pair<BigInteger, BigInteger> stakedReserves = onChainService.getFarmStakedReservesByTokenIdPair("Bot", "Ddd");
+//        System.out.println(stakedReserves);
+//        Pair<BigInteger, BigInteger> stakedReserves2 = onChainService.getFarmStakedReservesByTokenIdPair("Bot", "Usdx");
+//        System.out.println(stakedReserves2);
         //        tryRun(() -> addTestLiquidityToken("Bot", "Ddd"));
         //        tryRun(() -> addTestLiquidityToken("Bot", "Usdx"));
         //        tryRun(() -> addTestLiquidityToken("Ddd", "Usdx"));
