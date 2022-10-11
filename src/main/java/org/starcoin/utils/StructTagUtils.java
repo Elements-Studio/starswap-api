@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MiscUtils {
+public class StructTagUtils {
     private static final String COLON_COLON = "::";
     private static final String LT = "<";
     private static final String GT = ">";
     private static final String COMMA = ",";
 
-    private MiscUtils() {
+    private StructTagUtils() {
     }
 
 

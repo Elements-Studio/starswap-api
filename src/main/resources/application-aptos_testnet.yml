@@ -31,7 +31,7 @@ aptos:
     fixed-delay: 5000
   node-api:
     #base-url: "https://fullnode.devnet.aptoslabs.com/v1"
-    base-url: "https://testnet.aptoslabs.com"
+    base-url: "https://testnet.aptoslabs.com/v1"
 
 logging:
   level:

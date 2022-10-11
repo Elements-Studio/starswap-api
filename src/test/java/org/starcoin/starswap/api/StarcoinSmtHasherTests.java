@@ -11,7 +11,7 @@ import org.starcoin.bean.StateProof;
 import org.starcoin.smt.*;
 import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
 import org.starcoin.types.*;
-import org.starcoin.utils.MiscUtils;
+import org.starcoin.utils.StructTagUtils;
 import org.starcoin.utils.StarcoinProofUtils;
 
 import java.net.MalformedURLException;
@@ -76,7 +76,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
     @Test
     void testParseStructTag() throws SerializationError {
         String resourceStructTag = TEST_RESOURCE_STRUCT_TAG;
-        StructTag parsed = MiscUtils.parseStructTag(resourceStructTag);
+        StructTag parsed = StructTagUtils.parseStructTag(resourceStructTag);
         StructTag expected = getTestStructTag();
         Assertions.assertEquals(HexUtils.byteArrayToHex(expected.bcsSerialize()),
                 HexUtils.byteArrayToHex(parsed.bcsSerialize()));
@@ -91,7 +91,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 //        System.out.println(HexUtils.byteArrayToHex(MiscUtils.parseStructTag(resourceStructTag2).type_params.get(0).bcsSerialize()));
 
         String structTag2 = "0x00000000000000000000000000000001::IdentifierNFT::IdentifierNFT<0x6bfb460477adf9dd0455d3de2fc7f211::SBTModule::DaoMember<0x6bfb460477adf9dd0455d3de2fc7f211::SBTModule::SbtTestDAO>, 0x6bfb460477adf9dd0455d3de2fc7f211::SBTModule::DaoMemberBody<0x6bfb460477adf9dd0455d3de2fc7f211::SBTModule::SbtTestDAO>>";
-        StructTag parsed2 = MiscUtils.parseStructTag(structTag2);
+        StructTag parsed2 = StructTagUtils.parseStructTag(structTag2);
         System.out.println(HexUtils.byteArrayToHex(parsed2.bcsSerialize()));
     }
 
@@ -126,7 +126,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
         byte[] state = stateWithProof.getState() == null ? null : HexUtils.hexToByteArray(stateWithProof.getState());
         boolean v = StarcoinProofUtils.verifyResourceStateProof(proof, HexUtils.hexToByteArray(stateRoot),
                 AccountAddress.valueOf(HexUtils.hexToByteArray(accountAddress)),
-                MiscUtils.parseStructTag(resourceStructTag),
+                StructTagUtils.parseStructTag(resourceStructTag),
                 state);
         Assertions.assertTrue(v);
     }

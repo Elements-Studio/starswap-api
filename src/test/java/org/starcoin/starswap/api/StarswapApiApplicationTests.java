@@ -67,12 +67,31 @@ class StarswapApiApplicationTests {
     @Autowired
     AptosEventHandleRepository aptosEventHandleRepository;
 
+    @Autowired
+    ContractApiClient contractApiClient;
+
+    private static void addNodeHeartbeat(NodeHeartbeatRepository nodeHeartbeatRepository, NodeHeartbeat b7) {
+        b7.setCreatedAt(System.currentTimeMillis());
+        b7.setCreatedBy("admin");
+        b7.setUpdatedAt(b7.getCreatedAt());
+        b7.setUpdatedBy(b7.getCreatedBy());
+        nodeHeartbeatRepository.save(b7);
+    }
+
     @Test
     void contextLoads() {
+//        String tokenXUSDTOnAptos = "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee::XUSDT::XUSDT";
+//        String tokenSTAROnAptos = "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee::STAR::STAR";
+//        BigInteger scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenXUSDTOnAptos);
+//        System.out.println(tokenXUSDTOnAptos + " scalingFactor: " + scalingFactor);
+//        scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenSTAROnAptos);
+//        System.out.println(tokenSTAROnAptos + " scalingFactor: " + scalingFactor);
+//        if (true) return;
+
         try {
             ContractApiClient contractApiClient = new StarcoinContractApiClient("https://barnard-seed.starcoin.org", null);
             Triple<List<Long>, List<Long>, List<BigInteger>> pools = contractApiClient.syrupPoolQueryAllMultiplierPools(
-                    "0x8c109349c6bd91411d6bc962e080c4a3","0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR");
+                    "0x8c109349c6bd91411d6bc962e080c4a3", "0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR");
             System.out.println(pools);
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -223,14 +242,6 @@ class StarswapApiApplicationTests {
         // test queries...
         System.out.println(liquidityTokenService.findOneByTokenIdPair("Bot", "Ddd"));
         System.out.println(liquidityPoolService.findOneByTokenIdPair("Bot", "Ddd"));
-    }
-
-    private static void addNodeHeartbeat(NodeHeartbeatRepository nodeHeartbeatRepository, NodeHeartbeat b7) {
-        b7.setCreatedAt(System.currentTimeMillis());
-        b7.setCreatedBy("admin");
-        b7.setUpdatedAt(b7.getCreatedAt());
-        b7.setUpdatedBy(b7.getCreatedBy());
-        nodeHeartbeatRepository.save(b7);
     }
 
     private void addTestNodeHeartbeats() {

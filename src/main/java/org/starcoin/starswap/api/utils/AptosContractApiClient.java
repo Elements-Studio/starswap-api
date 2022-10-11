@@ -1,13 +1,18 @@
 package org.starcoin.starswap.api.utils;
 
+import dev.aptos.bean.AccountResource;
+import dev.aptos.utils.NodeApiUtils;
+import dev.aptos.utils.StructTagUtils;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 public class AptosContractApiClient implements ContractApiClient {
     private final String nodeApiBaseUrl;
@@ -100,7 +105,16 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public BigInteger tokenGetScalingFactor(String token) {
-        throw new UnsupportedOperationException();
+        StructTagUtils.StructTag coinType = StructTagUtils.parseStructTag(token);
+        String resourceType = "0x1::coin::CoinInfo<" + token + ">";
+        try {
+            AccountResource<Map> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    coinType.getAddress(), resourceType, Map.class, null);
+            Integer d = Integer.valueOf(resource.getData().get("decimals").toString());
+            return BigInteger.TEN.pow(d);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
