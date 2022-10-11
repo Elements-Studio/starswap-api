@@ -99,7 +99,7 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
     public void testGetStateWithProofByRootAndVerify() throws SerializationError, DeserializationError {
         StarcoinContractApiClient jsonRpcClient = null;
         try {
-            jsonRpcClient = new StarcoinContractApiClient("https://main-seed.starcoin.org");
+            jsonRpcClient = new StarcoinContractApiClient("https://main-seed.starcoin.org", null);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

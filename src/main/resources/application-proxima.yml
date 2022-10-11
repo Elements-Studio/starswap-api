@@ -18,7 +18,7 @@ starcoin:
 
 
 starswap:
-  contract-address: "0x8c109349c6bd91411d6bc962e080c4a3"
+  starcoin-contract-address: "0x8c109349c6bd91411d6bc962e080c4a3"
   token-price-service:
     base-url: http://k8s-default-starcoin-cbf39ae390-308376289.ap-northeast-1.elb.amazonaws.com/barnard/v1
     #https://price-api.starcoin.org/barnard/v1

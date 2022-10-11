@@ -26,8 +26,12 @@ public class StarcoinContractApiClient implements ContractApiClient {
 
     private final String jsonRpcUrl;
 
-    public StarcoinContractApiClient(String jsonRpcUrl) throws MalformedURLException {
+
+    private final String contractAddress;
+
+    public StarcoinContractApiClient(String jsonRpcUrl, String contractAddress) throws MalformedURLException {
         this.jsonRpcUrl = jsonRpcUrl;
+        this.contractAddress = contractAddress;
         this.jsonRpcSession = new JSONRPC2Session(new URL(this.jsonRpcUrl));
 
     }
@@ -133,13 +137,13 @@ public class StarcoinContractApiClient implements ContractApiClient {
 
 
     @Override
-    public BigInteger getAccountVeStarAmount(String contractAddress, String accountAddress) {
-        return JsonRpcUtils.getAccountVeStarAmount(this.jsonRpcSession, contractAddress, accountAddress);
+    public BigInteger getAccountVeStarAmount(String accountAddress) {
+        return JsonRpcUtils.getAccountVeStarAmount(this.jsonRpcSession, this.contractAddress, accountAddress);
     }
 
     @Override
-    public BigInteger getAccountVeStarAmountByStakeId(String contractAddress, String accountAddress, Long stakeId, String tokenTypeTag) {
-        return JsonRpcUtils.getAccountVeStarAmountByStakeId(this.jsonRpcSession, contractAddress, accountAddress, stakeId, tokenTypeTag);
+    public BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
+        return JsonRpcUtils.getAccountVeStarAmountByStakeId(this.jsonRpcSession, this.contractAddress, accountAddress, stakeId, tokenTypeTag);
     }
 
     // ------------------------

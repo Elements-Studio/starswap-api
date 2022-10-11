@@ -14,8 +14,9 @@ public class JsonRpcClientConfig {
 
     @Bean
     @ConditionalOnProperty(value = "starcoin.enabled", havingValue = "true", matchIfMissing = true)
-    public ContractApiClient starcoinContractApiClient(@Value("${starcoin.json-rpc-url}") String jsonRpcUrl) throws MalformedURLException {
-        return new StarcoinContractApiClient(jsonRpcUrl);
+    public ContractApiClient starcoinContractApiClient(@Value("${starcoin.json-rpc-url}") String jsonRpcUrl,
+                                                       @Value("${starswap.starcoin-contract-address}") String contractAddress) throws MalformedURLException {
+        return new StarcoinContractApiClient(jsonRpcUrl, contractAddress);
     }
 
 }

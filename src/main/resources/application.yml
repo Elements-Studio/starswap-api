@@ -73,7 +73,7 @@ starcoin:
   event-subscription-enabled: true
 
 starswap:
-  contract-address: "0x8c109349c6bd91411d6bc962e080c4a3"
+  starcoin-contract-address: "0x8c109349c6bd91411d6bc962e080c4a3"
   lp-token-farming:
     default-reward-token-id: "STAR"
   default-usd-equivalent-token-id: "XUSDT"

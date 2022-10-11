@@ -70,7 +70,7 @@ class StarswapApiApplicationTests {
     @Test
     void contextLoads() {
         try {
-            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://barnard-seed.starcoin.org");
+            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://barnard-seed.starcoin.org", null);
             Triple<List<Long>, List<Long>, List<BigInteger>> pools = contractApiClient.syrupPoolQueryAllMultiplierPools(
                     "0x8c109349c6bd91411d6bc962e080c4a3","0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR");
             System.out.println(pools);
@@ -84,7 +84,7 @@ class StarswapApiApplicationTests {
         if (true) return;
 
         try {
-            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://main-seed.starcoin.org");
+            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://main-seed.starcoin.org", null);
             AccountFarmStakeInfo accountFarmStakeInfo = contractApiClient.getAccountFarmStakeInfo(
                     "0x8c109349c6bd91411d6bc962e080c4a3",
                     "0x8c109349c6bd91411d6bc962e080c4a3",

@@ -24,7 +24,7 @@ public class PullingBoostEventTests {
         BigInteger maxToBlockNumber = new BigInteger("1146599");
         StarcoinContractApiClient jsonRpcClient = null;
         try {
-            jsonRpcClient = new StarcoinContractApiClient("https://proxima-seed.starcoin.org");
+            jsonRpcClient = new StarcoinContractApiClient("https://proxima-seed.starcoin.org", null);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
