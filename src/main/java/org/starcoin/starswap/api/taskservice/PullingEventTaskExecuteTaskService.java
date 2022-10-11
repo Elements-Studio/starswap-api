@@ -13,7 +13,7 @@ import org.starcoin.starswap.api.service.HandleEventService;
 import org.starcoin.starswap.api.service.NodeHeartbeatService;
 import org.starcoin.starswap.api.service.PullingEventTaskService;
 import org.starcoin.starswap.api.service.StarcoinEventFilter;
-import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -30,12 +30,12 @@ public class PullingEventTaskExecuteTaskService {
 
     private final PullingEventTaskService pullingEventTaskService;
     private final HandleEventService handleEventService;
-    private final JsonRpcClient jsonRpcClient;
+    private final StarcoinContractApiClient jsonRpcClient;
     private final NodeHeartbeatRepository nodeHeartbeatRepository;
     private final StarcoinEventFilter starcoinEventFilter;
 
     public PullingEventTaskExecuteTaskService(
-            @Autowired JsonRpcClient jsonRpcClient,
+            @Autowired StarcoinContractApiClient jsonRpcClient,
             @Autowired PullingEventTaskService pullingEventTaskService,
             @Autowired HandleEventService handleEventService,
             @Autowired NodeHeartbeatRepository nodeHeartbeatRepository,

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.starcoin.bean.RpcStateWithProof;
 import org.starcoin.bean.StateProof;
 import org.starcoin.smt.*;
-import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
 import org.starcoin.types.*;
 import org.starcoin.utils.MiscUtils;
 import org.starcoin.utils.StarcoinProofUtils;
@@ -97,9 +97,9 @@ curl --location --request POST 'https://main-seed.starcoin.org' \
 
     @Test
     public void testGetStateWithProofByRootAndVerify() throws SerializationError, DeserializationError {
-        JsonRpcClient jsonRpcClient = null;
+        StarcoinContractApiClient jsonRpcClient = null;
         try {
-            jsonRpcClient = new JsonRpcClient("https://main-seed.starcoin.org");
+            jsonRpcClient = new StarcoinContractApiClient("https://main-seed.starcoin.org");
         } catch (MalformedURLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

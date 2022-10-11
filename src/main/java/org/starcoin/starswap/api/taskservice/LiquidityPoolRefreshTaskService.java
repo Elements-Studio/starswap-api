@@ -12,7 +12,7 @@ import org.starcoin.starswap.api.data.model.Token;
 import org.starcoin.starswap.api.data.repo.LiquidityPoolRepository;
 import org.starcoin.starswap.api.service.OnChainService;
 import org.starcoin.starswap.api.service.TokenService;
-import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.utils.ContractApiClient;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -22,18 +22,18 @@ import java.util.List;
 @Service
 public class LiquidityPoolRefreshTaskService {
     private static final Logger LOG = LoggerFactory.getLogger(LiquidityPoolRefreshTaskService.class);
-    private final JsonRpcClient jsonRpcClient;
+    private final ContractApiClient contractApiClient;
     private final LiquidityPoolRepository liquidityPoolRepository;
     private final TokenService tokenService;
     private final OnChainService onChainService;
 
     @Autowired
     public LiquidityPoolRefreshTaskService(
-            @Autowired JsonRpcClient jsonRpcClient,
+            @Autowired ContractApiClient contractApiClient,
             @Autowired LiquidityPoolRepository liquidityPoolRepository,
             @Autowired TokenService tokenService,
             @Autowired OnChainService onChainService) throws MalformedURLException {
-        this.jsonRpcClient = jsonRpcClient;
+        this.contractApiClient = contractApiClient;
         this.liquidityPoolRepository = liquidityPoolRepository;
         this.tokenService = tokenService;
         this.onChainService = onChainService;
@@ -49,7 +49,7 @@ public class LiquidityPoolRefreshTaskService {
 
             boolean updated = false;
             try {
-                BigInteger totalLiquidity = jsonRpcClient.tokenSwapRouterGetTotalLiquidity(
+                BigInteger totalLiquidity = contractApiClient.tokenSwapRouterGetTotalLiquidity(
                         pool.getLiquidityPoolId().getLiquidityTokenId().getLiquidityTokenAddress(),
                         tokenX.getTokenStructType().toTypeTagString(), tokenY.getTokenStructType().toTypeTagString());
                 pool.setTotalLiquidity(totalLiquidity);
@@ -59,7 +59,7 @@ public class LiquidityPoolRefreshTaskService {
                 LOG.error("Update pool total Liquidity error. Pool Id: " + pool.getLiquidityPoolId(), e);
             }
             try {
-                Pair<BigInteger, BigInteger> reservePair = jsonRpcClient.tokenSwapRouterGetReserves(
+                Pair<BigInteger, BigInteger> reservePair = contractApiClient.tokenSwapRouterGetReserves(
                         pool.getLiquidityPoolId().getLiquidityTokenId().getLiquidityTokenAddress(),
                         tokenX.getTokenStructType().toTypeTagString(), tokenY.getTokenStructType().toTypeTagString());
                 pool.setTokenXReserve(reservePair.getItem1());
@@ -80,7 +80,7 @@ public class LiquidityPoolRefreshTaskService {
                 LOG.error("Update pool reserves in USD error. Pool Id: " + pool.getLiquidityPoolId(), e);
             }
             try {
-                Pair<Long, Long> r = jsonRpcClient.tokenSwapRouterGetPoundageRate(
+                Pair<Long, Long> r = contractApiClient.tokenSwapRouterGetPoundageRate(
                         pool.getLiquidityPoolId().getLiquidityTokenId().getLiquidityTokenAddress(),
                         tokenX.getTokenStructType().toTypeTagString(), tokenY.getTokenStructType().toTypeTagString());
                 pool.setPoundageRate(new Quotient(r.getItem1(), r.getItem2()));
@@ -90,7 +90,7 @@ public class LiquidityPoolRefreshTaskService {
                 LOG.error("Update pool PoundageRate error. Pool Id: " + pool.getLiquidityPoolId(), e);
             }
             try {
-                Pair<Long, Long> r = jsonRpcClient.tokenSwapRouterGetSwapFeeOperationRateV2(
+                Pair<Long, Long> r = contractApiClient.tokenSwapRouterGetSwapFeeOperationRateV2(
                         pool.getLiquidityPoolId().getLiquidityTokenId().getLiquidityTokenAddress(),
                         tokenX.getTokenStructType().toTypeTagString(), tokenY.getTokenStructType().toTypeTagString());
                 pool.setSwapFeeOperationRateV2(new Quotient(r.getItem1(), r.getItem2()));

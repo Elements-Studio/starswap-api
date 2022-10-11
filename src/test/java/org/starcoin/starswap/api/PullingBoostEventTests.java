@@ -3,7 +3,7 @@ package org.starcoin.starswap.api;
 import com.novi.serde.DeserializationError;
 import org.junit.jupiter.api.Test;
 import org.starcoin.bean.Event;
-import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
 import org.starcoin.starswap.types.BoostEvent;
 import org.starcoin.utils.HexUtils;
 
@@ -22,9 +22,9 @@ public class PullingBoostEventTests {
     public void testPullBoostEvents() {
         BigInteger fromBlockNumber = new BigInteger("1146538");
         BigInteger maxToBlockNumber = new BigInteger("1146599");
-        JsonRpcClient jsonRpcClient = null;
+        StarcoinContractApiClient jsonRpcClient = null;
         try {
-            jsonRpcClient = new JsonRpcClient("https://proxima-seed.starcoin.org");
+            jsonRpcClient = new StarcoinContractApiClient("https://proxima-seed.starcoin.org");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

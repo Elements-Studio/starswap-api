@@ -6,7 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.data.repo.*;
 import org.starcoin.starswap.api.service.*;
-import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.utils.ContractApiClient;
+import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.math.BigDecimal;
@@ -69,8 +70,8 @@ class StarswapApiApplicationTests {
     @Test
     void contextLoads() {
         try {
-            JsonRpcClient jsonRpcClient = new JsonRpcClient("https://barnard-seed.starcoin.org");
-            Triple<List<Long>, List<Long>, List<BigInteger>> pools = jsonRpcClient.syrupPoolQueryAllMultiplierPools(
+            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://barnard-seed.starcoin.org");
+            Triple<List<Long>, List<Long>, List<BigInteger>> pools = contractApiClient.syrupPoolQueryAllMultiplierPools(
                     "0x8c109349c6bd91411d6bc962e080c4a3","0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR");
             System.out.println(pools);
         } catch (MalformedURLException e) {
@@ -83,8 +84,8 @@ class StarswapApiApplicationTests {
         if (true) return;
 
         try {
-            JsonRpcClient jsonRpcClient = new JsonRpcClient("https://main-seed.starcoin.org");
-            AccountFarmStakeInfo accountFarmStakeInfo = jsonRpcClient.getAccountFarmStakeInfo(
+            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://main-seed.starcoin.org");
+            AccountFarmStakeInfo accountFarmStakeInfo = contractApiClient.getAccountFarmStakeInfo(
                     "0x8c109349c6bd91411d6bc962e080c4a3",
                     "0x8c109349c6bd91411d6bc962e080c4a3",
                     "0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR",

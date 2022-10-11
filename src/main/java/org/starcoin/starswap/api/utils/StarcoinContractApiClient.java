@@ -20,21 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class JsonRpcClient {
+public class StarcoinContractApiClient implements ContractApiClient {
 
     private final JSONRPC2Session jsonRpcSession;
 
     private final String jsonRpcUrl;
 
-    public JsonRpcClient(String jsonRpcUrl) throws MalformedURLException {
+    public StarcoinContractApiClient(String jsonRpcUrl) throws MalformedURLException {
         this.jsonRpcUrl = jsonRpcUrl;
         this.jsonRpcSession = new JSONRPC2Session(new URL(this.jsonRpcUrl));
 
     }
 
-    public String getJsonRpcUrl() {
-        return jsonRpcUrl;
-    }
+//    protected String getJsonRpcUrl() {
+//        return jsonRpcUrl;
+//    }
 
     public Event[] getEvents(Map<String, Object> eventFilter) {
         return JsonRpcClientUtils.getEvents(this.jsonRpcSession, eventFilter);
@@ -44,10 +44,12 @@ public class JsonRpcClient {
         return JsonRpcClientUtils.getStateWithProofByRoot(this.jsonRpcSession, accessPath, stateRoot);
     }
 
+    @Override
     public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapFarmQueryTotalStake(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 
+    @Override
     public BigInteger tokenSwapFarmQueryReleasePerSecond(String farmAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapFarmQueryReleasePerSecond(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
@@ -58,6 +60,7 @@ public class JsonRpcClient {
      * @param tokenY
      * @return return farm ReleasePerSecond and asset_total_weight which is a "boosted" virtual LP amount.
      */
+    @Override
     public Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress, String tokenX, String tokenY) {
         List<BigInteger> farmInfoV2 = JsonRpcUtils.tokenSwapFarmQueryInfoV2(this.jsonRpcSession, farmAddress, tokenX, tokenY);
         BigInteger alloc_point = farmInfoV2.get(0);
@@ -70,15 +73,18 @@ public class JsonRpcClient {
         return new Pair<>(rps, asset_total_weight);
     }
 
+    @Override
     public Integer tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapFarmGetRewardMultiplier(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 
+    @Override
     public Long tokenSwapFarmGetBoostFactor(String farmAddress, String tokenX, String tokenY, String accountAddress) {
         return JsonRpcUtils.tokenSwapFarmGetBoostFactor(this.jsonRpcSession, farmAddress, tokenX, tokenY, accountAddress);
     }
 
     // ------------------------
+    @Override
     public BigInteger syrupPoolQueryTotalStake(String poolAddress, String token) {
         return JsonRpcUtils.syrupPoolQueryTotalStake(this.jsonRpcSession, poolAddress, token);
     }
@@ -87,6 +93,7 @@ public class JsonRpcClient {
 //        return JsonRpcUtils.syrupPoolQueryReleasePerSecond(this.jsonRpcSession, poolAddress, token);
 //    }
 
+    @Override
     public BigInteger syrupPoolQueryReleasePerSecondV2(String poolAddress, String token) {
         return JsonRpcUtils.syrupPoolQueryReleasePerSecondV2(this.jsonRpcSession, poolAddress, token);
     }
@@ -95,6 +102,7 @@ public class JsonRpcClient {
 //        return JsonRpcUtils.syrupPoolGetRewardMultiplier(this.jsonRpcSession, poolAddress, token);
 //    }
 
+    @Override
     public List<SyrupStake> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
         List<Long> idList = JsonRpcUtils.syrupPoolQueryStakeList(this.jsonRpcSession, poolAddress, token, accountAddress);
         List<SyrupStake> stakeList = new ArrayList<>();
@@ -105,6 +113,7 @@ public class JsonRpcClient {
         return stakeList;
     }
 
+    @Override
     public List<SyrupStake> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
         List<SyrupStake> stakeList = syrupPoolQueryStakeList(poolAddress, token, accountAddress);
         stakeList.forEach(s -> {
@@ -114,6 +123,7 @@ public class JsonRpcClient {
         return stakeList;
     }
 
+    @Override
     @Cacheable(cacheNames = "syrupPoolQueryAllMultiplierPoolsCache",
             key = "#poolAddress + ',' + #token", unless = "#result == null")
     public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress,
@@ -122,16 +132,19 @@ public class JsonRpcClient {
     }
 
 
+    @Override
     public BigInteger getAccountVeStarAmount(String contractAddress, String accountAddress) {
         return JsonRpcUtils.getAccountVeStarAmount(this.jsonRpcSession, contractAddress, accountAddress);
     }
 
+    @Override
     public BigInteger getAccountVeStarAmountByStakeId(String contractAddress, String accountAddress, Long stakeId, String tokenTypeTag) {
         return JsonRpcUtils.getAccountVeStarAmountByStakeId(this.jsonRpcSession, contractAddress, accountAddress, stakeId, tokenTypeTag);
     }
 
     // ------------------------
 
+    @Override
     public AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress) {
         BigInteger stakedLiquidity = JsonRpcUtils.tokenSwapFarmGetAccountStakedLiquidity(this.jsonRpcSession, farmAddress, tokenX, tokenY, accountAddress);
         BigInteger farmTotalLiquidity = JsonRpcUtils.tokenSwapFarmQueryTotalStake(this.jsonRpcSession, farmAddress, tokenX, tokenY);
@@ -148,29 +161,34 @@ public class JsonRpcClient {
         return farmStakeInfo;
     }
 
+    @Override
     public Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.getTokenSwapFarmStakedReserves(this.jsonRpcSession, farmAddress, lpTokenAddress, tokenX, tokenY);
     }
 
+    @Override
     public Pair<BigInteger, BigInteger> getReservesByLiquidity(String lpTokenAddress, String tokenX, String tokenY, BigInteger liquidity) {
         return JsonRpcUtils.getReservesByLiquidity(this.jsonRpcSession, lpTokenAddress, tokenX, tokenY, liquidity);
     }
 
+    @Override
     public BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapRouterTotalLiquidity(this.jsonRpcSession, lpTokenAddress, tokenX, tokenY);
     }
 
+    @Override
     @Cacheable(cacheNames = "tokenScalingFactorCache", key = "#token", unless = "#result == null")
     public BigInteger tokenGetScalingFactor(String token) {
         return JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, token);
     }
 
-    public BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY) {
-        BigInteger tokenXScalingFactor = JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, tokenX);
-        BigInteger tokenYScalingFactor = JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, tokenY);
-        return getExchangeRate(lpTokenAddress, tokenX, tokenY, tokenXScalingFactor, tokenYScalingFactor);
-    }
+//    public BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY) {
+//        BigInteger tokenXScalingFactor = JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, tokenX);
+//        BigInteger tokenYScalingFactor = JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, tokenY);
+//        return getExchangeRate(lpTokenAddress, tokenX, tokenY, tokenXScalingFactor, tokenYScalingFactor);
+//    }
 
+    @Override
     @Cacheable(cacheNames = "tokenExchangeRateCache",
             key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY + ',' + #tokenXScalingFactor + '/' + #tokenYScalingFactor", unless = "#result == null")
     public BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY,
@@ -194,32 +212,37 @@ public class JsonRpcClient {
 
     }
 
+    @Override
     @Cacheable(cacheNames = "tokenSwapRouterGetReservesCache",
             key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY", unless = "#result == null")
     public Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
     }
 
+    @Override
     public BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountIn) {
         Pair<BigInteger, BigInteger> reserves = JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenIn, tokenOut);
         return JsonRpcUtils.tokenSwapRouterGetAmountOut(jsonRpcSession, lpTokenAddress, amountIn, reserves.getItem1(), reserves.getItem2());
     }
 
+    @Override
     public BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountOut) {
         Pair<BigInteger, BigInteger> reserves = JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenIn, tokenOut);
         return JsonRpcUtils.tokenSwapRouterGetAmountIn(jsonRpcSession, lpTokenAddress, amountOut, reserves.getItem1(), reserves.getItem2());
     }
 
+    @Override
     public Pair<Long, Long> tokenSwapRouterGetPoundageRate(String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapRouterGetPoundageRate(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
     }
 
+    @Override
     public Pair<Long, Long> tokenSwapRouterGetSwapFeeOperationRateV2(String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapRouterGetSwapFeeOperationRateV2(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
     }
 
-    public List<Object> tokenSwapOracleLibraryCurrentCumulativePrices(String lpTokenAddress, String tokenX, String tokenY) {
-        return JsonRpcUtils.tokenSwapOracleLibraryCurrentCumulativePrices(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
-    }
+//    public List<Object> tokenSwapOracleLibraryCurrentCumulativePrices(String lpTokenAddress, String tokenX, String tokenY) {
+//        return JsonRpcUtils.tokenSwapOracleLibraryCurrentCumulativePrices(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
+//    }
 
 }

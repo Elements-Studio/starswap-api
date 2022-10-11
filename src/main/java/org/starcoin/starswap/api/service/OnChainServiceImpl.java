@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.starswap.api.data.model.*;
-import org.starcoin.starswap.api.utils.JsonRpcClient;
+import org.starcoin.starswap.api.utils.ContractApiClient;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.starswap.api.vo.SyrupMultiplierPoolInfo;
 
@@ -15,24 +15,23 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.net.MalformedURLException;
 import java.util.*;
 import java.util.function.Function;
 
 @Service
-public class StarcoinOnChainService implements OnChainService {
+public class OnChainServiceImpl implements OnChainService {
 
     private static final long ONE_YEAR_SECONDS = 60L * 60 * 24 * 365;
 
     private static final long ONE_DAY_SECONDS = 60L * 60 * 24;
 
-    private static final long SYRUP_POOL_TOTAL_REWARD_MULTIPLIER = 2 + 3 + 4 + 6 + 8;
+    //private static final long SYRUP_POOL_TOTAL_REWARD_MULTIPLIER = 2 + 3 + 4 + 6 + 8;
 
-    private static final Logger LOG = LoggerFactory.getLogger(StarcoinOnChainService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OnChainServiceImpl.class);
 
 //    private static final boolean USE_FARM_AVERAGE_APY = false;
 
-    private final JsonRpcClient jsonRpcClient;
+    private final ContractApiClient contractApiClient;
 
     @Value("${starswap.contract-address}")
     private String contractAddress;
@@ -53,8 +52,8 @@ public class StarcoinOnChainService implements OnChainService {
     private TokenPriceService tokenPriceService;
 
     @Autowired
-    public StarcoinOnChainService(JsonRpcClient jsonRpcClient) throws MalformedURLException {
-        this.jsonRpcClient = jsonRpcClient;
+    public OnChainServiceImpl(ContractApiClient contractApiClient) {
+        this.contractApiClient = contractApiClient;
     }
 
 
@@ -65,7 +64,7 @@ public class StarcoinOnChainService implements OnChainService {
         Token tokenY = tokenService.getTokenOrElseThrow(tokenIdPair.tokenYId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenYId()));
         LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
 
-        AccountFarmStakeInfo farmStakeInfo = this.jsonRpcClient.getAccountFarmStakeInfo(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+        AccountFarmStakeInfo farmStakeInfo = this.contractApiClient.getAccountFarmStakeInfo(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
                 liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress(),
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString(),
@@ -96,7 +95,7 @@ public class StarcoinOnChainService implements OnChainService {
         Token tokenX = tokenService.getTokenOrElseThrow(tokenIdPair.tokenXId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenXId()));
         Token tokenY = tokenService.getTokenOrElseThrow(tokenIdPair.tokenYId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenYId()));
         LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
-        return this.jsonRpcClient.tokenSwapFarmGetBoostFactor(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+        return this.contractApiClient.tokenSwapFarmGetBoostFactor(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString(),
                 accountAddress);
@@ -111,7 +110,7 @@ public class StarcoinOnChainService implements OnChainService {
         BigInteger directAmountOut = null;
         if (directLiquidityToken != null) {
             // todo call On-Chain contract twice??
-            directAmountOut = jsonRpcClient.tokenSwapRouterGetAmountOut(directLiquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
+            directAmountOut = contractApiClient.tokenSwapRouterGetAmountOut(directLiquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
                     tokenIn.getTokenStructType().toTypeTagString(), tokenOut.getTokenStructType().toTypeTagString(), amountIn);
             if (isInvalidSwapPath(indirectSwapPath)) {
                 return new Pair<>(Arrays.asList(tokenInId, tokenOutId), directAmountOut);
@@ -139,7 +138,7 @@ public class StarcoinOnChainService implements OnChainService {
         BigInteger directAmountIn = null;
         if (directLiquidityToken != null) {
             // todo call On-Chain contract twice??
-            directAmountIn = jsonRpcClient.tokenSwapRouterGetAmountIn(directLiquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
+            directAmountIn = contractApiClient.tokenSwapRouterGetAmountIn(directLiquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
                     tokenIn.getTokenStructType().toTypeTagString(), tokenOut.getTokenStructType().toTypeTagString(), amountOut);
             if (isInvalidSwapPath(indirectSwapPath)) {
                 return new Pair<>(Arrays.asList(tokenInId, tokenOutId), directAmountIn);
@@ -197,7 +196,7 @@ public class StarcoinOnChainService implements OnChainService {
             LiquidityToken liquidityTokenInOut = liquidityTokenService.findOneByTokenIdPairOrElseThrow(tokenIn.getTokenId(), tokenOut.getTokenId());
             BigInteger currentAmountIn = (amountOut == null ? amountIn : amountOut);
             // todo call On-Chain contract twice??
-            amountOut = jsonRpcClient.tokenSwapRouterGetAmountOut(liquidityTokenInOut.getLiquidityTokenId().getLiquidityTokenAddress(),
+            amountOut = contractApiClient.tokenSwapRouterGetAmountOut(liquidityTokenInOut.getLiquidityTokenId().getLiquidityTokenAddress(),
                     tokenIn.getTokenStructType().toTypeTagString(),
                     tokenOut.getTokenStructType().toTypeTagString(),
                     currentAmountIn);
@@ -216,7 +215,7 @@ public class StarcoinOnChainService implements OnChainService {
             LiquidityToken liquidityTokenInOut = liquidityTokenService.findOneByTokenIdPairOrElseThrow(tokenIn.getTokenId(), tokenOut.getTokenId());
             BigInteger currentAmountOut = (amountIn == null ? amountOut : amountIn);
             // todo call On-Chain contract twice??
-            amountIn = jsonRpcClient.tokenSwapRouterGetAmountIn(liquidityTokenInOut.getLiquidityTokenId().getLiquidityTokenAddress(),
+            amountIn = contractApiClient.tokenSwapRouterGetAmountIn(liquidityTokenInOut.getLiquidityTokenId().getLiquidityTokenAddress(),
                     tokenIn.getTokenStructType().toTypeTagString(),
                     tokenOut.getTokenStructType().toTypeTagString(),
                     currentAmountOut);
@@ -238,7 +237,7 @@ public class StarcoinOnChainService implements OnChainService {
         String tokenY = tokenService.getTokenOrElseThrow(tokenYId, () -> {
             throw new RuntimeException("Cannot find token by Id: " + tokenYId);
         }).getTokenStructType().toTypeTagString();
-        BigInteger stakeAmount = jsonRpcClient.tokenSwapFarmQueryTotalStake(farmAddress, tokenX, tokenY);
+        BigInteger stakeAmount = contractApiClient.tokenSwapFarmQueryTotalStake(farmAddress, tokenX, tokenY);
         return stakeAmount;
     }
 
@@ -289,7 +288,7 @@ public class StarcoinOnChainService implements OnChainService {
                     tokenX = tokenY;
                     tokenY = t;
                 }
-                Pair<BigInteger, BigInteger> rp = jsonRpcClient.tokenSwapRouterGetReserves(
+                Pair<BigInteger, BigInteger> rp = contractApiClient.tokenSwapRouterGetReserves(
                         liquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
                         tokenX.getTokenStructType().toTypeTagString(),
                         tokenY.getTokenStructType().toTypeTagString());
@@ -316,7 +315,7 @@ public class StarcoinOnChainService implements OnChainService {
         LiquidityTokenFarmId liquidityTokenFarmId = farm.getLiquidityTokenFarmId();
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarmId.getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarmId.getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
-        return jsonRpcClient.tokenSwapFarmGetRewardMultiplier(liquidityTokenFarmId.getFarmAddress(),
+        return contractApiClient.tokenSwapFarmGetRewardMultiplier(liquidityTokenFarmId.getFarmAddress(),
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString());
     }
@@ -425,22 +424,22 @@ public class StarcoinOnChainService implements OnChainService {
         return estimatedApy;
     }
 
-    /**
-     * Get FarmEstimatedApyV2 using the totalTvlInUsd argument.
-     *
-     * @param tokenX
-     * @param tokenY
-     * @param liquidityTokenFarm
-     * @param totalTvlInUsd
-     * @return
-     */
-    private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
-        BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsdV2AndAssetTotalWeight(tokenX, tokenY, liquidityTokenFarm).getItem1();
-        int scale = 10;
-        return totalTvlInUsd.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rewardPerYearInUsd
-                .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
-    }
+//    /**
+//     * Get FarmEstimatedApyV2 using the totalTvlInUsd argument.
+//     *
+//     * @param tokenX
+//     * @param tokenY
+//     * @param liquidityTokenFarm
+//     * @param totalTvlInUsd
+//     * @return
+//     */
+//    private BigDecimal getFarmEstimatedApyV2(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
+//        BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsdV2AndAssetTotalWeight(tokenX, tokenY, liquidityTokenFarm).getItem1();
+//        int scale = 10;
+//        return totalTvlInUsd.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : rewardPerYearInUsd
+//                .divide(totalTvlInUsd, scale, RoundingMode.HALF_UP)
+//                .multiply(BigDecimal.valueOf(100));
+//    }
 
 //    private BigDecimal getFarmEstimatedApy(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm, BigDecimal totalTvlInUsd) {
 //        BigDecimal rewardPerYearInUsd = getFarmRewardPerYearInUsd(tokenX, tokenY, liquidityTokenFarm);
@@ -474,7 +473,7 @@ public class StarcoinOnChainService implements OnChainService {
     private Pair<BigDecimal, BigInteger> getFarmRewardPerYearInUsdV2AndAssetTotalWeight(Token tokenX, Token tokenY, LiquidityTokenFarm liquidityTokenFarm) {
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
 
-        Pair<BigInteger, BigInteger> p = jsonRpcClient.tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(
+        Pair<BigInteger, BigInteger> p = contractApiClient.tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(
                 farmAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString()
@@ -515,7 +514,7 @@ public class StarcoinOnChainService implements OnChainService {
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
-        BigInteger rewardReleasePerSecond = jsonRpcClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
+        BigInteger rewardReleasePerSecond = contractApiClient.tokenSwapFarmQueryReleasePerSecond(farmAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString());
         BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
@@ -534,7 +533,7 @@ public class StarcoinOnChainService implements OnChainService {
         }
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
         String liquidityTokenAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress();
-        Pair<BigInteger, BigInteger> reservePair = jsonRpcClient.getTokenSwapFarmStakedReserves(
+        Pair<BigInteger, BigInteger> reservePair = contractApiClient.getTokenSwapFarmStakedReserves(
                 farmAddress,
                 liquidityTokenAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
@@ -547,7 +546,7 @@ public class StarcoinOnChainService implements OnChainService {
     }
 
     private BigDecimal getLiquidityAmountInUsd(Token tokenX, Token tokenY, String liquidityTokenAddress, BigInteger liquidity) {
-        Pair<BigInteger, BigInteger> reservePair = jsonRpcClient.getReservesByLiquidity(
+        Pair<BigInteger, BigInteger> reservePair = contractApiClient.getReservesByLiquidity(
                 liquidityTokenAddress,
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString(),
@@ -584,7 +583,7 @@ public class StarcoinOnChainService implements OnChainService {
         if (token.getScalingFactor() != null) {
             return token.getScalingFactor();
         }
-        return jsonRpcClient.tokenGetScalingFactor(token.getTokenStructType().toTypeTagString());
+        return contractApiClient.tokenGetScalingFactor(token.getTokenStructType().toTypeTagString());
     }
 
 //    @Override
@@ -744,7 +743,7 @@ public class StarcoinOnChainService implements OnChainService {
             src = toToken;
             trg = fromToken;
         }
-        BigDecimal r = jsonRpcClient.getExchangeRate(liquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
+        BigDecimal r = contractApiClient.getExchangeRate(liquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
                 src.getTokenStructType().toTypeTagString(), trg.getTokenStructType().toTypeTagString(),
                 getTokenScalingFactorOffChainFirst(src), getTokenScalingFactorOffChainFirst(trg));
         if (fromToken.getTokenId().equals(tokenIdPair.tokenXId())) {
@@ -761,7 +760,7 @@ public class StarcoinOnChainService implements OnChainService {
     public void refreshOffChainScalingFactors() {
         tokenService.findByScalingFactorIsNull().forEach((t) -> {
             if (t.getScalingFactor() == null) {
-                t.setScalingFactor(jsonRpcClient.tokenGetScalingFactor(t.getTokenStructType().toTypeTagString()));
+                t.setScalingFactor(contractApiClient.tokenGetScalingFactor(t.getTokenStructType().toTypeTagString()));
                 t.setUpdatedAt(System.currentTimeMillis());
                 t.setUpdatedBy("admin");
                 tokenService.save(t);
@@ -773,7 +772,7 @@ public class StarcoinOnChainService implements OnChainService {
     public BigInteger getSyrupPoolTotalStakeAmount(SyrupPool pool) {
         String tokenId = pool.getSyrupPoolId().getTokenId();
         Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
-        return jsonRpcClient.syrupPoolQueryTotalStake(pool.getSyrupPoolId().getPoolAddress(),
+        return contractApiClient.syrupPoolQueryTotalStake(pool.getSyrupPoolId().getPoolAddress(),
                 token.getTokenStructType().toTypeTagString());
     }
 
@@ -781,7 +780,7 @@ public class StarcoinOnChainService implements OnChainService {
     public BigDecimal getSyrupPoolTvlInUsd(SyrupPool pool) {
         String tokenId = pool.getSyrupPoolId().getTokenId();
         Token token = tokenService.getTokenOrElseThrow(tokenId, () -> new RuntimeException("Cannot find Token by Id: " + tokenId));
-        BigInteger stakeAmount = jsonRpcClient.syrupPoolQueryTotalStake(pool.getSyrupPoolId().getPoolAddress(),
+        BigInteger stakeAmount = contractApiClient.syrupPoolQueryTotalStake(pool.getSyrupPoolId().getPoolAddress(),
                 token.getTokenStructType().toTypeTagString());
         return getTokenAmountInUsd(token, stakeAmount);
     }
@@ -804,7 +803,7 @@ public class StarcoinOnChainService implements OnChainService {
         String rewardTokenId = pool.getRewardTokenId();
         Token rewardToken = tokenService.getTokenOrElseThrow(rewardTokenId, () -> new RuntimeException("Cannot find Token by Id: " + rewardTokenId));
 
-        BigInteger rewardReleasePerSecond = jsonRpcClient.syrupPoolQueryReleasePerSecondV2(pool.getSyrupPoolId().getPoolAddress(),
+        BigInteger rewardReleasePerSecond = contractApiClient.syrupPoolQueryReleasePerSecondV2(pool.getSyrupPoolId().getPoolAddress(),
                 rewardToken.getTokenStructType().toTypeTagString());
         BigInteger rewardPerYear = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_YEAR_SECONDS));
 
@@ -815,7 +814,7 @@ public class StarcoinOnChainService implements OnChainService {
     public BigInteger getSyrupPoolDailyReward(SyrupPool pool) {
         String rewardTokenId = pool.getRewardTokenId();
         Token rewardToken = tokenService.getTokenOrElseThrow(rewardTokenId, () -> new RuntimeException("Cannot find Token by Id: " + rewardTokenId));
-        BigInteger rewardReleasePerSecond = jsonRpcClient.syrupPoolQueryReleasePerSecondV2(pool.getSyrupPoolId().getPoolAddress(),
+        BigInteger rewardReleasePerSecond = contractApiClient.syrupPoolQueryReleasePerSecondV2(pool.getSyrupPoolId().getPoolAddress(),
                 rewardToken.getTokenStructType().toTypeTagString());
         BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));
         return rewardPerDay;//.multiply(BigInteger.valueOf(SYRUP_POOL_TOTAL_REWARD_MULTIPLIER));
@@ -827,7 +826,7 @@ public class StarcoinOnChainService implements OnChainService {
         Token poolToken = tokenService.getTokenOrElseThrow(syrupPool.getSyrupPoolId().getTokenId(),
                 () -> new RuntimeException("Cannot find Token by Id: " + syrupPool.getSyrupPoolId().getTokenId()));
         Triple<List<Long>, List<Long>, List<BigInteger>> triple =
-                jsonRpcClient.syrupPoolQueryAllMultiplierPools(syrupPool.getSyrupPoolId().getPoolAddress(),
+                contractApiClient.syrupPoolQueryAllMultiplierPools(syrupPool.getSyrupPoolId().getPoolAddress(),
                         poolToken.getTokenStructType().toTypeTagString());
         List<SyrupMultiplierPoolInfo> pools = new ArrayList<>();
         for (int i = 0; i < triple.getItem1().size(); i++) {
@@ -885,7 +884,7 @@ public class StarcoinOnChainService implements OnChainService {
         }
         try {
             //return jsonRpcClient.syrupPoolQueryStakeList(syrupPool.getSyrupPoolId().getPoolAddress(),
-            List<SyrupStake> stakeList = jsonRpcClient.syrupPoolQueryStakeWithExpectedGainList(syrupPool.getSyrupPoolId().getPoolAddress(),
+            List<SyrupStake> stakeList = contractApiClient.syrupPoolQueryStakeWithExpectedGainList(syrupPool.getSyrupPoolId().getPoolAddress(),
                     token.getTokenStructType().toTypeTagString(),
                     accountAddress);
             stakeList.forEach(s -> s.setTokenTypeTag(token.getTokenStructType().toTypeTagString()));
@@ -898,12 +897,12 @@ public class StarcoinOnChainService implements OnChainService {
 
     @Override
     public BigInteger getAccountVeStarAmount(String accountAddress) {
-        return this.jsonRpcClient.getAccountVeStarAmount(this.contractAddress, accountAddress);
+        return this.contractApiClient.getAccountVeStarAmount(this.contractAddress, accountAddress);
     }
 
     @Override
     public BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
-        return this.jsonRpcClient.getAccountVeStarAmountByStakeId(this.contractAddress, accountAddress, stakeId, tokenTypeTag);
+        return this.contractApiClient.getAccountVeStarAmountByStakeId(this.contractAddress, accountAddress, stakeId, tokenTypeTag);
     }
 
 }
