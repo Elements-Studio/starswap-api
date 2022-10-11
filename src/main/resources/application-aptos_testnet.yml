@@ -19,13 +19,19 @@ starswap:
   pulling-event-task-auto-create:
     fixed-delay: 300000
   invisible-token-pairs: '["BX_USDT,STC"]'
+  aptos-contract-address: "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee"
+
+starcoin:
+  enabled: false
+  event-subscription-enabled: false
 
 aptos:
-  enabled: false
+  enabled: true
   event-handle:
     fixed-delay: 5000
   node-api:
-    base-url: "https://fullnode.devnet.aptoslabs.com/v1"
+    #base-url: "https://fullnode.devnet.aptoslabs.com/v1"
+    base-url: "https://testnet.aptoslabs.com"
 
 logging:
   level:

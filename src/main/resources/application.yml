@@ -97,11 +97,10 @@ starswap:
   invisible-token-pairs: '[]'
 
 aptos:
-  enabled: false
   event-handle:
     fixed-delay: 5000
-  node-api:
-    base-url: "https://fullnode.devnet.aptoslabs.com/v1"
+#  node-api:
+#    base-url: "https://fullnode.devnet.aptoslabs.com/v1"
 
 #elasticsearch:
 #  host: ${STARCOIN_ES_URL}

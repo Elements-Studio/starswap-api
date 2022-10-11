@@ -10,10 +10,12 @@ public class NodeApiException extends RuntimeException {
     }
 
     public NodeApiException(Integer httpStatusCode) {
+        super(getString(httpStatusCode, null));
         this.httpStatusCode = httpStatusCode;
     }
 
     public NodeApiException(Integer httpStatusCode, AptosError aptosError) {
+        super(getString(httpStatusCode, aptosError));
         this.httpStatusCode = httpStatusCode;
         this.aptosError = aptosError;
     }
@@ -36,6 +38,10 @@ public class NodeApiException extends RuntimeException {
 
     @Override
     public String toString() {
+        return getString(httpStatusCode, aptosError);
+    }
+
+    private static String getString(Integer httpStatusCode, AptosError aptosError) {
         return "NodeApiException{" +
                 "httpStatusCode=" + httpStatusCode +
                 ", aptosError=" + aptosError +

@@ -10,10 +10,10 @@ import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
 import java.net.MalformedURLException;
 
 @Configuration
-public class JsonRpcClientConfig {
+@ConditionalOnProperty(value = "starcoin.enabled", havingValue = "true", matchIfMissing = true)
+public class StarcoinChainConfig {
 
     @Bean
-    @ConditionalOnProperty(value = "starcoin.enabled", havingValue = "true", matchIfMissing = true)
     public ContractApiClient starcoinContractApiClient(@Value("${starcoin.json-rpc-url}") String jsonRpcUrl,
                                                        @Value("${starswap.starcoin-contract-address}") String contractAddress) throws MalformedURLException {
         return new StarcoinContractApiClient(jsonRpcUrl, contractAddress);
