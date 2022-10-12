@@ -104,7 +104,7 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenGetScalingFactor(String token) {
+    public BigInteger getTokenScalingFactor(String token) {
         StructTagUtils.StructTag coinType = StructTagUtils.parseStructTag(token);
         String resourceType = "0x1::coin::CoinInfo<" + token + ">";
         try {

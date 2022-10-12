@@ -579,7 +579,7 @@ public class OnChainServiceImpl implements OnChainService {
         if (token.getScalingFactor() != null) {
             return token.getScalingFactor();
         }
-        return contractApiClient.tokenGetScalingFactor(token.getTokenStructType().toTypeTagString());
+        return contractApiClient.getTokenScalingFactor(token.getTokenStructType().toTypeTagString());
     }
 
 //    @Override
@@ -756,7 +756,7 @@ public class OnChainServiceImpl implements OnChainService {
     public void refreshOffChainScalingFactors() {
         tokenService.findByScalingFactorIsNull().forEach((t) -> {
             if (t.getScalingFactor() == null) {
-                t.setScalingFactor(contractApiClient.tokenGetScalingFactor(t.getTokenStructType().toTypeTagString()));
+                t.setScalingFactor(contractApiClient.getTokenScalingFactor(t.getTokenStructType().toTypeTagString()));
                 t.setUpdatedAt(System.currentTimeMillis());
                 t.setUpdatedBy("admin");
                 tokenService.save(t);

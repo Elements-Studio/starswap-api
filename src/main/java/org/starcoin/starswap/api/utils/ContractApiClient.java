@@ -48,7 +48,7 @@ public interface ContractApiClient {
     BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY);
 
     @Cacheable(cacheNames = "tokenScalingFactorCache", key = "#token", unless = "#result == null")
-    BigInteger tokenGetScalingFactor(String token);
+    BigInteger getTokenScalingFactor(String token);
 
     @Cacheable(cacheNames = "tokenExchangeRateCache",
             key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY + ',' + #tokenXScalingFactor + '/' + #tokenYScalingFactor", unless = "#result == null")

@@ -182,7 +182,7 @@ public class StarcoinContractApiClient implements ContractApiClient {
 
     @Override
     @Cacheable(cacheNames = "tokenScalingFactorCache", key = "#token", unless = "#result == null")
-    public BigInteger tokenGetScalingFactor(String token) {
+    public BigInteger getTokenScalingFactor(String token) {
         return JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, token);
     }
 
