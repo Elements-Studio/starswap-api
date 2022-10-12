@@ -16,7 +16,23 @@ import java.util.List;
 public class EventTests {
 
     public static void main(String[] args) throws IOException {
-        String baseUrl = "https://fullnode.devnet.aptoslabs.com/v1";
+        String baseUrl = "https://testnet.aptoslabs.com/v1";//"https://fullnode.devnet.aptoslabs.com/v1";
+
+//        String hex = NodeApiUtils.getTableItem("https://testnet.aptoslabs.com/v1",
+//                "0x1b854694ae746cdbd8d44186ca4929b2b337df21d1c74633be19b2710552fdca",
+//                "vector<u8>", "vector<u8>",
+//                "0x619dc29a0aac8fa146714058e8dd6d2d0f3bdf5f6331907bf91f3acd81e6935", String.class, null);
+//        System.out.println(hex);
+//        System.out.println(new String(HexUtils.hexToByteArray(hex)));
+//        if (true) return;
+//        //0x1b854694ae746cdbd8d44186ca4929b2b337df21d1c74633be19b2710552fdca
+//        //0x619dc29a0aac8fa146714058e8dd6d2d0f3bdf5f6331907bf91f3acd81e6935
+
+//        AccountResource<CoinInfo> coinInfo = NodeApiUtils.getAccountResource(baseUrl, "0x1",
+//                "0x1::coin::CoinInfo<0x1::aptos_coin::AptosCoin>", CoinInfo.class, null);
+//        System.out.println(coinInfo);
+//        if (true) return;
+
         String accountAddress = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14";
         String eventHandleStruct = "0x2b490841c230a31fe012f3b2a3f3d146316be073e599eb7d7e5074838073ef14::message::MessageHolder";
         String eventHandleFieldName = "message_change_events";
