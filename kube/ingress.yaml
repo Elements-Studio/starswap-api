@@ -33,4 +33,7 @@ spec:
 #            backend:
 #              serviceName: "starswap-api-barnard-new"
 #              servicePort: 80
-
+          - path: /aptos-testnet/*
+            backend:
+              serviceName: "starswap-api-aptos-testnet"
+              servicePort: 80

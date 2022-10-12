@@ -1,31 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: starswap-api-deployment
+  name: starswap-api-deployment-aptos-testnet
   labels:
-    app: starswap-api
+    app: starswap-api-aptos-testnet
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: starswap-api
+      app: starswap-api-aptos-testnet
   template:
     metadata:
       labels:
-        app: starswap-api
+        app: starswap-api-aptos-testnet
     spec:
       containers:
-        - name: starswap-api
+        - name: starswap-api-aptos-testnet
           image: ghcr.io/elements-studio/starcoin_starswap:sha-3f85deb
           ports:
             - containerPort: 8600
           env:
             - name: spring_profiles_active
-              value: prod
+              value: aptos-testnet
             - name: FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS
               value: "true"
             - name: STARCOIN_MYSQL_URL
-              value: "jdbc:mysql://starcoin-db-2.c0bz9kehdvnb.ap-northeast-1.rds.amazonaws.com:3306/starswap?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC"
+              value: "jdbc:mysql://starcoin-db-2.c0bz9kehdvnb.ap-northeast-1.rds.amazonaws.com:3306/starswap_aptos_testnet?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC"
             - name: STARCOIN_MYSQL_USER
               value: "starcoin"
             - name: STARCOIN_MYSQL_PWD
@@ -34,14 +34,12 @@ spec:
                   name: mysql-pwd
                   key: password
             - name: STARCOIN_SEEDS
-              value: "main1.seed.starcoin.org,main2.seed.starcoin.org"
+              value: ""
             - name: STARCOIN_NETWORK
-              value: "main"
+              value: ""
             - name: STARCOIN_JSON_RPC_URL
-              value: "https://main-seed.starcoin.org"
+              value: ""
             - name: FARMING_BOOST_WHITELIST
-              valueFrom:
-                secretKeyRef:
-                  name: starswap-farming-boost-secrets
-                  key: whitelist
-
+              value: '{}'
+            - name: CHAIN_NETWORK
+              value: "aptos-testnet"
