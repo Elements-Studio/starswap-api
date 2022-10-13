@@ -20,6 +20,9 @@ import java.util.function.Function;
 @Service
 public class OnChainServiceImpl implements OnChainService {
 
+    public static final long DEFAULT_SWAP_FEE_NUMERATOR = 3; //u64
+    public static final long DEFAULT_SWAP_FEE_DENUMERATOR = 1000;//u64
+
     private static final long ONE_YEAR_SECONDS = 60L * 60 * 24 * 365;
 
     private static final long ONE_DAY_SECONDS = 60L * 60 * 24;
@@ -106,8 +109,10 @@ public class OnChainServiceImpl implements OnChainService {
         BigInteger directAmountOut = null;
         if (directLiquidityToken != null) {
             // todo call On-Chain contract twice??
-            directAmountOut = contractApiClient.tokenSwapRouterGetAmountOut(directLiquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
-                    tokenIn.getTokenStructType().toTypeTagString(), tokenOut.getTokenStructType().toTypeTagString(), amountIn);
+            directAmountOut = contractApiClient.tokenSwapRouterGetAmountOut(
+                    directLiquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
+                    tokenIn.getTokenStructType().toTypeTagString(), tokenOut.getTokenStructType().toTypeTagString(),
+                    amountIn, DEFAULT_SWAP_FEE_NUMERATOR, DEFAULT_SWAP_FEE_DENUMERATOR);
             if (isInvalidSwapPath(indirectSwapPath)) {
                 return new Pair<>(Arrays.asList(tokenInId, tokenOutId), directAmountOut);
             }
@@ -134,8 +139,10 @@ public class OnChainServiceImpl implements OnChainService {
         BigInteger directAmountIn = null;
         if (directLiquidityToken != null) {
             // todo call On-Chain contract twice??
-            directAmountIn = contractApiClient.tokenSwapRouterGetAmountIn(directLiquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
-                    tokenIn.getTokenStructType().toTypeTagString(), tokenOut.getTokenStructType().toTypeTagString(), amountOut);
+            directAmountIn = contractApiClient.tokenSwapRouterGetAmountIn(
+                    directLiquidityToken.getLiquidityTokenId().getLiquidityTokenAddress(),
+                    tokenIn.getTokenStructType().toTypeTagString(), tokenOut.getTokenStructType().toTypeTagString(),
+                    amountOut, DEFAULT_SWAP_FEE_NUMERATOR, DEFAULT_SWAP_FEE_DENUMERATOR);
             if (isInvalidSwapPath(indirectSwapPath)) {
                 return new Pair<>(Arrays.asList(tokenInId, tokenOutId), directAmountIn);
             }
@@ -195,7 +202,7 @@ public class OnChainServiceImpl implements OnChainService {
             amountOut = contractApiClient.tokenSwapRouterGetAmountOut(liquidityTokenInOut.getLiquidityTokenId().getLiquidityTokenAddress(),
                     tokenIn.getTokenStructType().toTypeTagString(),
                     tokenOut.getTokenStructType().toTypeTagString(),
-                    currentAmountIn);
+                    currentAmountIn, DEFAULT_SWAP_FEE_NUMERATOR, DEFAULT_SWAP_FEE_DENUMERATOR);
         }
         if (amountOut == null) {
             throw new IllegalArgumentException("Path error. Size of path: " + pathTokens.size());
@@ -214,7 +221,7 @@ public class OnChainServiceImpl implements OnChainService {
             amountIn = contractApiClient.tokenSwapRouterGetAmountIn(liquidityTokenInOut.getLiquidityTokenId().getLiquidityTokenAddress(),
                     tokenIn.getTokenStructType().toTypeTagString(),
                     tokenOut.getTokenStructType().toTypeTagString(),
-                    currentAmountOut);
+                    currentAmountOut, DEFAULT_SWAP_FEE_NUMERATOR, DEFAULT_SWAP_FEE_DENUMERATOR);
         }
         if (amountIn == null) {
             throw new IllegalArgumentException("Path error. Size of path: " + pathTokens.size());

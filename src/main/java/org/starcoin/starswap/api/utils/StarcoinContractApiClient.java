@@ -8,6 +8,7 @@ import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.data.model.Triple;
+import org.starcoin.starswap.api.service.OnChainServiceImpl;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.utils.JsonRpcClientUtils;
 
@@ -200,7 +201,10 @@ public class StarcoinContractApiClient implements ContractApiClient {
         // use tokenSwapRouterGetReserves and tokenSwapRouterGetAmountOut to calculate exchange rate:
         Pair<BigInteger, BigInteger> reserves = JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
         BigInteger amountX = reserves.getItem1().divide(BigInteger.valueOf(100L));//try to swap tokenX of 1 percent reserve
-        BigInteger amountY = JsonRpcUtils.tokenSwapRouterGetAmountOut(jsonRpcSession, lpTokenAddress, amountX, reserves.getItem1(), reserves.getItem2());
+        BigInteger amountY = JsonRpcUtils.tokenSwapRouterGetAmountOut(jsonRpcSession, lpTokenAddress, amountX,
+                reserves.getItem1(), reserves.getItem2(),
+                OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR,
+                OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
 //        System.out.println("----- tokenX: " + tokenX + ", ----- amountX: " + amountX);
 //        System.out.println("----- tokenY: " + tokenY + ", ----- amountY: " + amountY);
         int scale = Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
@@ -224,15 +228,19 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountIn) {
+    public BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut,
+                                                  BigInteger amountIn,
+                                                  long swapFeeNumerator, long swapFeeDenumerator) {
         Pair<BigInteger, BigInteger> reserves = JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenIn, tokenOut);
-        return JsonRpcUtils.tokenSwapRouterGetAmountOut(jsonRpcSession, lpTokenAddress, amountIn, reserves.getItem1(), reserves.getItem2());
+        return JsonRpcUtils.tokenSwapRouterGetAmountOut(jsonRpcSession, lpTokenAddress, amountIn, reserves.getItem1(), reserves.getItem2(), swapFeeNumerator, swapFeeDenumerator);
     }
 
     @Override
-    public BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountOut) {
+    public BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut,
+                                                 BigInteger amountOut,
+                                                 long swapFeeNumerator, long swapFeeDenumerator) {
         Pair<BigInteger, BigInteger> reserves = JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenIn, tokenOut);
-        return JsonRpcUtils.tokenSwapRouterGetAmountIn(jsonRpcSession, lpTokenAddress, amountOut, reserves.getItem1(), reserves.getItem2());
+        return JsonRpcUtils.tokenSwapRouterGetAmountIn(jsonRpcSession, lpTokenAddress, amountOut, reserves.getItem1(), reserves.getItem2(), swapFeeNumerator, swapFeeDenumerator);
     }
 
     @Override

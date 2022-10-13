@@ -37,8 +37,6 @@ public class JsonRpcUtils {
     //private static final String TOKEN_SWAP_SCRIPTS_MODULE_NAME = "TokenSwapScripts";
     private static final String TOKEN_SWAP_SYRUP_SCRIPT_MODULE_NAME = "TokenSwapSyrupScript";
 
-    private static final String SWAP_FEE_NUMERATOR = "3u64";
-    private static final String SWAP_FEE_DENUMERATOR = "1000u64";
 
     private static final Logger LOG = LoggerFactory.getLogger(LiquidityPoolService.class);
 
@@ -77,27 +75,35 @@ public class JsonRpcUtils {
     }
 
     // public fun get_amount_out(amount_in: u128, reserve_in: u128, reserve_out: u128): u128
-    public static BigInteger tokenSwapRouterGetAmountOut(JSONRPC2Session jsonRpcSession, String lpTokenAddress, BigInteger amountIn, BigInteger reserveIn, BigInteger reserveOut) {
+    public static BigInteger tokenSwapRouterGetAmountOut(JSONRPC2Session jsonRpcSession, String lpTokenAddress,
+                                                         BigInteger amountIn,
+                                                         BigInteger reserveIn, BigInteger reserveOut,
+                                                         long swapFeeNumerator, long swapFeeDenumerator) {
         List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
                         + SWAP_GET_AMOUNT_IN_OUT_FUNCTION_MODULE_NAME + "::get_amount_out",
                 Collections.emptyList(), Arrays.asList(
                         amountIn.toString() + "u128",
                         reserveIn.toString() + "u128",
                         reserveOut.toString() + "u128",
-                        SWAP_FEE_NUMERATOR, SWAP_FEE_DENUMERATOR
+                        swapFeeNumerator + "u64",
+                        swapFeeDenumerator + "u64"
                 ), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));
     }
 
-    public static BigInteger tokenSwapRouterGetAmountIn(JSONRPC2Session jsonRpcSession, String lpTokenAddress, BigInteger amountOut, BigInteger reserveIn, BigInteger reserveOut) {
+    public static BigInteger tokenSwapRouterGetAmountIn(JSONRPC2Session jsonRpcSession, String lpTokenAddress,
+                                                        BigInteger amountOut,
+                                                        BigInteger reserveIn, BigInteger reserveOut,
+                                                        long swapFeeNumerator, long swapFeeDenumerator) {
         List<String> resultFields = contractCallV2(jsonRpcSession, lpTokenAddress + "::"
                         + SWAP_GET_AMOUNT_IN_OUT_FUNCTION_MODULE_NAME + "::get_amount_in",
                 Collections.emptyList(), Arrays.asList(
                         amountOut.toString() + "u128",
                         reserveIn.toString() + "u128",
                         reserveOut.toString() + "u128",
-                        SWAP_FEE_NUMERATOR, SWAP_FEE_DENUMERATOR
+                        swapFeeNumerator + "u64",
+                        swapFeeDenumerator + "u64"
                 ), new TypeReference<List<String>>() {
                 });
         return new BigInteger(resultFields.get(0));

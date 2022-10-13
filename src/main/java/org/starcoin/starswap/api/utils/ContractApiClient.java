@@ -60,9 +60,11 @@ public interface ContractApiClient {
             key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY", unless = "#result == null")
     Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY);
 
-    BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountIn);
+    BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountIn,
+                                           long swapFeeNumerator, long swapFeeDenumerator);
 
-    BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountOut);
+    BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountOut,
+                                          long swapFeeNumerator, long swapFeeDenumerator);
 
     Pair<Long, Long> tokenSwapRouterGetPoundageRate(String lpTokenAddress, String tokenX, String tokenY);
 

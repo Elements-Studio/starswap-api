@@ -19,6 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 public class AptosContractApiClient implements ContractApiClient {
+
+    private static final long DEFAULT_OPERATION_NUMERATOR = 10;
+    private static final long DEFAULT_OPERATION_DENUMERATOR = 60;
+    private static final long DEFAULT_POUNDAGE_NUMERATOR = 3;
+    private static final long DEFAULT_POUNDAGE_DENUMERATOR = 1000;
+
     private final String nodeApiBaseUrl;
     private final String contractAddress;
 
@@ -173,22 +179,24 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountIn) {
+    public BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut,
+                                                  BigInteger amountIn, long swapFeeNumerator, long swapFeeDenumerator) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountOut) {
+    public BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut,
+                                                 BigInteger amountOut, long swapFeeNumerator, long swapFeeDenumerator) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Pair<Long, Long> tokenSwapRouterGetPoundageRate(String lpTokenAddress, String tokenX, String tokenY) {
-        throw new UnsupportedOperationException();
+        return new Pair<>(DEFAULT_POUNDAGE_NUMERATOR, DEFAULT_POUNDAGE_DENUMERATOR);
     }
 
     @Override
     public Pair<Long, Long> tokenSwapRouterGetSwapFeeOperationRateV2(String lpTokenAddress, String tokenX, String tokenY) {
-        throw new UnsupportedOperationException();
+        return new Pair<>(DEFAULT_OPERATION_NUMERATOR, DEFAULT_OPERATION_DENUMERATOR);//todo?
     }
 }
