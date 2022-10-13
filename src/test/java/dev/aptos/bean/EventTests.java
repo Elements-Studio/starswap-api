@@ -15,7 +15,16 @@ import java.util.List;
 
 public class EventTests {
 
+//    public static class C {
+//        @JsonProperty("foo")
+//        String foo;
+//    }
+
     public static void main(String[] args) throws IOException {
+//        String json = "{\"foo\": {\"k\": \"v\"}}";
+//        C o = new ObjectMapper().readValue(json, C.class);
+//        if (true) return;
+
         String baseUrl = "https://testnet.aptoslabs.com/v1";//"https://fullnode.devnet.aptoslabs.com/v1";
 
 //        String hex = NodeApiUtils.getTableItem("https://testnet.aptoslabs.com/v1",

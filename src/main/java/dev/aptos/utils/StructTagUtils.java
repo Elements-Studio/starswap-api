@@ -1,6 +1,9 @@
 package dev.aptos.utils;
 
 
+import dev.aptos.types.AccountAddress;
+import dev.aptos.types.TypeInfo;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +15,22 @@ public class StructTagUtils {
     private static final String COMMA = ",";
 
     private StructTagUtils() {
+    }
+
+    public static TypeInfo toTypeInfo(StructTagUtils.StructTag t) {
+        TypeInfo.Builder builder = new TypeInfo.Builder();
+        builder.accountAddress = AccountAddress.valueOf(HexUtils.hexToByteArray(t.getAddress()));
+        builder.moduleName = t.getModule();
+        builder.structName = t.getName();
+        return builder.build();
+    }
+
+    public static dev.aptos.bean.TypeInfo toTypeInfoBean(StructTagUtils. StructTag t) {
+        dev.aptos.bean.TypeInfo typeInfo = new dev.aptos.bean.TypeInfo();
+        typeInfo.setAccountAddress(t.getAddress());
+        typeInfo.setModuleName(t.getModule());
+        typeInfo.setStructName(t.getName());
+        return typeInfo;
     }
 
     public static StructTag parseStructTag(String s) {

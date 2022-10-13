@@ -2,9 +2,7 @@ package org.starcoin.starswap.api.utils;
 
 import com.novi.serde.SerializationError;
 import dev.aptos.bean.AccountResource;
-import dev.aptos.types.AccountAddress;
 import dev.aptos.types.TypeInfo;
-import dev.aptos.utils.HexUtils;
 import dev.aptos.utils.NodeApiUtils;
 import dev.aptos.utils.StructTagUtils;
 import org.starcoin.starswap.api.data.model.Pair;
@@ -37,19 +35,11 @@ public class AptosContractApiClient implements ContractApiClient {
         return ByteUtils.compareBytes(t1.bcsSerialize(), t2.bcsSerialize());
     }
 
-    public static TypeInfo toTypeInfo(StructTagUtils.StructTag t) {
-        TypeInfo.Builder builder = new TypeInfo.Builder();
-        builder.accountAddress = AccountAddress.valueOf(HexUtils.hexToByteArray(t.getAddress()));
-        builder.moduleName = t.getModule();
-        builder.structName = t.getName();
-        return builder.build();
-    }
-
     public static Pair<String, String> sortTokens(String tokenX, String tokenY) {
         StructTagUtils.StructTag tokenXStructTag = StructTagUtils.parseStructTag(tokenX);
         StructTagUtils.StructTag tokenYStructTag = StructTagUtils.parseStructTag(tokenY);
-        TypeInfo tokenXTypeInfo = toTypeInfo(tokenXStructTag);
-        TypeInfo tokenYTypeInfo = toTypeInfo(tokenYStructTag);
+        TypeInfo tokenXTypeInfo = StructTagUtils.toTypeInfo(tokenXStructTag);
+        TypeInfo tokenYTypeInfo = StructTagUtils.toTypeInfo(tokenYStructTag);
         try {
             int i = compareTokenCode(tokenXTypeInfo, tokenYTypeInfo);
             if (i < 0) {
@@ -201,16 +191,45 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut,
                                                  BigInteger amountOut, long swapFeeNumerator, long swapFeeDenumerator) {
-        throw new UnsupportedOperationException();
+        Pair<BigInteger, BigInteger> reserves = tokenSwapRouterGetReserves(lpTokenAddress, tokenIn, tokenOut);
+        BigInteger reserve_in = reserves.getItem1();
+        BigInteger reserve_out = reserves.getItem2();
+        if (!(amountOut.compareTo(BigInteger.ZERO) > 0))
+            throw new IllegalArgumentException("ERROR_ROUTER_PARAMETER_INVALID");
+        if (!(reserve_in.compareTo(BigInteger.ZERO) > 0 && reserve_out.compareTo(BigInteger.ZERO) > 0))
+            throw new IllegalArgumentException("ERROR_ROUTER_PARAMETER_INVALID");
+        if (!(swapFeeDenumerator > 0 && swapFeeNumerator > 0))
+            throw new IllegalArgumentException("ERROR_SWAP_FEE_ALGORITHM_INVALID");
+        if (!(swapFeeDenumerator > swapFeeNumerator))
+            throw new IllegalArgumentException("ERROR_SWAP_FEE_ALGORITHM_INVALID");
+        if (!(reserve_out.compareTo(amountOut) > 0))
+            throw new IllegalArgumentException("ERROR_SWAP_FEE_ALGORITHM_INVALID");
+        //let denominator = (reserve_out - amount_out) * ((fee_denumerator - fee_numerator) as u128);
+        BigInteger denominator = (reserve_out.subtract(amountOut)).multiply(
+                BigInteger.valueOf(swapFeeDenumerator - swapFeeNumerator));
+        //let r = SafeMath::safe_mul_div_u128(amount_out * (fee_denumerator as u128), reserve_in, denominator);
+        BigInteger r = amountOut.multiply(BigInteger.valueOf(swapFeeDenumerator))
+                .multiply(reserve_in).divide(denominator);
+        return r.add(BigInteger.ONE);//r + 1
+        // ---------------------------------------------------------
+        // r_in * r_out == new_r_in * new_r_out
+        // r_in * r_out == (r_in + amount_in) * (r_out - amount_out)
+        // r_in + amount_in == (r_in * r_out) / (r_out - amount_out)
+        // amount_in = (r_in * r_out) / (r_out - amount_out) - r_in
+        // amount_in = (r_in * r_out - r_in * (r_out - amount_out)) / (r_out - amount_out)
+        // amount_in = r_in * amount_out / (r_out - amount_out)
+        // ---------------------------------------------------------
     }
 
     @Override
     public Pair<Long, Long> tokenSwapRouterGetPoundageRate(String lpTokenAddress, String tokenX, String tokenY) {
+        //todo ?
         return new Pair<>(DEFAULT_POUNDAGE_NUMERATOR, DEFAULT_POUNDAGE_DENUMERATOR);
     }
 
     @Override
     public Pair<Long, Long> tokenSwapRouterGetSwapFeeOperationRateV2(String lpTokenAddress, String tokenX, String tokenY) {
-        return new Pair<>(DEFAULT_OPERATION_NUMERATOR, DEFAULT_OPERATION_DENUMERATOR);//todo?
+        //todo ?
+        return new Pair<>(DEFAULT_OPERATION_NUMERATOR, DEFAULT_OPERATION_DENUMERATOR);
     }
 }

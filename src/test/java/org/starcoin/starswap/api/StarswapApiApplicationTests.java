@@ -95,13 +95,20 @@ class StarswapApiApplicationTests {
                 "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
                 tokenXUSDTOnAptos, tokenSTAROnAptos, BigInteger.valueOf(1),
                 OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR, OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
-        System.out.println("--------------- Amount out ----------------: " + amountOut);
+        System.out.println("USDT / STAR: " + p.getItem2().divide(p.getItem1()));
+        System.out.println("--------------- 1 USDT in, STAR amount out ----------------: " + amountOut);
+        BigInteger amountIn = this.contractApiClient.tokenSwapRouterGetAmountIn(
+                "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
+                tokenSTAROnAptos, tokenXUSDTOnAptos, BigInteger.valueOf(1),
+                OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR, OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
+        System.out.println("--------------- 1000000 USDT out, need STAR mount in ----------------: " + amountIn);
         if (true) return;
 //        BigInteger scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenXUSDTOnAptos);
 //        System.out.println(tokenXUSDTOnAptos + " scalingFactor: " + scalingFactor);
 //        scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenSTAROnAptos);
 //        System.out.println(tokenSTAROnAptos + " scalingFactor: " + scalingFactor);
 //        if (true) return;
+
 
         try {
             ContractApiClient contractApiClient = new StarcoinContractApiClient("https://barnard-seed.starcoin.org", null);
