@@ -90,6 +90,12 @@ class StarswapApiApplicationTests {
                 "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
                 tokenSTAROnAptos, tokenXUSDTOnAptos);
         System.out.println(p2);
+
+        BigInteger amountOut = this.contractApiClient.tokenSwapRouterGetAmountOut(
+                "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
+                tokenXUSDTOnAptos, tokenSTAROnAptos, BigInteger.valueOf(1),
+                OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR, OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
+        System.out.println("--------------- Amount out ----------------: " + amountOut);
         if (true) return;
 //        BigInteger scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenXUSDTOnAptos);
 //        System.out.println(tokenXUSDTOnAptos + " scalingFactor: " + scalingFactor);

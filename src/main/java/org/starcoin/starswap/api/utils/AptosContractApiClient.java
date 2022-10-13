@@ -181,7 +181,21 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut,
                                                   BigInteger amountIn, long swapFeeNumerator, long swapFeeDenumerator) {
-        throw new UnsupportedOperationException();
+        Pair<BigInteger, BigInteger> reserves = tokenSwapRouterGetReserves(lpTokenAddress, tokenIn, tokenOut);
+        BigInteger reserve_in = reserves.getItem1();
+        BigInteger reserve_out = reserves.getItem2();
+        if (!(amountIn.compareTo(BigInteger.ZERO) > 0))
+            throw new IllegalArgumentException("ERROR_ROUTER_PARAMETER_INVALID");
+        if (!(reserve_in.compareTo(BigInteger.ZERO) > 0 && reserve_out.compareTo(BigInteger.ZERO) > 0))
+            throw new IllegalArgumentException("ERROR_ROUTER_PARAMETER_INVALID");
+        if (!(swapFeeDenumerator > 0 && swapFeeNumerator > 0))
+            throw new IllegalArgumentException("ERROR_SWAP_FEE_ALGORITHM_INVALID");
+        if (!(swapFeeDenumerator > swapFeeNumerator))
+            throw new IllegalArgumentException("ERROR_SWAP_FEE_ALGORITHM_INVALID");
+        BigInteger amount_in_with_fee = amountIn.multiply(BigInteger.valueOf(swapFeeDenumerator - swapFeeNumerator));
+        //let denominator = reserve_in * (fee_denumerator as u128) + amount_in_with_fee;
+        BigInteger denominator = reserve_in.multiply(BigInteger.valueOf(swapFeeDenumerator)).add(amount_in_with_fee);
+        return amount_in_with_fee.multiply(reserve_out).divide(denominator);
     }
 
     @Override
