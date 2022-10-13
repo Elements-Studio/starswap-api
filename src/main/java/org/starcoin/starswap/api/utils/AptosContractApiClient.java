@@ -1,6 +1,10 @@
 package org.starcoin.starswap.api.utils;
 
+import com.novi.serde.SerializationError;
 import dev.aptos.bean.AccountResource;
+import dev.aptos.types.AccountAddress;
+import dev.aptos.types.TypeInfo;
+import dev.aptos.utils.HexUtils;
 import dev.aptos.utils.NodeApiUtils;
 import dev.aptos.utils.StructTagUtils;
 import org.starcoin.starswap.api.data.model.Pair;
@@ -21,6 +25,36 @@ public class AptosContractApiClient implements ContractApiClient {
     public AptosContractApiClient(String nodeApiBaseUrl, String contractAddress) {
         this.nodeApiBaseUrl = nodeApiBaseUrl;
         this.contractAddress = contractAddress;
+    }
+
+    public static int compareTokenCode(TypeInfo t1, TypeInfo t2) throws SerializationError {
+        return ByteUtils.compareBytes(t1.bcsSerialize(), t2.bcsSerialize());
+    }
+
+    public static TypeInfo toTypeInfo(StructTagUtils.StructTag t) {
+        TypeInfo.Builder builder = new TypeInfo.Builder();
+        builder.accountAddress = AccountAddress.valueOf(HexUtils.hexToByteArray(t.getAddress()));
+        builder.moduleName = t.getModule();
+        builder.structName = t.getName();
+        return builder.build();
+    }
+
+    public static Pair<String, String> sortTokens(String tokenX, String tokenY) {
+        StructTagUtils.StructTag tokenXStructTag = StructTagUtils.parseStructTag(tokenX);
+        StructTagUtils.StructTag tokenYStructTag = StructTagUtils.parseStructTag(tokenY);
+        TypeInfo tokenXTypeInfo = toTypeInfo(tokenXStructTag);
+        TypeInfo tokenYTypeInfo = toTypeInfo(tokenYStructTag);
+        try {
+            int i = compareTokenCode(tokenXTypeInfo, tokenYTypeInfo);
+            if (i < 0) {
+                return new Pair<>(tokenX, tokenY);
+            } else if (i > 0) {
+                return new Pair<>(tokenY, tokenX);
+            }
+        } catch (SerializationError e) {
+            throw new IllegalArgumentException(e);
+        }
+        throw new IllegalArgumentException("Two tokens are equal.");
     }
 
     @Override
@@ -124,7 +158,18 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY) {
-        throw new UnsupportedOperationException();
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        String resourceType = lpTokenAddress + "::TokenSwap::TokenSwapPair<" + tp.getItem1() + ", " + tp.getItem2() + ">";
+        try {
+            AccountResource<Map> resource = NodeApiUtils.getAccountResource(nodeApiBaseUrl, lpTokenAddress, resourceType, Map.class, null);
+            Map r1 = (Map) resource.getData().get("token_x_reserve");
+            Map r2 = (Map) resource.getData().get("token_y_reserve");
+            BigInteger v1 = new BigInteger(r1.get("value").toString());
+            BigInteger v2 = new BigInteger(r2.get("value").toString());
+            return tokenX.equals(tp.getItem1()) ? new Pair<>(v1, v2) : new Pair<>(v2, v1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

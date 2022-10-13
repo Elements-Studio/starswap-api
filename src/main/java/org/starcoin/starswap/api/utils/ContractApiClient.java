@@ -55,6 +55,7 @@ public interface ContractApiClient {
     BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY,
                                BigInteger tokenXScalingFactor, BigInteger tokenYScalingFactor);
 
+    //todo Is contract address equals LPToken address?
     @Cacheable(cacheNames = "tokenSwapRouterGetReservesCache",
             key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY", unless = "#result == null")
     Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY);

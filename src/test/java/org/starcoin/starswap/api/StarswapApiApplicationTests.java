@@ -80,8 +80,17 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
-//        String tokenXUSDTOnAptos = "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee::XUSDT::XUSDT";
-//        String tokenSTAROnAptos = "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee::STAR::STAR";
+        String tokenXUSDTOnAptos = "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee::XUSDT::XUSDT";
+        String tokenSTAROnAptos = "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee::STAR::STAR";
+        Pair<BigInteger, BigInteger> p = this.contractApiClient.tokenSwapRouterGetReserves(
+                "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
+                tokenXUSDTOnAptos, tokenSTAROnAptos);
+        System.out.println(p);
+        Pair<BigInteger, BigInteger> p2 = this.contractApiClient.tokenSwapRouterGetReserves(
+                "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
+                tokenSTAROnAptos, tokenXUSDTOnAptos);
+        System.out.println(p2);
+        if (true) return;
 //        BigInteger scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenXUSDTOnAptos);
 //        System.out.println(tokenXUSDTOnAptos + " scalingFactor: " + scalingFactor);
 //        scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenSTAROnAptos);

@@ -347,7 +347,7 @@ public class JsonRpcUtils {
         List<BigInteger> resultFields = contractCallV2(jsonRpcSession, contractAddress + "::"
                         + TOKEN_SWAP_SYRUP_SCRIPT_MODULE_NAME + "::query_vestar_amount",//
                 Collections.emptyList(),
-                Arrays.asList(accountAddress),
+                Collections.singletonList(accountAddress),
                 new TypeReference<List<BigInteger>>() {
                 });
         if (resultFields.size() > 0) {
