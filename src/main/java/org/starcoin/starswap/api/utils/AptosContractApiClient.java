@@ -2,6 +2,9 @@ package org.starcoin.starswap.api.utils;
 
 import com.novi.serde.SerializationError;
 import dev.aptos.bean.AccountResource;
+import dev.aptos.bean.CoinInfo;
+import dev.aptos.bean.Option;
+import dev.aptos.bean.OptionalAggregator;
 import dev.aptos.types.TypeInfo;
 import dev.aptos.utils.NodeApiUtils;
 import dev.aptos.utils.StructTagUtils;
@@ -104,7 +107,9 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public BigInteger getAccountVeStarAmount(String accountAddress) {
-        throw new UnsupportedOperationException();
+        //query_vestar_amount_by_staked_id_tokentype
+        //todo
+        return null;
     }
 
     @Override
@@ -224,4 +229,86 @@ public class AptosContractApiClient implements ContractApiClient {
         //todo ?
         return new Pair<>(DEFAULT_OPERATION_NUMERATOR, DEFAULT_OPERATION_DENUMERATOR);
     }
+
+    /// Boost multiplier calculation follows the formula
+    /// @param The amount of Vestar staked by users
+    /// @param The user's pledge amount on the current farm
+    /// @param Total stake on the current farm
+    /// return Boost factor Max:250
+    /// `boost factor = ( UserLockedVeSTARAmount / TotalVeSTARAmount ) / ( ( 2 / 3) * UserLockedFarmAmount / TotalLockedFarmAmount ) + 1  `
+    public BigInteger computeBoostFactor(BigInteger user_locked_vestar_amount,
+                                         BigInteger user_locked_farm_amount,
+                                         BigInteger total_farm_amount) {
+//    public fun compute_boost_factor(user_locked_vestar_amount: u128,
+//                                    user_locked_farm_amount: u128,
+//                                    total_farm_amount: u128): u64 {
+//        let factor = (math64::pow(10, 8) as u128);
+//
+//        let total_vestar_amount = option::get_with_default(&coin::supply<VESTAR::VESTAR>(), 0u128);
+//
+//        let boost_factor = 1 * factor;
+//        let dividend = SafeMath::mul_div(user_locked_vestar_amount, factor * 3, total_vestar_amount) * factor;
+//        let divisor  = SafeMath::mul_div(user_locked_farm_amount, factor * 2, total_farm_amount);
+//
+//        if(divisor != 0){
+//            boost_factor = ( dividend / divisor ) + boost_factor;
+//        };
+//        if (boost_factor > (25 * factor / 10)) {
+//            boost_factor = 25 * factor / 10;
+//        }else if( ( 1 * factor ) < boost_factor && boost_factor <  ( 1 * factor + 1 * ( factor / 100 ) ) ){
+//            boost_factor =  1 * factor + 1 * ( factor / 100 ) ;
+//        };
+//        let boost_factor = boost_factor / ( factor / 100 );
+//        return (boost_factor as u64)
+        return null;//todo
+    }
+
+    public BigInteger getBoostLockedVestarAmount(String tokenX, String tokenY, String accountAddress) {
+
+//    public fun get_boost_locked_vestar_amount<X: copy + drop + store, Y: copy + drop + store>(account: address): u128 acquires UserInfo {
+//        if (exists<UserInfo<X, Y>>(account)) {
+//            let user_info = borrow_global<UserInfo<X, Y>>(account);
+//            let vestar_value = VToken::value<VESTAR>(&user_info.locked_vetoken);
+//            vestar_value
+//        } else {
+//            0
+//        }
+        return null;
+    }
+
+    public BigInteger getCoinSupply(String token) {
+        StructTagUtils.StructTag coinType = StructTagUtils.parseStructTag(token);
+        String resourceType = "0x1::coin::CoinInfo<" + token + ">";
+        try {
+            AccountResource<CoinInfo> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    coinType.getAddress(), resourceType, CoinInfo.class, null);
+            Option<OptionalAggregator> s = resource.getData().getSupply();
+            if (s == null || s.getVec() == null || s.getVec().size() == 0) {
+                return null;
+            }
+            if (s.getVec().get(0).getAggregator() != null
+                    && s.getVec().get(0).getInteger().getVec() != null
+                    && s.getVec().get(0).getAggregator().getVec().size() > 0) {
+                throw new IllegalArgumentException("Not supported token: " + token);
+            }
+            if (s.getVec().get(0).getInteger() != null
+                    && s.getVec().get(0).getInteger().getVec() != null) {
+                if (s.getVec().get(0).getInteger().getVec().size() == 1) {
+                    return new BigInteger(s.getVec().get(0).getInteger().getVec().get(0).getValue());
+                } else {
+                    throw new RuntimeException("supply.getVec().get(0).getInteger().getVec().size() != 1");
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public BigInteger getVestarAmountByTokenTypeAndStakeId(String accountAddress, String token, Long stakeId) {
+        //query_vestar_amount_by_staked_id_tokentype
+        //todo
+        return null;
+    }
+
 }
