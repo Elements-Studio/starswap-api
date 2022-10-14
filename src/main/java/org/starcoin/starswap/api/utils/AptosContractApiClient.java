@@ -11,7 +11,6 @@ import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -148,11 +147,6 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY, BigInteger tokenXScalingFactor, BigInteger tokenYScalingFactor) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY) {
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
         String resourceType = lpTokenAddress + "::TokenSwap::TokenSwapPair<" + tp.getItem1() + ", " + tp.getItem2() + ">";
@@ -169,14 +163,12 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut,
-                                                  BigInteger amountIn, long swapFeeNumerator, long swapFeeDenumerator) {
-        Pair<BigInteger, BigInteger> reserves = tokenSwapRouterGetReserves(lpTokenAddress, tokenIn, tokenOut);
-        BigInteger reserve_in = reserves.getItem1();
-        BigInteger reserve_out = reserves.getItem2();
+    public BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, BigInteger reserveIn, BigInteger reserveOut,
+                                                  BigInteger amountIn,
+                                                  long swapFeeNumerator, long swapFeeDenumerator) {
         if (!(amountIn.compareTo(BigInteger.ZERO) > 0))
             throw new IllegalArgumentException("ERROR_ROUTER_PARAMETER_INVALID");
-        if (!(reserve_in.compareTo(BigInteger.ZERO) > 0 && reserve_out.compareTo(BigInteger.ZERO) > 0))
+        if (!(reserveIn.compareTo(BigInteger.ZERO) > 0 && reserveOut.compareTo(BigInteger.ZERO) > 0))
             throw new IllegalArgumentException("ERROR_ROUTER_PARAMETER_INVALID");
         if (!(swapFeeDenumerator > 0 && swapFeeNumerator > 0))
             throw new IllegalArgumentException("ERROR_SWAP_FEE_ALGORITHM_INVALID");
@@ -184,8 +176,8 @@ public class AptosContractApiClient implements ContractApiClient {
             throw new IllegalArgumentException("ERROR_SWAP_FEE_ALGORITHM_INVALID");
         BigInteger amount_in_with_fee = amountIn.multiply(BigInteger.valueOf(swapFeeDenumerator - swapFeeNumerator));
         //let denominator = reserve_in * (fee_denumerator as u128) + amount_in_with_fee;
-        BigInteger denominator = reserve_in.multiply(BigInteger.valueOf(swapFeeDenumerator)).add(amount_in_with_fee);
-        return amount_in_with_fee.multiply(reserve_out).divide(denominator);
+        BigInteger denominator = reserveIn.multiply(BigInteger.valueOf(swapFeeDenumerator)).add(amount_in_with_fee);
+        return amount_in_with_fee.multiply(reserveOut).divide(denominator);
     }
 
     @Override

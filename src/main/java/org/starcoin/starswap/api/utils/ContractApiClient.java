@@ -4,10 +4,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.data.model.Triple;
+import org.starcoin.starswap.api.service.OnChainServiceImpl;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.List;
 
 public interface ContractApiClient {
@@ -50,17 +52,52 @@ public interface ContractApiClient {
     @Cacheable(cacheNames = "tokenScalingFactorCache", key = "#token", unless = "#result == null")
     BigInteger getTokenScalingFactor(String token);
 
+
     @Cacheable(cacheNames = "tokenExchangeRateCache",
             key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY + ',' + #tokenXScalingFactor + '/' + #tokenYScalingFactor", unless = "#result == null")
-    BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY,
-                               BigInteger tokenXScalingFactor, BigInteger tokenYScalingFactor);
+    default BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY,
+                                       BigInteger tokenXScalingFactor, BigInteger tokenYScalingFactor) {
+        // use tokenSwapRouterGetReserves and tokenSwapRouterGetAmountOut to calculate exchange rate:
+        Pair<BigInteger, BigInteger> reserves = tokenSwapRouterGetReserves(lpTokenAddress, tokenX, tokenY);
+        BigInteger amountX = reserves.getItem1().divide(BigInteger.valueOf(100L));//try to swap tokenX of 1 percent reserve
+        BigInteger amountY = tokenSwapRouterGetAmountOut(lpTokenAddress,
+                reserves.getItem1(), reserves.getItem2(), amountX,
+                OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR,
+                OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
+//        System.out.println("----- tokenX: " + tokenX + ", ----- amountX: " + amountX);
+//        System.out.println("----- tokenY: " + tokenY + ", ----- amountY: " + amountY);
+        int scale = Math.max(tokenXScalingFactor.toString().length(), tokenYScalingFactor.toString().length()) - 1;
+        return new BigDecimal(amountY).divide(new BigDecimal(tokenYScalingFactor), scale, RoundingMode.HALF_UP)
+                .divide(new BigDecimal(amountX).divide(new BigDecimal(tokenXScalingFactor), scale, RoundingMode.HALF_UP),
+                        scale, RoundingMode.HALF_UP);
+
+//        // use another method?
+//        List<Object> results = JsonRpcUtils.tokenSwapOracleLibraryCurrentCumulativePrices(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
+//        BigInteger cumulativePriceX = new BigInteger(results.get(0).toString());
+//        BigInteger cumulativePriceY = new BigInteger(results.get(1).toString());
+    }
+
+    //    public BigDecimal getExchangeRate(String lpTokenAddress, String tokenX, String tokenY) {
+//        BigInteger tokenXScalingFactor = JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, tokenX);
+//        BigInteger tokenYScalingFactor = JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, tokenY);
+//        return getExchangeRate(lpTokenAddress, tokenX, tokenY, tokenXScalingFactor, tokenYScalingFactor);
+//    }
 
     //todo Is contract address equals LPToken address?
     @Cacheable(cacheNames = "tokenSwapRouterGetReservesCache",
             key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY", unless = "#result == null")
     Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY);
 
-    BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountIn,
+    default BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, String tokenIn, String tokenOut,
+                                                   BigInteger amountIn,
+                                                   long swapFeeNumerator, long swapFeeDenumerator) {
+        Pair<BigInteger, BigInteger> reserves = tokenSwapRouterGetReserves(lpTokenAddress, tokenIn, tokenOut);
+        return tokenSwapRouterGetAmountOut(lpTokenAddress, reserves.getItem1(), reserves.getItem2(), amountIn,
+                swapFeeNumerator, swapFeeDenumerator);
+    }
+
+    BigInteger tokenSwapRouterGetAmountOut(String lpTokenAddress, BigInteger reserveIn, BigInteger reserveOut,
+                                           BigInteger amountIn,
                                            long swapFeeNumerator, long swapFeeDenumerator);
 
     BigInteger tokenSwapRouterGetAmountIn(String lpTokenAddress, String tokenIn, String tokenOut, BigInteger amountOut,
