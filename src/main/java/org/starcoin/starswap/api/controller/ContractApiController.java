@@ -58,6 +58,6 @@ public class ContractApiController {
     public BigInteger getVestarAmountByTokenTypeAndStakeId(@RequestParam("accountAddress") String accountAddress,
                                                            @RequestParam("token") String token,
                                                            @RequestParam("stakeId") Long stakeId) {
-        return getAptosContractApiClient().getVestarAmountByTokenTypeAndStakeId(accountAddress, token, stakeId);
+        return contractApiClient.getVestarAmountByTokenTypeAndStakeId(accountAddress, token, stakeId);
     }
 }

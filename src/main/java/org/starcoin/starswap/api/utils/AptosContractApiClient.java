@@ -11,6 +11,10 @@ import dev.aptos.utils.StructTagUtils;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.data.model.Triple;
+import org.starcoin.starswap.api.utils.bean.MintRecordListT;
+import org.starcoin.starswap.api.utils.bean.MintRecordT;
+import org.starcoin.starswap.api.utils.bean.StarswapUserInfo;
+import org.starcoin.starswap.api.utils.bean.Treasury;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -132,14 +136,31 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public BigInteger getAccountVestarAmount(String accountAddress) {
         //query_vestar_amount
-        //todo
-        return null;
+        String resourceType = contractAddress + "::TokenSwapVestarMinter::Treasury";
+        try {
+            AccountResource<Treasury> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, resourceType, Treasury.class, null);
+            return resource.getData().getVtoken().getToken().getValue();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
+    public BigInteger getVestarAmountByTokenTypeAndStakeId(String accountAddress, String token, Long stakeId) {
         //query_vestar_amount_by_staked_id
-        throw new UnsupportedOperationException();
+        //query_vestar_amount_by_staked_id_tokentype
+        String resourceType = contractAddress + "::TokenSwapVestarMinter::MintRecordListT<" + token + ">";
+        try {
+            AccountResource<MintRecordListT> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, resourceType, MintRecordListT.class, null);
+            MintRecordT recordT = resource.getData().getItems().stream()
+                    .filter(i -> i.getId().equals(stakeId))
+                    .findFirst().orElse(null);
+            return recordT != null ? recordT.getMintedAmount() : BigInteger.ZERO;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -288,7 +309,6 @@ public class AptosContractApiClient implements ContractApiClient {
 
 
     public BigInteger getBoostLockedVestarAmount(String tokenX, String tokenY, String accountAddress) {
-
 //    public fun get_boost_locked_vestar_amount<X: copy + drop + store, Y: copy + drop + store>(account: address): u128 acquires UserInfo {
 //        if (exists<UserInfo<X, Y>>(account)) {
 //            let user_info = borrow_global<UserInfo<X, Y>>(account);
@@ -297,7 +317,16 @@ public class AptosContractApiClient implements ContractApiClient {
 //        } else {
 //            0
 //        }
-        return null;
+        String resourceType = contractAddress + "::TokenSwapFarmBoost::UserInfo";
+        try {
+            AccountResource<StarswapUserInfo> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, resourceType, StarswapUserInfo.class, null);
+            StarswapUserInfo userInfo = resource.getData();
+            return userInfo.getLockedVetoken().getToken().getValue();
+        } catch (IOException e) {
+            throw new RuntimeException(e);//todo throw error or return 0?
+        }
+        //return BigInteger.ZERO;
     }
 
     public BigInteger getCoinSupply(String token) {
@@ -329,10 +358,5 @@ public class AptosContractApiClient implements ContractApiClient {
         return null;
     }
 
-    public BigInteger getVestarAmountByTokenTypeAndStakeId(String accountAddress, String token, Long stakeId) {
-        //query_vestar_amount_by_staked_id_tokentype
-        //todo
-        return null;
-    }
 
 }

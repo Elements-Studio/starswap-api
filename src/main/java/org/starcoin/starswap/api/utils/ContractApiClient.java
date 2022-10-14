@@ -39,7 +39,7 @@ public interface ContractApiClient {
 
     BigInteger getAccountVestarAmount(String accountAddress);
 
-    BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag);
+    BigInteger getVestarAmountByTokenTypeAndStakeId(String accountAddress, String token, Long stakeId);
 
     default Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         BigInteger stakedLiquidity = tokenSwapFarmQueryTotalStake(farmAddress, tokenX, tokenY);

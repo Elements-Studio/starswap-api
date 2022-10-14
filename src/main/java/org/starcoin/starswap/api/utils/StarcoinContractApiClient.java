@@ -8,12 +8,9 @@ import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.data.model.Triple;
-import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.utils.JsonRpcClientUtils;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -142,8 +139,8 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
-        return JsonRpcUtils.getAccountVeStarAmountByStakeId(this.jsonRpcSession, this.contractAddress, accountAddress, stakeId, tokenTypeTag);
+    public BigInteger getVestarAmountByTokenTypeAndStakeId(String accountAddress, String token, Long stakeId) {
+        return JsonRpcUtils.getAccountVeStarAmountByStakeId(this.jsonRpcSession, this.contractAddress, accountAddress, stakeId, token);
     }
 
     // ------------------------
