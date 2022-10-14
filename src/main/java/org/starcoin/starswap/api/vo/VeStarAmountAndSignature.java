@@ -2,8 +2,11 @@ package org.starcoin.starswap.api.vo;
 
 import java.math.BigInteger;
 
+/**
+ * todo rename to VestarAmountAndSignature?
+ */
 public class VeStarAmountAndSignature {
-    private BigInteger veStarAmount;
+    private BigInteger veStarAmount;//todo rename to vestarAmount?
     private String signature;
 
     public VeStarAmountAndSignature() {

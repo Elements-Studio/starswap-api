@@ -68,7 +68,7 @@ public interface OnChainService {
 
     List<SyrupStake> getSyrupPoolStakeList(SyrupPool syrupPool, String accountAddress);
 
-    BigInteger getAccountVeStarAmount(String accountAddress);
+    BigInteger getAccountVestarAmount(String accountAddress);
 
-    BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag);
+    BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag);
 }

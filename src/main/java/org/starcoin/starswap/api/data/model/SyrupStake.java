@@ -19,7 +19,7 @@ public class SyrupStake {
 
     private BigInteger expectedGain;
 
-    private BigInteger veStarAmount;
+    private BigInteger veStarAmount;//todo rename to veStarAmount?
 
     private String tokenTypeTag;
 

@@ -137,12 +137,12 @@ public class StarcoinContractApiClient implements ContractApiClient {
 
 
     @Override
-    public BigInteger getAccountVeStarAmount(String accountAddress) {
+    public BigInteger getAccountVestarAmount(String accountAddress) {
         return JsonRpcUtils.getAccountVeStarAmount(this.jsonRpcSession, this.contractAddress, accountAddress);
     }
 
     @Override
-    public BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
+    public BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
         return JsonRpcUtils.getAccountVeStarAmountByStakeId(this.jsonRpcSession, this.contractAddress, accountAddress, stakeId, tokenTypeTag);
     }
 

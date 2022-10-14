@@ -37,9 +37,9 @@ public interface ContractApiClient {
     Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress,
                                                                                       String token);
 
-    BigInteger getAccountVeStarAmount(String accountAddress);
+    BigInteger getAccountVestarAmount(String accountAddress);
 
-    BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag);
+    BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag);
 
     AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress);
 

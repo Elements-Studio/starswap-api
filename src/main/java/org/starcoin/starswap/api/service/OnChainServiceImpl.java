@@ -899,13 +899,13 @@ public class OnChainServiceImpl implements OnChainService {
     }
 
     @Override
-    public BigInteger getAccountVeStarAmount(String accountAddress) {
-        return this.contractApiClient.getAccountVeStarAmount(accountAddress);
+    public BigInteger getAccountVestarAmount(String accountAddress) {
+        return this.contractApiClient.getAccountVestarAmount(accountAddress);
     }
 
     @Override
-    public BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
-        return this.contractApiClient.getAccountVeStarAmountByStakeId(accountAddress, stakeId, tokenTypeTag);
+    public BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
+        return this.contractApiClient.getAccountVestarAmountByStakeId(accountAddress, stakeId, tokenTypeTag);
     }
 
 }

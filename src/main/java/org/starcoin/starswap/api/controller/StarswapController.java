@@ -240,34 +240,34 @@ public class StarswapController {
         }
         List<SyrupStake> stakeList = onChainService.getSyrupPoolStakeList(syrupPool, accountAddress);
         stakeList.forEach(s -> {
-            BigInteger veStarAmount = onChainService.getAccountVeStarAmountByStakeId(accountAddress, s.getId(), s.getTokenTypeTag());
-            s.setVeStarAmount(veStarAmount);
+            BigInteger vestarAmount = onChainService.getAccountVestarAmountByStakeId(accountAddress, s.getId(), s.getTokenTypeTag());
+            s.setVeStarAmount(vestarAmount);
         });
         return stakeList;
     }
 
-    @GetMapping(path = "getAccountVeStarAmount")
-    public BigInteger getAccountVeStarAmount(
+    @GetMapping(path = {"getAccountVeStarAmount", "getAccountVestarAmount"})
+    public BigInteger getAccountVestarAmount(
             @RequestParam(value = "accountAddress", required = true) String accountAddress
     ) {
-        return onChainService.getAccountVeStarAmount(accountAddress);
+        return onChainService.getAccountVestarAmount(accountAddress);
     }
 
-    @GetMapping(path = "getAccountVeStarAmountAndBoostSignature")
-    public VeStarAmountAndSignature getAccountVeStarAmountAndBoostSignature(
+    @GetMapping(path = {"getAccountVeStarAmountAndBoostSignature", "getAccountVestarAmountAndBoostSignature"})
+    public VeStarAmountAndSignature getAccountVestarAmountAndBoostSignature(
             @RequestParam(value = "accountAddress", required = true) String accountAddress
     ) {
-        BigInteger amount = onChainService.getAccountVeStarAmount(accountAddress);
+        BigInteger amount = onChainService.getAccountVestarAmount(accountAddress);
         String signature = this.farmingBoostWhitelist.get(accountAddress);
         return new VeStarAmountAndSignature(amount, signature);
     }
 
-    @GetMapping(path = "getAccountStakedVeStarAmount")
-    public BigInteger getAccountStakedVeStarAmount(
+    @GetMapping(path = {"getAccountStakedVeStarAmount", "getAccountStakedveStarAmount"})
+    public BigInteger getAccountStakedVestarAmount(
             @RequestParam(value = "accountAddress", required = true) String accountAddress,
             @RequestParam(value = "id", required = true) Long stakeId,
             @RequestParam(value = "t", required = true) String tokenTypeTag) {
-        return onChainService.getAccountVeStarAmountByStakeId(accountAddress, stakeId, tokenTypeTag);
+        return onChainService.getAccountVestarAmountByStakeId(accountAddress, stakeId, tokenTypeTag);
     }
 
     @PostMapping(path = "getTokenPairReservesList")

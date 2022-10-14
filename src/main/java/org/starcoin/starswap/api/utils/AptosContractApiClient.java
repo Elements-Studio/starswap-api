@@ -106,14 +106,14 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger getAccountVeStarAmount(String accountAddress) {
-        //query_vestar_amount_by_staked_id_tokentype
+    public BigInteger getAccountVestarAmount(String accountAddress) {
+        //query_vestar_amount
         //todo
         return null;
     }
 
     @Override
-    public BigInteger getAccountVeStarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
+    public BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
         throw new UnsupportedOperationException();
     }
 
