@@ -11,13 +11,11 @@ import dev.aptos.utils.StructTagUtils;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.data.model.Triple;
-import org.starcoin.starswap.api.utils.bean.MintRecordListT;
-import org.starcoin.starswap.api.utils.bean.MintRecordT;
-import org.starcoin.starswap.api.utils.bean.StarswapUserInfo;
-import org.starcoin.starswap.api.utils.bean.Treasury;
+import org.starcoin.starswap.api.utils.bean.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -108,13 +106,58 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public BigInteger syrupPoolQueryReleasePerSecondV2(String poolAddress, String token) {
-//        List<BigInteger> syrupTotalInfo = syrupPoolQuerySyrupInfo(jsonRpcSession, poolAddress);
-//        BigInteger total_alloc_point = syrupTotalInfo.get(0);
-//        BigInteger pool_release_per_second = syrupTotalInfo.get(1);
-//        List<BigInteger> poolInfo = syrupPoolQueryPoolInfoV2(jsonRpcSession, poolAddress, token);
-//        BigInteger alloc_point = poolInfo.get(0);
-//        return pool_release_per_second.multiply(alloc_point).divide(total_alloc_point);
-        throw new UnsupportedOperationException();
+        YieldFarmingGlobalPoolInfo syrupTotalInfo = syrupPoolQuerySyrupInfo();
+        BigInteger total_alloc_point = syrupTotalInfo.getTotalAllocPoint();
+        BigInteger pool_release_per_second = syrupTotalInfo.getPoolReleasePerSecond();
+
+        BigInteger alloc_point = BigInteger.ZERO;
+        String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
+                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
+        try {
+            AccountResource<FarmingAssetExtend> extResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, extResourceType, FarmingAssetExtend.class, null);
+            alloc_point = new BigInteger(extResource.getData().getAllocPoint());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return pool_release_per_second.multiply(alloc_point).divide(total_alloc_point);
+    }
+
+    public YieldFarmingGlobalPoolInfo syrupPoolQuerySyrupInfo() {
+        String resourceType = contractAddress + "::YieldFarmingV3::YieldFarmingGlobalPoolInfo<" +
+                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ">";
+        try {
+            AccountResource<YieldFarmingGlobalPoolInfo> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, resourceType, YieldFarmingGlobalPoolInfo.class, null);
+            return resource.getData();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @return (alloc_point, asset_total_amount, asset_total_weight, harvest_index)
+     */
+    public List<BigInteger> syrupPoolQueryPoolInfoV2(String token) {
+        List<BigInteger> resultFields = new ArrayList<>();
+        try {
+            String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
+                    contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
+            AccountResource<FarmingAssetExtend> extResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, extResourceType, FarmingAssetExtend.class, null);
+            resultFields.add(new BigInteger(extResource.getData().getAllocPoint()));
+            resultFields.add(new BigInteger(extResource.getData().getAssetTotalAmount()));
+
+            String resourceType = contractAddress + "::YieldFarmingV3::FarmingAsset<" +
+                    contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
+            AccountResource<FarmingAsset> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, resourceType, FarmingAsset.class, null);
+            resultFields.add(new BigInteger(resource.getData().getAssetTotalWeight()));
+            resultFields.add(new BigInteger(resource.getData().getHarvestIndex()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return resultFields;
     }
 
     @Override

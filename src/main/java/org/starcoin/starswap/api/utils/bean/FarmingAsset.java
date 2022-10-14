@@ -27,6 +27,54 @@ public class FarmingAsset {
     @JsonProperty("alive")//: bool,
     private Boolean alive;//todo is this type ok?
 
+    public String getAssetTotalWeight() {
+        return assetTotalWeight;
+    }
+
+    public void setAssetTotalWeight(String assetTotalWeight) {
+        this.assetTotalWeight = assetTotalWeight;
+    }
+
+    public String getHarvestIndex() {
+        return harvestIndex;
+    }
+
+    public void setHarvestIndex(String harvestIndex) {
+        this.harvestIndex = harvestIndex;
+    }
+
+    public Long getLastUpdateTimestamp() {
+        return lastUpdateTimestamp;
+    }
+
+    public void setLastUpdateTimestamp(Long lastUpdateTimestamp) {
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    public String getReleasePerSecond() {
+        return releasePerSecond;
+    }
+
+    public void setReleasePerSecond(String releasePerSecond) {
+        this.releasePerSecond = releasePerSecond;
+    }
+
+    public Long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Long startTime) {
+        this.startTime = startTime;
+    }
+
+    public Boolean getAlive() {
+        return alive;
+    }
+
+    public void setAlive(Boolean alive) {
+        this.alive = alive;
+    }
+
     @Override
     public String toString() {
         return "FarmingAsset{" +
