@@ -11,7 +11,6 @@ import dev.aptos.utils.StructTagUtils;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.data.model.Triple;
-import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -57,36 +56,56 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY) {
+        //TokenSwapFarmScript::query_total_stake
         throw new UnsupportedOperationException();
     }
 
     @Override
     public BigInteger tokenSwapFarmQueryReleasePerSecond(String farmAddress, String tokenX, String tokenY) {
+        //TokenSwapFarmScript::query_release_per_second
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress, String tokenX, String tokenY) {
+        //TokenSwapFarmRouter::query_info_v2
+        //TokenSwapFarmRouter::query_global_pool_info
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Integer tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
+        //TokenSwapFarmScript::get_farm_multiplier
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Long tokenSwapFarmGetBoostFactor(String farmAddress, String tokenX, String tokenY, String accountAddress) {
+        //TokenSwapFarmRouter::get_boost_factor
         throw new UnsupportedOperationException();
     }
 
     @Override
+    public BigInteger tokenSwapFarmGetAccountStakedLiquidity(String farmAddress, String tokenX, String tokenY, String accountAddress) {
+        //TokenSwapFarmScript::query_stake
+        return null;//todo
+    }
+
+    @Override
     public BigInteger syrupPoolQueryTotalStake(String poolAddress, String token) {
+        //List<BigInteger> info = syrupPoolQueryPoolInfoV2(jsonRpcSession, poolAddress, token);
+        //return info.get(1);
         throw new UnsupportedOperationException();
     }
 
     @Override
     public BigInteger syrupPoolQueryReleasePerSecondV2(String poolAddress, String token) {
+//        List<BigInteger> syrupTotalInfo = syrupPoolQuerySyrupInfo(jsonRpcSession, poolAddress);
+//        BigInteger total_alloc_point = syrupTotalInfo.get(0);
+//        BigInteger pool_release_per_second = syrupTotalInfo.get(1);
+//        List<BigInteger> poolInfo = syrupPoolQueryPoolInfoV2(jsonRpcSession, poolAddress, token);
+//        BigInteger alloc_point = poolInfo.get(0);
+//        return pool_release_per_second.multiply(alloc_point).divide(total_alloc_point);
         throw new UnsupportedOperationException();
     }
 
@@ -102,6 +121,7 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress, String token) {
+        //TokenSwapSyrup::query_all_multiplier_pools
         throw new UnsupportedOperationException();
     }
 
@@ -114,26 +134,13 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Pair<BigInteger, BigInteger> getReservesByLiquidity(String lpTokenAddress, String tokenX, String tokenY, BigInteger liquidity) {
+        //query_vestar_amount_by_staked_id
         throw new UnsupportedOperationException();
     }
 
     @Override
     public BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY) {
+        //TokenSwapRouter::total_liquidity
         throw new UnsupportedOperationException();
     }
 

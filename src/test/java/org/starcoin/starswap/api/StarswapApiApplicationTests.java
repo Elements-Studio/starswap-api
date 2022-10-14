@@ -124,19 +124,19 @@ class StarswapApiApplicationTests {
         System.out.println(h);
         if (true) return;
 
-        try {
-            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://main-seed.starcoin.org", null);
-            AccountFarmStakeInfo accountFarmStakeInfo = contractApiClient.getAccountFarmStakeInfo(
-                    "0x8c109349c6bd91411d6bc962e080c4a3",
-                    "0x8c109349c6bd91411d6bc962e080c4a3",
-                    "0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR",
-                    "0x00000000000000000000000000000001::STC::STC",
-                    "...");
-            System.out.println(accountFarmStakeInfo);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        if (true) return;
+//        try {
+//            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://main-seed.starcoin.org", null);
+//            AccountFarmStakeInfo accountFarmStakeInfo = contractApiClient.getAccountFarmStakeInfo(
+//                    "0x8c109349c6bd91411d6bc962e080c4a3",
+//                    "0x8c109349c6bd91411d6bc962e080c4a3",
+//                    "0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR",
+//                    "0x00000000000000000000000000000001::STC::STC",
+//                    "...");
+//            System.out.println(accountFarmStakeInfo);
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+//        if (true) return;
 
         LiquidityTokenFarm farm = liquidityTokenFarmService.findOneByTokenIdPair("FAI", "STC");
         Integer farmMultiplier = onChainService.getFarmRewardMultiplier(farm);

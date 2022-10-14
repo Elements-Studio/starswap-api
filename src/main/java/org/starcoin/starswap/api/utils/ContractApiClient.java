@@ -41,11 +41,40 @@ public interface ContractApiClient {
 
     BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag);
 
-    AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress);
+    default Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
+        BigInteger stakedLiquidity = tokenSwapFarmQueryTotalStake(farmAddress, tokenX, tokenY);
+        return getReservesByLiquidity(lpTokenAddress, tokenX, tokenY, stakedLiquidity);
+    }
 
-    Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY);
+    default Pair<BigInteger, BigInteger> getReservesByLiquidity(String lpTokenAddress, String tokenX, String tokenY, BigInteger liquidity) {
+        //     return JsonRpcUtils.getReservesByLiquidity(this.jsonRpcSession, lpTokenAddress, tokenX, tokenY, liquidity);
+        Pair<BigInteger, BigInteger> totalReservesPair = tokenSwapRouterGetReserves(lpTokenAddress, tokenX, tokenY);
+        //System.out.println("totalReservesPair: " + totalReservesPair);
+        BigInteger totalLiquidity = tokenSwapRouterGetTotalLiquidity(lpTokenAddress, tokenX, tokenY);
+        //System.out.println("totalLiquidity: " + totalLiquidity);
+        return new Pair<>(
+                totalReservesPair.getItem1().multiply(liquidity).divide(totalLiquidity),
+                totalReservesPair.getItem2().multiply(liquidity).divide(totalLiquidity)
+        );
+    }
 
-    Pair<BigInteger, BigInteger> getReservesByLiquidity(String lpTokenAddress, String tokenX, String tokenY, BigInteger liquidity);
+    default AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress) {
+        BigInteger stakedLiquidity = tokenSwapFarmGetAccountStakedLiquidity(farmAddress, tokenX, tokenY, accountAddress);
+        BigInteger farmTotalLiquidity = tokenSwapFarmQueryTotalStake(farmAddress, tokenX, tokenY);
+        BigDecimal sharePercentage = new BigDecimal(stakedLiquidity.multiply(BigInteger.valueOf(100))).divide(new BigDecimal(farmTotalLiquidity), 9, RoundingMode.HALF_UP);
+        Pair<BigInteger, BigInteger> stakedAmountPair = getReservesByLiquidity(lpTokenAddress, tokenX, tokenY, stakedLiquidity);
+
+        AccountFarmStakeInfo farmStakeInfo = new AccountFarmStakeInfo();
+        farmStakeInfo.setStakedLiquidity(stakedLiquidity);
+        farmStakeInfo.setFarmTotalLiquidity(farmTotalLiquidity);
+        farmStakeInfo.setSharePercentage(sharePercentage);
+        farmStakeInfo.setTokenXAmount(new AccountFarmStakeInfo.TokenAmount(null, tokenX, stakedAmountPair.getItem1()));
+        farmStakeInfo.setTokenYAmount(new AccountFarmStakeInfo.TokenAmount(null, tokenY, stakedAmountPair.getItem2()));
+        //farmStakeInfo.setStakedAmountInUsd();
+        return farmStakeInfo;
+    }
+
+    BigInteger tokenSwapFarmGetAccountStakedLiquidity(String farmAddress, String tokenX, String tokenY, String accountAddress);
 
     BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY);
 

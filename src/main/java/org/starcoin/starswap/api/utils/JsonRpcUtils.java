@@ -40,21 +40,21 @@ public class JsonRpcUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(LiquidityPoolService.class);
 
-    public static Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(JSONRPC2Session jsonRpcSession, String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
-        BigInteger stakedLiquidity = tokenSwapFarmQueryTotalStake(jsonRpcSession, farmAddress, tokenX, tokenY);
-        return getReservesByLiquidity(jsonRpcSession, lpTokenAddress, tokenX, tokenY, stakedLiquidity);
-    }
+//    public static Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(JSONRPC2Session jsonRpcSession, String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
+//        BigInteger stakedLiquidity = tokenSwapFarmQueryTotalStake(jsonRpcSession, farmAddress, tokenX, tokenY);
+//        return getReservesByLiquidity(jsonRpcSession, lpTokenAddress, tokenX, tokenY, stakedLiquidity);
+//    }
 
-    public static Pair<BigInteger, BigInteger> getReservesByLiquidity(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY, BigInteger liquidity) {
-        Pair<BigInteger, BigInteger> totalReservesPair = tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
-        //System.out.println("totalReservesPair: " + totalReservesPair);
-        BigInteger totalLiquidity = tokenSwapRouterTotalLiquidity(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
-        //System.out.println("totalLiquidity: " + totalLiquidity);
-        return new Pair<>(
-                totalReservesPair.getItem1().multiply(liquidity).divide(totalLiquidity),
-                totalReservesPair.getItem2().multiply(liquidity).divide(totalLiquidity)
-        );
-    }
+//    public static Pair<BigInteger, BigInteger> getReservesByLiquidity(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY, BigInteger liquidity) {
+//        Pair<BigInteger, BigInteger> totalReservesPair = tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
+//        //System.out.println("totalReservesPair: " + totalReservesPair);
+//        BigInteger totalLiquidity = tokenSwapRouterTotalLiquidity(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
+//        //System.out.println("totalLiquidity: " + totalLiquidity);
+//        return new Pair<>(
+//                totalReservesPair.getItem1().multiply(liquidity).divide(totalLiquidity),
+//                totalReservesPair.getItem2().multiply(liquidity).divide(totalLiquidity)
+//        );
+//    }
 
     // public fun total_liquidity<X: store, Y: store>(): u128
     public static BigInteger tokenSwapRouterTotalLiquidity(JSONRPC2Session jsonRpcSession, String lpTokenAddress, String tokenX, String tokenY) {
