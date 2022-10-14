@@ -54,6 +54,10 @@ public class AptosContractApiClient implements ContractApiClient {
         throw new IllegalArgumentException("Two tokens are equal.");
     }
 
+    private String getVestarCoinType() {
+        return contractAddress + "::VESTAR::VESTAR";
+    }
+
     @Override
     public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY) {
         //TokenSwapFarmScript::query_total_stake
@@ -237,38 +241,51 @@ public class AptosContractApiClient implements ContractApiClient {
         return new Pair<>(DEFAULT_OPERATION_NUMERATOR, DEFAULT_OPERATION_DENUMERATOR);
     }
 
-    /// Boost multiplier calculation follows the formula
-    /// @param The amount of Vestar staked by users
-    /// @param The user's pledge amount on the current farm
-    /// @param Total stake on the current farm
-    /// return Boost factor Max:250
-    /// `boost factor = ( UserLockedVeSTARAmount / TotalVeSTARAmount ) / ( ( 2 / 3) * UserLockedFarmAmount / TotalLockedFarmAmount ) + 1  `
     public BigInteger computeBoostFactor(BigInteger user_locked_vestar_amount,
                                          BigInteger user_locked_farm_amount,
                                          BigInteger total_farm_amount) {
+
+        /// Boost multiplier calculation follows the formula
+        /// @param The amount of Vestar staked by users
+        /// @param The user's pledge amount on the current farm
+        /// @param Total stake on the current farm
+        /// return Boost factor Max:250
+        /// `boost factor = ( UserLockedVeSTARAmount / TotalVeSTARAmount ) / ( ( 2 / 3) * UserLockedFarmAmount / TotalLockedFarmAmount ) + 1  `
+
 //    public fun compute_boost_factor(user_locked_vestar_amount: u128,
 //                                    user_locked_farm_amount: u128,
 //                                    total_farm_amount: u128): u64 {
 //        let factor = (math64::pow(10, 8) as u128);
-//
+        BigInteger factor = BigInteger.TEN.pow(8);
 //        let total_vestar_amount = option::get_with_default(&coin::supply<VESTAR::VESTAR>(), 0u128);
-//
+        BigInteger total_vestar_amount = getCoinSupply(getVestarCoinType());
+        if (total_vestar_amount == null) {
+            total_vestar_amount = BigInteger.ZERO;
+        }
 //        let boost_factor = 1 * factor;
+        BigInteger boost_factor = factor;
 //        let dividend = SafeMath::mul_div(user_locked_vestar_amount, factor * 3, total_vestar_amount) * factor;
+        BigInteger dividend = user_locked_vestar_amount.multiply(factor.multiply(BigInteger.valueOf(3))).divide(total_vestar_amount).multiply(factor);
 //        let divisor  = SafeMath::mul_div(user_locked_farm_amount, factor * 2, total_farm_amount);
-//
-//        if(divisor != 0){
-//            boost_factor = ( dividend / divisor ) + boost_factor;
-//        };
+        BigInteger divisor = user_locked_farm_amount.multiply(factor.multiply(BigInteger.valueOf(2))).multiply(total_farm_amount);
+        if (divisor.compareTo(BigInteger.ZERO) != 0) {
+            boost_factor = dividend.divide(divisor).add(boost_factor);
+        }
 //        if (boost_factor > (25 * factor / 10)) {
+        if (boost_factor.compareTo(factor.multiply(BigInteger.valueOf(25)).divide(BigInteger.TEN)) > 0) {
 //            boost_factor = 25 * factor / 10;
+            boost_factor = factor.multiply(BigInteger.valueOf(25)).divide(BigInteger.TEN);
 //        }else if( ( 1 * factor ) < boost_factor && boost_factor <  ( 1 * factor + 1 * ( factor / 100 ) ) ){
+        } else if (factor.compareTo(boost_factor) < 0
+                && boost_factor.compareTo(factor.add(factor.divide(BigInteger.valueOf(100)))) < 0) {
 //            boost_factor =  1 * factor + 1 * ( factor / 100 ) ;
-//        };
+            boost_factor = factor.add(factor.divide(BigInteger.valueOf(100)));
+        }
 //        let boost_factor = boost_factor / ( factor / 100 );
 //        return (boost_factor as u64)
-        return null;//todo
+        return boost_factor.divide(factor.divide(BigInteger.valueOf(100)));
     }
+
 
     public BigInteger getBoostLockedVestarAmount(String tokenX, String tokenY, String accountAddress) {
 
