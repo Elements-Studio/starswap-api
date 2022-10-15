@@ -99,16 +99,22 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public BigInteger syrupPoolQueryTotalStake(String poolAddress, String token) {
-        //List<BigInteger> info = syrupPoolQueryPoolInfoV2(jsonRpcSession, poolAddress, token);
-        //return info.get(1);
-        throw new UnsupportedOperationException();
+        String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
+                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
+        try {
+            AccountResource<FarmingAssetExtend> extResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, extResourceType, FarmingAssetExtend.class, null);
+            return new BigInteger(extResource.getData().getAssetTotalAmount());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public BigInteger syrupPoolQueryReleasePerSecondV2(String poolAddress, String token) {
-        YieldFarmingGlobalPoolInfo syrupTotalInfo = syrupPoolQuerySyrupInfo();
-        BigInteger total_alloc_point = syrupTotalInfo.getTotalAllocPoint();
-        BigInteger pool_release_per_second = syrupTotalInfo.getPoolReleasePerSecond();
+        YieldFarmingGlobalPoolInfo syrupGlobalInfo = syrupPoolQuerySyrupInfo();
+        BigInteger total_alloc_point = syrupGlobalInfo.getTotalAllocPoint();
+        BigInteger pool_release_per_second = syrupGlobalInfo.getPoolReleasePerSecond();
 
         BigInteger alloc_point = BigInteger.ZERO;
         String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
@@ -162,7 +168,31 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public List<SyrupStake> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
-        throw new UnsupportedOperationException();
+        String listResourceType = contractAddress + "::YieldFarmingV3::StakeList<" +
+                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
+        String syrupStakesResourceType =  contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + token + ">";
+        try {
+            AccountResource<StakeList> stakeListResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, listResourceType, StakeList.class, null);
+            AccountResource<SyrupStakeList> syrupStakesResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, syrupStakesResourceType, SyrupStakeList.class, null);
+            List<SyrupStake> stakeList = new ArrayList<>();
+            for (Stake s : stakeListResource.getData().getItems()) {
+                SyrupStake t = new SyrupStake();
+                t.setId(s.getId());
+                SyrupStakeList.SyrupStake syrupStakeOnChain =  syrupStakesResource.getData().getItems().stream()
+                         .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
+                t.setAmount(syrupStakeOnChain.getTokenAmount());
+                t.setEndTime(syrupStakeOnChain.getEndTime());
+                t.setStartTime(syrupStakeOnChain.getStartTime());
+                t.setStepwiseMultiplier(syrupStakeOnChain.getStepwiseMultiplier().intValue());
+                t.setTokenTypeTag(token);
+                stakeList.add(t);
+            }
+            return stakeList;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
