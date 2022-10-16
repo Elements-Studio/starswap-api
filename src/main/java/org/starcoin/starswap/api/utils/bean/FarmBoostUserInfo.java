@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigInteger;
 
-public class StarswapUserInfo {
+public class FarmBoostUserInfo {
     //    struct UserInfo<phantom X, phantom Y> has key, store {
     @JsonProperty("boost_factor")//: u64,
     private Long boostFactor;

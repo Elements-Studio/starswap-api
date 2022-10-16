@@ -88,13 +88,33 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public Long tokenSwapFarmGetBoostFactor(String farmAddress, String tokenX, String tokenY, String accountAddress) {
         //TokenSwapFarmRouter::get_boost_factor
-        throw new UnsupportedOperationException();
+        FarmBoostUserInfo userInfo = getFarmBoostUserInfo(tokenX, tokenY, accountAddress);
+        return userInfo != null ? userInfo.getBoostFactor() : 0L;
     }
 
     @Override
     public BigInteger tokenSwapFarmGetAccountStakedLiquidity(String farmAddress, String tokenX, String tokenY, String accountAddress) {
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
         //TokenSwapFarmScript::query_stake
-        return null;//todo
+        String farmPoolStakeResType = contractAddress + "::TokenSwapFarm::FarmPoolStake<" + tp.getItem1() +
+                ", " + tp.getItem2() + ">";
+        try {
+            AccountResource<FarmPoolStake> farmPoolStakeResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, farmPoolStakeResType, FarmPoolStake.class, null);
+            Long stakeId = farmPoolStakeResource.getData().getId();
+
+            String stakeListExtResType = contractAddress + "::YieldFarmingV3::StakeListExtend<" +
+                    contractAddress + "::TokenSwapGovPoolType::PoolTypeFarmPool, " +
+                    contractAddress + "::TokenSwap::LiquidityToken<" + tp.getItem1() + ", " + tp.getItem2() + ">" +
+                    ">";
+            AccountResource<StakeListExtend> stakeListExtRes = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, stakeListExtResType, StakeListExtend.class, null);
+            StakeExtend stakeExtend = stakeListExtRes.getData().getItems().stream()
+                    .filter(i -> stakeId.equals(i.getId())).findFirst().orElse(null);
+            return stakeExtend != null ? stakeExtend.getAssetAmount() : BigInteger.ZERO;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -120,9 +140,9 @@ public class AptosContractApiClient implements ContractApiClient {
         String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
                 contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
         try {
-            AccountResource<FarmingAssetExtend> extResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+            AccountResource<FarmingAssetExtend> assetExtResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     contractAddress, extResourceType, FarmingAssetExtend.class, null);
-            alloc_point = new BigInteger(extResource.getData().getAllocPoint());
+            alloc_point = new BigInteger(assetExtResource.getData().getAllocPoint());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -170,18 +190,18 @@ public class AptosContractApiClient implements ContractApiClient {
     public List<SyrupStake> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
         String listResourceType = contractAddress + "::YieldFarmingV3::StakeList<" +
                 contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
-        String syrupStakesResourceType =  contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + token + ">";
+        String syrupStakesResourceType = contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + token + ">";
         try {
             AccountResource<StakeList> stakeListResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    contractAddress, listResourceType, StakeList.class, null);
+                    accountAddress, listResourceType, StakeList.class, null);
             AccountResource<SyrupStakeList> syrupStakesResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    contractAddress, syrupStakesResourceType, SyrupStakeList.class, null);
+                    accountAddress, syrupStakesResourceType, SyrupStakeList.class, null);
             List<SyrupStake> stakeList = new ArrayList<>();
             for (Stake s : stakeListResource.getData().getItems()) {
                 SyrupStake t = new SyrupStake();
                 t.setId(s.getId());
-                SyrupStakeList.SyrupStake syrupStakeOnChain =  syrupStakesResource.getData().getItems().stream()
-                         .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
+                SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakesResource.getData().getItems().stream()
+                        .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
                 t.setAmount(syrupStakeOnChain.getTokenAmount());
                 t.setEndTime(syrupStakeOnChain.getEndTime());
                 t.setStartTime(syrupStakeOnChain.getStartTime());
@@ -203,7 +223,7 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress, String token) {
         //TokenSwapSyrup::query_all_multiplier_pools
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(); //todo waiting on-chain contract impl.
     }
 
     @Override
@@ -390,16 +410,23 @@ public class AptosContractApiClient implements ContractApiClient {
 //        } else {
 //            0
 //        }
-        String resourceType = contractAddress + "::TokenSwapFarmBoost::UserInfo";
+        FarmBoostUserInfo userInfo = getFarmBoostUserInfo(tokenX, tokenY, accountAddress);
+        return userInfo != null ? userInfo.getLockedVetoken().getToken().getValue() : BigInteger.ZERO;
+    }
+
+    private FarmBoostUserInfo getFarmBoostUserInfo(String tokenX, String tokenY, String accountAddress) {
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        String resourceType = contractAddress + "::TokenSwapFarmBoost::UserInfo<" + tp.getItem1() + "," + tp.getItem2() + " >";
+        FarmBoostUserInfo userInfo;
         try {
-            AccountResource<StarswapUserInfo> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    accountAddress, resourceType, StarswapUserInfo.class, null);
-            StarswapUserInfo userInfo = resource.getData();
-            return userInfo.getLockedVetoken().getToken().getValue();
+            AccountResource<FarmBoostUserInfo> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, resourceType, FarmBoostUserInfo.class, null);
+            userInfo = resource.getData();
         } catch (IOException e) {
-            throw new RuntimeException(e);//todo throw error or return 0?
+            //return BigInteger.ZERO;
+            throw new RuntimeException(e);//todo throw error or return null?
         }
-        //return BigInteger.ZERO;
+        return userInfo;
     }
 
     public BigInteger getCoinSupply(String token) {
