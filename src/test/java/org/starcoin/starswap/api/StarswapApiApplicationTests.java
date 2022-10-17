@@ -139,7 +139,7 @@ class StarswapApiApplicationTests {
 //        if (true) return;
 
         LiquidityTokenFarm farm = liquidityTokenFarmService.findOneByTokenIdPair("FAI", "STC");
-        Integer farmMultiplier = onChainService.getFarmRewardMultiplier(farm);
+        Long farmMultiplier = onChainService.getFarmRewardMultiplier(farm);
         System.out.println(farmMultiplier);
 
         if (true) return;

@@ -48,7 +48,7 @@ public class LiquidityTokenFarm {
     private String rewardTokenId;
 
     @Column
-    private Integer rewardMultiplier;
+    private Long rewardMultiplier;
 
     @Column(precision = 31, scale = 0)
     private BigInteger dailyReward;
@@ -181,11 +181,11 @@ public class LiquidityTokenFarm {
         this.rewardTokenId = rewardTokenId;
     }
 
-    public Integer getRewardMultiplier() {
+    public Long getRewardMultiplier() {
         return rewardMultiplier;
     }
 
-    public void setRewardMultiplier(Integer rewardMultiplier) {
+    public void setRewardMultiplier(Long rewardMultiplier) {
         this.rewardMultiplier = rewardMultiplier;
     }
 

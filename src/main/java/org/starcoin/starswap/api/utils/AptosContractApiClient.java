@@ -63,26 +63,65 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY) {
         //TokenSwapFarmScript::query_total_stake
-        throw new UnsupportedOperationException();
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        String lpToken = getLiquidityTokenStructTag(tp);
+        FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend("PoolTypeFarmPool", lpToken);
+        return new BigInteger(farmingAssetExtend.getAssetTotalAmount());
     }
 
     @Override
-    public BigInteger tokenSwapFarmQueryReleasePerSecond(String farmAddress, String tokenX, String tokenY) {
+    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String tokenX, String tokenY) {
+        //v1:
         //TokenSwapFarmScript::query_release_per_second
-        throw new UnsupportedOperationException();
+/*
+            let farm_pool_info = borrow_global<FarmPoolInfo<X, Y>>(STAR::token_address());
+            let (total_alloc_point, pool_release_per_second) = YieldFarming::query_global_pool_info<PoolTypeFarmPool>(STAR::token_address());
+            pool_release_per_second * farm_pool_info.alloc_point / total_alloc_point
+ */
+        //TokenSwapFarmRouter::query_info_v2
+        //TokenSwapFarmRouter::query_global_pool_info
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        String lpToken = getLiquidityTokenStructTag(tp);
+        return tokenSwapFarmQueryReleasePerSecondV2(lpToken);
+    }
+
+    private BigInteger tokenSwapFarmQueryReleasePerSecondV2(String lpToken) {
+        String poolType = "PoolTypeFarmPool";
+        YieldFarmingGlobalPoolInfo yieldFarmingGlobalPoolInfo = getYieldFarmingGlobalPoolInfo(poolType);
+        FarmingAssetExtend assetExtend = getFarmingAssetExtend(poolType, lpToken);
+        BigInteger total_alloc_point = yieldFarmingGlobalPoolInfo.getTotalAllocPoint();
+        BigInteger total_release_per_second = yieldFarmingGlobalPoolInfo.getPoolReleasePerSecond();
+        BigInteger alloc_point = new BigInteger(assetExtend.getAllocPoint());
+        return total_release_per_second.multiply(alloc_point).divide(total_alloc_point);
     }
 
     @Override
     public Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress, String tokenX, String tokenY) {
-        //TokenSwapFarmRouter::query_info_v2
-        //TokenSwapFarmRouter::query_global_pool_info
-        throw new UnsupportedOperationException();
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        String lpToken = getLiquidityTokenStructTag(tp);
+        BigInteger rps = tokenSwapFarmQueryReleasePerSecondV2(lpToken);
+        FarmingAsset farmingAsset = getFarmingAsset("PoolTypeFarmPool", lpToken);
+        BigInteger w = new BigInteger(farmingAsset.getAssetTotalWeight());
+        return new Pair<>(rps, w);
     }
 
     @Override
-    public Integer tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
+    public Long tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
         //TokenSwapFarmScript::get_farm_multiplier
-        throw new UnsupportedOperationException();
+//        let farm_pool_info = borrow_global<FarmPoolInfo<X, Y>>(STAR::token_address());
+//        (farm_pool_info.alloc_point as u64)
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        //TokenSwapFarmScript::query_stake
+        String farmPoolInfoResType = contractAddress + "::TokenSwapFarm::FarmPoolInfo<" + tp.getItem1() +
+                ", " + tp.getItem2() + ">";
+        AccountResource<FarmPoolInfo> farmPoolInfoResource = null;
+        try {
+            farmPoolInfoResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, farmPoolInfoResType, FarmPoolInfo.class, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);//todo ?
+        }
+        return new BigInteger(farmPoolInfoResource.getData().getAllocPoint()).longValue();
     }
 
     @Override
@@ -105,7 +144,7 @@ public class AptosContractApiClient implements ContractApiClient {
 
             String stakeListExtResType = contractAddress + "::YieldFarmingV3::StakeListExtend<" +
                     contractAddress + "::TokenSwapGovPoolType::PoolTypeFarmPool, " +
-                    contractAddress + "::TokenSwap::LiquidityToken<" + tp.getItem1() + ", " + tp.getItem2() + ">" +
+                    getLiquidityTokenStructTag(tp) +
                     ">";
             AccountResource<StakeListExtend> stakeListExtRes = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, stakeListExtResType, StakeListExtend.class, null);
@@ -117,41 +156,60 @@ public class AptosContractApiClient implements ContractApiClient {
         }
     }
 
+    private String getLiquidityTokenStructTag(Pair<String, String> tp) {
+        return contractAddress + "::TokenSwap::LiquidityToken<" + tp.getItem1() + ", " + tp.getItem2() + ">";
+    }
+
+    /**
+     * @param token token type
+     * @return "0x1::coin::Coin<" + token + ">"
+     */
+    private String getAptosCoinStructTag(String token) {
+        return "0x1::coin::Coin<" + token + ">";
+    }
+
     @Override
     public BigInteger syrupPoolQueryTotalStake(String poolAddress, String token) {
-        String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
-                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
-        try {
-            AccountResource<FarmingAssetExtend> extResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    contractAddress, extResourceType, FarmingAssetExtend.class, null);
-            return new BigInteger(extResource.getData().getAssetTotalAmount());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend("PoolTypeSyrup", token);
+        return new BigInteger(farmingAssetExtend.getAssetTotalAmount());
     }
 
     @Override
     public BigInteger syrupPoolQueryReleasePerSecondV2(String poolAddress, String token) {
-        YieldFarmingGlobalPoolInfo syrupGlobalInfo = syrupPoolQuerySyrupInfo();
-        BigInteger total_alloc_point = syrupGlobalInfo.getTotalAllocPoint();
-        BigInteger pool_release_per_second = syrupGlobalInfo.getPoolReleasePerSecond();
+        return getPoolReleasePerSecondV2("PoolTypeSyrup", token);
+    }
 
-        BigInteger alloc_point = BigInteger.ZERO;
+    private BigInteger getPoolReleasePerSecondV2(String poolType, String token) {
+        YieldFarmingGlobalPoolInfo syrupGlobalInfo = getYieldFarmingGlobalPoolInfo(poolType);
+        BigInteger total_alloc_point = syrupGlobalInfo.getTotalAllocPoint();
+        BigInteger total_release_per_second = syrupGlobalInfo.getPoolReleasePerSecond();
+
+        FarmingAssetExtend assetExtend = getFarmingAssetExtend(poolType, token);
+        BigInteger alloc_point = new BigInteger(assetExtend.getAllocPoint());
+        return total_release_per_second.multiply(alloc_point).divide(total_alloc_point);
+    }
+
+    private FarmingAssetExtend getFarmingAssetExtend(String poolType, String token) {
         String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
-                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
+                contractAddress + "::TokenSwapGovPoolType::" + poolType + ", " + getAptosCoinStructTag(token) + ">";
+        AccountResource<FarmingAssetExtend> assetExtResource;
         try {
-            AccountResource<FarmingAssetExtend> assetExtResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+            assetExtResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     contractAddress, extResourceType, FarmingAssetExtend.class, null);
-            alloc_point = new BigInteger(assetExtResource.getData().getAllocPoint());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return pool_release_per_second.multiply(alloc_point).divide(total_alloc_point);
+        FarmingAssetExtend assetExtend = assetExtResource.getData();
+        return assetExtend;
     }
 
-    public YieldFarmingGlobalPoolInfo syrupPoolQuerySyrupInfo() {
+//    private YieldFarmingGlobalPoolInfo syrupPoolQueryGlobalPoolInfo() {
+//        return getYieldFarmingGlobalPoolInfo("PoolTypeSyrup");
+//    }
+
+    private YieldFarmingGlobalPoolInfo getYieldFarmingGlobalPoolInfo(String poolType) {
         String resourceType = contractAddress + "::YieldFarmingV3::YieldFarmingGlobalPoolInfo<" +
-                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ">";
+                contractAddress + "::TokenSwapGovPoolType::" + poolType + ">";
         try {
             AccountResource<YieldFarmingGlobalPoolInfo> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     contractAddress, resourceType, YieldFarmingGlobalPoolInfo.class, null);
@@ -161,36 +219,38 @@ public class AptosContractApiClient implements ContractApiClient {
         }
     }
 
-    /**
-     * @return (alloc_point, asset_total_amount, asset_total_weight, harvest_index)
-     */
-    public List<BigInteger> syrupPoolQueryPoolInfoV2(String token) {
-        List<BigInteger> resultFields = new ArrayList<>();
+
+    public FarmingAsset getFarmingAsset(String poolType, String token) {
+//        /*
+//         * return (alloc_point, asset_total_amount, asset_total_weight, harvest_index).
+//         */
+//        List<BigInteger> resultFields = new ArrayList<>();
         try {
-            String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
-                    contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
-            AccountResource<FarmingAssetExtend> extResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    contractAddress, extResourceType, FarmingAssetExtend.class, null);
-            resultFields.add(new BigInteger(extResource.getData().getAllocPoint()));
-            resultFields.add(new BigInteger(extResource.getData().getAssetTotalAmount()));
+//            String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
+//                    contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + getAptosCoinStructTag(token) + ">";
+//            AccountResource<FarmingAssetExtend> extResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+//                    contractAddress, extResourceType, FarmingAssetExtend.class, null);
+//            resultFields.add(new BigInteger(extResource.getData().getAllocPoint()));
+//            resultFields.add(new BigInteger(extResource.getData().getAssetTotalAmount()));
 
             String resourceType = contractAddress + "::YieldFarmingV3::FarmingAsset<" +
-                    contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
+                    contractAddress + "::TokenSwapGovPoolType::" + poolType + ", " + getAptosCoinStructTag(token) + ">";
             AccountResource<FarmingAsset> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     contractAddress, resourceType, FarmingAsset.class, null);
-            resultFields.add(new BigInteger(resource.getData().getAssetTotalWeight()));
-            resultFields.add(new BigInteger(resource.getData().getHarvestIndex()));
+//            resultFields.add(new BigInteger(resource.getData().getAssetTotalWeight()));
+//            resultFields.add(new BigInteger(resource.getData().getHarvestIndex()));
+            return resource.getData();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return resultFields;
+//        return resultFields;
     }
 
     @Override
     public List<SyrupStake> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
         String listResourceType = contractAddress + "::YieldFarmingV3::StakeList<" +
-                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + token + ">";
-        String syrupStakesResourceType = contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + token + ">";
+                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + getAptosCoinStructTag(token) + ">";
+        String syrupStakesResourceType = contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + getAptosCoinStructTag(token) + ">";
         try {
             AccountResource<StakeList> stakeListResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, listResourceType, StakeList.class, null);
@@ -217,7 +277,7 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public List<SyrupStake> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(); //todo
     }
 
     @Override
@@ -243,7 +303,7 @@ public class AptosContractApiClient implements ContractApiClient {
     public BigInteger getVestarAmountByTokenTypeAndStakeId(String accountAddress, String token, Long stakeId) {
         //query_vestar_amount_by_staked_id
         //query_vestar_amount_by_staked_id_tokentype
-        String resourceType = contractAddress + "::TokenSwapVestarMinter::MintRecordListT<" + token + ">";
+        String resourceType = contractAddress + "::TokenSwapVestarMinter::MintRecordListT<" + token + ">"; //todo not aptos Coin??
         try {
             AccountResource<MintRecordListT> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, resourceType, MintRecordListT.class, null);
@@ -259,7 +319,9 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY) {
         //TokenSwapRouter::total_liquidity
-        throw new UnsupportedOperationException();
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        String lpToken = getLiquidityTokenStructTag(tp);
+        return getCoinSupply(lpToken);
     }
 
     @Override

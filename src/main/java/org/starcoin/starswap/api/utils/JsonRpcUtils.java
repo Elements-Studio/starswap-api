@@ -134,20 +134,21 @@ public class JsonRpcUtils {
         return new BigInteger(resultFields.get(0));
     }
 
-    public static BigInteger tokenSwapFarmQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
-        List<String> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
-                        + SWAP_FARM_QUERY_RELEASE_PER_SECOND_FUNCTION_MODULE_NAME + "::query_release_per_second",
-                Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<String>>() {
-                });
-        return new BigInteger(resultFields.get(0));
-    }
+    //v1:
+//    public static BigInteger tokenSwapFarmQueryReleasePerSecond(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
+//        List<String> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
+//                        + SWAP_FARM_QUERY_RELEASE_PER_SECOND_FUNCTION_MODULE_NAME + "::query_release_per_second",
+//                Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<String>>() {
+//                });
+//        return new BigInteger(resultFields.get(0));
+//    }
 
-    public static Integer tokenSwapFarmGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
+    public static Long tokenSwapFarmGetRewardMultiplier(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
         List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
                         + TOKEN_SWAP_FARM_SCRIPT_MODULE_NAME + "::get_farm_multiplier",//
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
-        return Integer.parseInt(resultFields.get(0).toString());
+        return Long.parseLong(resultFields.get(0).toString());
     }
 
     public static BigInteger tokenSwapFarmGetAccountStakedLiquidity(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY, String accountAddress) {
@@ -159,7 +160,8 @@ public class JsonRpcUtils {
     }
 
     /***
-     * TokenSwapFarmRouter::query_global_pool_info
+     * TokenSwapFarmRouter::query_global_pool_info.
+     *
      * @param jsonRpcSession
      * @param farmAddress
      * @return total_alloc_point, pool_release_per_second.
@@ -173,7 +175,8 @@ public class JsonRpcUtils {
     }
 
     /***
-     * TokenSwapFarmRouter::query_info_v2
+     * TokenSwapFarmRouter::query_info_v2.
+     *
      * @param jsonRpcSession
      * @param farmAddress
      * @param tokenX
@@ -281,6 +284,8 @@ public class JsonRpcUtils {
     }
 
     /**
+     * Query syrup pool global info.
+     *
      * @return (total_alloc_point, pool_release_per_second)
      */
     public static List<BigInteger> syrupPoolQuerySyrupInfo(JSONRPC2Session jsonRpcSession,

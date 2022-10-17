@@ -51,8 +51,12 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenSwapFarmQueryReleasePerSecond(String farmAddress, String tokenX, String tokenY) {
-        return JsonRpcUtils.tokenSwapFarmQueryReleasePerSecond(this.jsonRpcSession, farmAddress, tokenX, tokenY);
+    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String tokenX, String tokenY) {
+        // v1:
+        //return JsonRpcUtils.tokenSwapFarmQueryReleasePerSecond(this.jsonRpcSession, farmAddress, tokenX, tokenY);
+        Pair<BigInteger, BigInteger> pair
+                = tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(farmAddress, tokenX, tokenY);
+        return pair.getItem1();
     }
 
     /**
@@ -75,7 +79,7 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public Integer tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
+    public Long tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapFarmGetRewardMultiplier(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 

@@ -15,11 +15,11 @@ import java.util.List;
 public interface ContractApiClient {
     BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY);
 
-    BigInteger tokenSwapFarmQueryReleasePerSecond(String farmAddress, String tokenX, String tokenY);
+    BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String tokenX, String tokenY);
 
     Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress, String tokenX, String tokenY);
 
-    Integer tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY);
+    Long tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY);
 
     Long tokenSwapFarmGetBoostFactor(String farmAddress, String tokenX, String tokenY, String accountAddress);
 

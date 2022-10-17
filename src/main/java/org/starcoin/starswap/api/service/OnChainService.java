@@ -30,7 +30,7 @@ public interface OnChainService {
 
     List<BigInteger[]> getReservesListByTokenTypeTagPairs(String[][] tokenTypeTagPairs);
 
-    Integer getFarmRewardMultiplier(LiquidityTokenFarm farm);
+    Long getFarmRewardMultiplier(LiquidityTokenFarm farm);
 
     BigDecimal getFarmTvlInUsd(LiquidityTokenFarm liquidityTokenFarm);
 

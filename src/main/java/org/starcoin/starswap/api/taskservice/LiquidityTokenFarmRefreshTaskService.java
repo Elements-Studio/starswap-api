@@ -69,7 +69,7 @@ public class LiquidityTokenFarmRefreshTaskService {
                 }
             }
             try {
-                Integer multiplier = onChainService.getFarmRewardMultiplier(farm);
+                Long multiplier = onChainService.getFarmRewardMultiplier(farm);
                 farm.setRewardMultiplier(multiplier);
                 updated = true;
                 LOG.debug("Update farm reward multiplier Ok. Farm Id: " + farm.getLiquidityTokenFarmId());
