@@ -3,6 +3,7 @@ package org.starcoin.starswap.api.service;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.starswap.api.vo.SyrupMultiplierPoolInfo;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -66,7 +67,7 @@ public interface OnChainService {
 
     List<SyrupMultiplierPoolInfo> getSyrupMultiplierPools(SyrupPool syrupPool, Boolean estimateApr);
 
-    List<SyrupStake> getSyrupPoolStakeList(SyrupPool syrupPool, String accountAddress);
+    List<SyrupStakeVO> getSyrupPoolStakeList(SyrupPool syrupPool, String accountAddress);
 
     BigInteger getAccountVestarAmount(String accountAddress);
 

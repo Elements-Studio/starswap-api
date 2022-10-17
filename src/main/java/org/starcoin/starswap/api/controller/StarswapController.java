@@ -207,7 +207,7 @@ public class StarswapController {
     }
 
     @GetMapping(path = "syrupStakes")
-    public List<SyrupStake> getSyrupStakes(
+    public List<SyrupStakeVO> getSyrupStakes(
             @RequestParam(value = "accountAddress", required = true) String accountAddress,
             @RequestParam(value = "tokenId", required = true) String tokenId
     ) {
@@ -230,7 +230,7 @@ public class StarswapController {
     }
 
     @GetMapping(path = "getAccountSyrupStakes")
-    public List<SyrupStake> getAccountSyrupStakes(
+    public List<SyrupStakeVO> getAccountSyrupStakes(
             @RequestParam(value = "accountAddress", required = true) String accountAddress,
             @RequestParam(value = "tokenId", required = true) String tokenId
     ) {
@@ -238,7 +238,7 @@ public class StarswapController {
         if (syrupPool == null) {
             return null;
         }
-        List<SyrupStake> stakeList = onChainService.getSyrupPoolStakeList(syrupPool, accountAddress);
+        List<SyrupStakeVO> stakeList = onChainService.getSyrupPoolStakeList(syrupPool, accountAddress);
         stakeList.forEach(s -> {
             BigInteger vestarAmount = onChainService.getAccountVestarAmountByStakeId(accountAddress, s.getId(), s.getTokenTypeTag());
             s.setVeStarAmount(vestarAmount);

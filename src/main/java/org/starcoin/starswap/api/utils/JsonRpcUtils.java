@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
-import org.starcoin.starswap.api.data.model.SyrupStake;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.service.LiquidityPoolService;
 import org.starcoin.utils.HexUtils;
@@ -237,7 +237,7 @@ public class JsonRpcUtils {
         }
     }
 
-    public static SyrupStake syrupPoolGetStakeInfo(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress, Long id) {
+    public static SyrupStakeVO syrupPoolGetStakeInfo(JSONRPC2Session jsonRpcSession, String poolAddress, String token, String accountAddress, Long id) {
         //public fun get_stake_info<TokenT: store>(user_addr: address, id: u64): (u64, u64, u64, u128) acquires SyrupStakeList {
         ////...
         //(
@@ -250,7 +250,7 @@ public class JsonRpcUtils {
                         + TOKEN_SWAP_SYRUP_MODULE_NAME + "::get_stake_info",//
                 Collections.singletonList(token), Arrays.asList(accountAddress, id.toString() + "u64"), new TypeReference<List<Object>>() {
                 });
-        SyrupStake syrupStake = new SyrupStake();
+        SyrupStakeVO syrupStake = new SyrupStakeVO();
         syrupStake.setId(id);
         syrupStake.setStartTime(Long.parseLong(resultFields.get(0).toString()));
         syrupStake.setEndTime(Long.parseLong(resultFields.get(1).toString()));

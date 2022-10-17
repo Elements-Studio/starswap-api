@@ -1,8 +1,11 @@
-package org.starcoin.starswap.api.data.model;
+package org.starcoin.starswap.api.vo;
 
 import java.math.BigInteger;
 
-public class SyrupStake {
+/**
+ * Syrup stake view object to client.
+ */
+public class SyrupStakeVO {
     private Long id;
 
     private BigInteger amount;

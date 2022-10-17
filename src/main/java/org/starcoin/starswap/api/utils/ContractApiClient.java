@@ -2,7 +2,7 @@ package org.starcoin.starswap.api.utils;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.starcoin.starswap.api.data.model.Pair;
-import org.starcoin.starswap.api.data.model.SyrupStake;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.service.OnChainServiceImpl;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
@@ -28,9 +28,9 @@ public interface ContractApiClient {
 
     BigInteger syrupPoolQueryReleasePerSecondV2(String poolAddress, String token);
 
-    List<SyrupStake> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress);
+    List<SyrupStakeVO> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress);
 
-    List<SyrupStake> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress);
+    List<SyrupStakeVO> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress);
 
     @Cacheable(cacheNames = "syrupPoolQueryAllMultiplierPoolsCache",
             key = "#poolAddress + ',' + #token", unless = "#result == null")

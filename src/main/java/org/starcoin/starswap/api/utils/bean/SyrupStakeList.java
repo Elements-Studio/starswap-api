@@ -50,7 +50,7 @@ public class SyrupStakeList {
         private Long id;
         /// Harvest capability for Syrup
         @JsonProperty("harvest_cap")//: YieldFarming::HarvestCapability<PoolTypeSyrup, coin::Coin<CoinT>>,
-        private Object harvestCap;
+        private YieldFarmingHarvestCapability harvestCap;
         /// Stepwise multiplier
         @JsonProperty("stepwise_multiplier")//: u64,
         private Long stepwiseMultiplier;
@@ -72,11 +72,11 @@ public class SyrupStakeList {
             this.id = id;
         }
 
-        public Object getHarvestCap() {
+        public YieldFarmingHarvestCapability getHarvestCap() {
             return harvestCap;
         }
 
-        public void setHarvestCap(Object harvestCap) {
+        public void setHarvestCap(YieldFarmingHarvestCapability harvestCap) {
             this.harvestCap = harvestCap;
         }
 

@@ -6,7 +6,7 @@ import org.starcoin.bean.Event;
 import org.starcoin.bean.RpcStateWithProof;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
-import org.starcoin.starswap.api.data.model.SyrupStake;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.utils.JsonRpcClientUtils;
 
@@ -108,19 +108,19 @@ public class StarcoinContractApiClient implements ContractApiClient {
 //    }
 
     @Override
-    public List<SyrupStake> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
+    public List<SyrupStakeVO> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
         List<Long> idList = JsonRpcUtils.syrupPoolQueryStakeList(this.jsonRpcSession, poolAddress, token, accountAddress);
-        List<SyrupStake> stakeList = new ArrayList<>();
+        List<SyrupStakeVO> stakeList = new ArrayList<>();
         for (Long id : idList) {
-            SyrupStake stake = JsonRpcUtils.syrupPoolGetStakeInfo(this.jsonRpcSession, poolAddress, token, accountAddress, id);
+            SyrupStakeVO stake = JsonRpcUtils.syrupPoolGetStakeInfo(this.jsonRpcSession, poolAddress, token, accountAddress, id);
             stakeList.add(stake);
         }
         return stakeList;
     }
 
     @Override
-    public List<SyrupStake> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
-        List<SyrupStake> stakeList = syrupPoolQueryStakeList(poolAddress, token, accountAddress);
+    public List<SyrupStakeVO> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
+        List<SyrupStakeVO> stakeList = syrupPoolQueryStakeList(poolAddress, token, accountAddress);
         stakeList.forEach(s -> {
             s.setExpectedGain(JsonRpcUtils.syrupPoolQueryExpectedGain(this.jsonRpcSession, poolAddress, token, accountAddress,
                     s.getId()));

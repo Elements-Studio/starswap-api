@@ -9,13 +9,14 @@ import dev.aptos.types.TypeInfo;
 import dev.aptos.utils.NodeApiUtils;
 import dev.aptos.utils.StructTagUtils;
 import org.starcoin.starswap.api.data.model.Pair;
-import org.starcoin.starswap.api.data.model.SyrupStake;
 import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.utils.bean.*;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +55,18 @@ public class AptosContractApiClient implements ContractApiClient {
             throw new IllegalArgumentException(e);
         }
         throw new IllegalArgumentException("Two tokens are equal.");
+    }
+
+    private static SyrupStakeVO toSyrupStakeVO(Stake s, SyrupStakeList syrupStakeList) {
+        SyrupStakeVO t = new SyrupStakeVO();
+        t.setId(s.getId());
+        SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakeList.getItems().stream()
+                .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
+        t.setAmount(syrupStakeOnChain.getTokenAmount());
+        t.setEndTime(syrupStakeOnChain.getEndTime());
+        t.setStartTime(syrupStakeOnChain.getStartTime());
+        t.setStepwiseMultiplier(syrupStakeOnChain.getStepwiseMultiplier().intValue());
+        return t;
     }
 
     private String getVestarCoinType() {
@@ -189,6 +202,10 @@ public class AptosContractApiClient implements ContractApiClient {
         return total_release_per_second.multiply(alloc_point).divide(total_alloc_point);
     }
 
+//    private YieldFarmingGlobalPoolInfo syrupPoolQueryGlobalPoolInfo() {
+//        return getYieldFarmingGlobalPoolInfo("PoolTypeSyrup");
+//    }
+
     private FarmingAssetExtend getFarmingAssetExtend(String poolType, String token) {
         String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
                 contractAddress + "::TokenSwapGovPoolType::" + poolType + ", " + getAptosCoinStructTag(token) + ">";
@@ -203,10 +220,6 @@ public class AptosContractApiClient implements ContractApiClient {
         return assetExtend;
     }
 
-//    private YieldFarmingGlobalPoolInfo syrupPoolQueryGlobalPoolInfo() {
-//        return getYieldFarmingGlobalPoolInfo("PoolTypeSyrup");
-//    }
-
     private YieldFarmingGlobalPoolInfo getYieldFarmingGlobalPoolInfo(String poolType) {
         String resourceType = contractAddress + "::YieldFarmingV3::YieldFarmingGlobalPoolInfo<" +
                 contractAddress + "::TokenSwapGovPoolType::" + poolType + ">";
@@ -218,7 +231,6 @@ public class AptosContractApiClient implements ContractApiClient {
             throw new RuntimeException(e);
         }
     }
-
 
     public FarmingAsset getFarmingAsset(String poolType, String token) {
 //        /*
@@ -247,25 +259,14 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public List<SyrupStake> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
-        String listResourceType = contractAddress + "::YieldFarmingV3::StakeList<" +
-                contractAddress + "::TokenSwapGovPoolType::PoolTypeSyrup" + ", " + getAptosCoinStructTag(token) + ">";
-        String syrupStakesResourceType = contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + getAptosCoinStructTag(token) + ">";
+    public List<SyrupStakeVO> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
         try {
-            AccountResource<StakeList> stakeListResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    accountAddress, listResourceType, StakeList.class, null);
-            AccountResource<SyrupStakeList> syrupStakesResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    accountAddress, syrupStakesResourceType, SyrupStakeList.class, null);
-            List<SyrupStake> stakeList = new ArrayList<>();
-            for (Stake s : stakeListResource.getData().getItems()) {
-                SyrupStake t = new SyrupStake();
-                t.setId(s.getId());
-                SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakesResource.getData().getItems().stream()
-                        .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
-                t.setAmount(syrupStakeOnChain.getTokenAmount());
-                t.setEndTime(syrupStakeOnChain.getEndTime());
-                t.setStartTime(syrupStakeOnChain.getStartTime());
-                t.setStepwiseMultiplier(syrupStakeOnChain.getStepwiseMultiplier().intValue());
+            String poolType = "PoolTypeSyrup";
+            StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
+            SyrupStakeList syrupStakeList = getSyrupStakeList(accountAddress, token);
+            List<SyrupStakeVO> stakeList = new ArrayList<>();
+            for (Stake s : farmingStakeList.getItems()) {
+                SyrupStakeVO t = toSyrupStakeVO(s, syrupStakeList);
                 t.setTokenTypeTag(token);
                 stakeList.add(t);
             }
@@ -276,14 +277,53 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public List<SyrupStake> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
+    public List<SyrupStakeVO> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
+        //TokenSwapSyrup::query_expect_gain
         throw new UnsupportedOperationException(); //todo
+    }
+
+
+    private SyrupStakeList getSyrupStakeList(String accountAddress, String token) throws IOException {
+        String syrupStakesResourceType = contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + getAptosCoinStructTag(token) + ">";
+        AccountResource<SyrupStakeList> syrupStakesResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                accountAddress, syrupStakesResourceType, SyrupStakeList.class, null);
+        SyrupStakeList syrupStakes = syrupStakesResource.getData();
+        return syrupStakes;
+    }
+
+    private StakeList getYieldFarmingStakeList(String accountAddress, String poolType, String token) {
+        String listResourceType = contractAddress + "::YieldFarmingV3::StakeList<" +
+                contractAddress + "::TokenSwapGovPoolType::" + poolType + ", " + getAptosCoinStructTag(token) + ">";
+        AccountResource<StakeList> stakeListResource = null;
+        try {
+            stakeListResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, listResourceType, StakeList.class, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        StakeList oStakeList = stakeListResource.getData();
+        return oStakeList;
     }
 
     @Override
     public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress, String token) {
         //TokenSwapSyrup::query_all_multiplier_pools
-        throw new UnsupportedOperationException(); //todo waiting on-chain contract impl.
+        /*
+        https://swap-api.starswap.xyz/main/v1/syrupPools?embedSyrupMultiplierPools=true
+         */
+        // return estimated values...
+        Long[] secs = new Long[]{604800L, 1209600L, 2592000L, 5184000L, 7776000L};
+        Long[] multipliers = new Long[]{2L, 3L, 4L, 6L, 8L};
+        BigInteger totalStake = syrupPoolQueryTotalStake(poolAddress, token);
+        BigInteger[] amounts = new BigInteger[]{
+                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(96L)),
+        };
+        return new Triple<>(Arrays.asList(secs), Arrays.asList(multipliers), Arrays.asList(amounts));
+        //todo waiting on-chain contract impl.
     }
 
     @Override

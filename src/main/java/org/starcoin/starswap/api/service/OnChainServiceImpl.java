@@ -9,6 +9,7 @@ import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.utils.ContractApiClient;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.starswap.api.vo.SyrupMultiplierPoolInfo;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -879,7 +880,7 @@ public class OnChainServiceImpl implements OnChainService {
 //    }
 
     @Override
-    public List<SyrupStake> getSyrupPoolStakeList(SyrupPool syrupPool, String accountAddress) {
+    public List<SyrupStakeVO> getSyrupPoolStakeList(SyrupPool syrupPool, String accountAddress) {
         Token token = this.tokenService.getToken(syrupPool.getSyrupPoolId().getTokenId());
         if (token == null) {
             LOG.info("getSyrupPoolStakeList error, cannot get token by Id: " + syrupPool.getSyrupPoolId().getTokenId());
@@ -887,7 +888,7 @@ public class OnChainServiceImpl implements OnChainService {
         }
         try {
             //return jsonRpcClient.syrupPoolQueryStakeList(syrupPool.getSyrupPoolId().getPoolAddress(),
-            List<SyrupStake> stakeList = contractApiClient.syrupPoolQueryStakeWithExpectedGainList(syrupPool.getSyrupPoolId().getPoolAddress(),
+            List<SyrupStakeVO> stakeList = contractApiClient.syrupPoolQueryStakeWithExpectedGainList(syrupPool.getSyrupPoolId().getPoolAddress(),
                     token.getTokenStructType().toTypeTagString(),
                     accountAddress);
             stakeList.forEach(s -> s.setTokenTypeTag(token.getTokenStructType().toTypeTagString()));
