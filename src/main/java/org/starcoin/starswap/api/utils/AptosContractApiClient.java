@@ -26,7 +26,7 @@ public class AptosContractApiClient implements ContractApiClient {
     private static final long DEFAULT_OPERATION_DENUMERATOR = 60;
     private static final long DEFAULT_POUNDAGE_NUMERATOR = 3;
     private static final long DEFAULT_POUNDAGE_DENUMERATOR = 1000;
-
+    private static BigInteger EXP_SCALE = new BigInteger("1000000000000000000"); //e18
     private final String nodeApiBaseUrl;
     private final String contractAddress;
 
@@ -57,11 +57,9 @@ public class AptosContractApiClient implements ContractApiClient {
         throw new IllegalArgumentException("Two tokens are equal.");
     }
 
-    private static SyrupStakeVO toSyrupStakeVO(Stake s, SyrupStakeList syrupStakeList) {
+    private static SyrupStakeVO toSyrupStakeVO(SyrupStakeList.SyrupStake syrupStakeOnChain) {
         SyrupStakeVO t = new SyrupStakeVO();
-        t.setId(s.getId());
-        SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakeList.getItems().stream()
-                .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
+        t.setId(syrupStakeOnChain.getId());
         t.setAmount(syrupStakeOnChain.getTokenAmount());
         t.setEndTime(syrupStakeOnChain.getEndTime());
         t.setStartTime(syrupStakeOnChain.getStartTime());
@@ -192,6 +190,10 @@ public class AptosContractApiClient implements ContractApiClient {
         return getPoolReleasePerSecondV2("PoolTypeSyrup", token);
     }
 
+//    private YieldFarmingGlobalPoolInfo syrupPoolQueryGlobalPoolInfo() {
+//        return getYieldFarmingGlobalPoolInfo("PoolTypeSyrup");
+//    }
+
     private BigInteger getPoolReleasePerSecondV2(String poolType, String token) {
         YieldFarmingGlobalPoolInfo syrupGlobalInfo = getYieldFarmingGlobalPoolInfo(poolType);
         BigInteger total_alloc_point = syrupGlobalInfo.getTotalAllocPoint();
@@ -201,10 +203,6 @@ public class AptosContractApiClient implements ContractApiClient {
         BigInteger alloc_point = new BigInteger(assetExtend.getAllocPoint());
         return total_release_per_second.multiply(alloc_point).divide(total_alloc_point);
     }
-
-//    private YieldFarmingGlobalPoolInfo syrupPoolQueryGlobalPoolInfo() {
-//        return getYieldFarmingGlobalPoolInfo("PoolTypeSyrup");
-//    }
 
     private FarmingAssetExtend getFarmingAssetExtend(String poolType, String token) {
         String extResourceType = contractAddress + "::YieldFarmingV3::FarmingAssetExtend<" +
@@ -260,33 +258,145 @@ public class AptosContractApiClient implements ContractApiClient {
 
     @Override
     public List<SyrupStakeVO> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
-        try {
-            String poolType = "PoolTypeSyrup";
-            StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
-            SyrupStakeList syrupStakeList = getSyrupStakeList(accountAddress, token);
-            List<SyrupStakeVO> stakeList = new ArrayList<>();
-            for (Stake s : farmingStakeList.getItems()) {
-                SyrupStakeVO t = toSyrupStakeVO(s, syrupStakeList);
-                t.setTokenTypeTag(token);
-                stakeList.add(t);
+        String poolType = "PoolTypeSyrup";
+        StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
+        SyrupStakeList syrupStakeList = getSyrupStakeList(accountAddress, token);
+        List<SyrupStakeVO> stakeVOList = new ArrayList<>();
+        for (Stake s : farmingStakeList.getItems()) {
+            SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakeList.getItems().stream()
+                    .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
+            if (syrupStakeOnChain == null) {
+                throw new IllegalArgumentException();//todo ?
             }
-            return stakeList;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            SyrupStakeVO t = toSyrupStakeVO(syrupStakeOnChain);
+            t.setTokenTypeTag(token);
+            stakeVOList.add(t);
         }
+        return stakeVOList;
     }
 
     @Override
     public List<SyrupStakeVO> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
         //TokenSwapSyrup::query_expect_gain
-        throw new UnsupportedOperationException(); //todo
+        String poolType = "PoolTypeSyrup";
+        StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
+        SyrupStakeList syrupStakeList = getSyrupStakeList(accountAddress, token);
+        FarmingAsset farmingAsset = getFarmingAsset(poolType, token);
+        FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend(poolType, token);
+        YieldFarmingGlobalPoolInfo globalPoolInfo = getYieldFarmingGlobalPoolInfo(poolType);
+        List<SyrupStakeVO> stakeVOList = new ArrayList<>();
+        for (Stake s : farmingStakeList.getItems()) {
+            SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakeList.getItems().stream()
+                    .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
+            if (syrupStakeOnChain == null) {
+                throw new IllegalArgumentException();
+            }
+            SyrupStakeVO t = toSyrupStakeVO(syrupStakeOnChain);
+            t.setTokenTypeTag(token);
+
+            // ---------------------------------------
+            // get gain info.
+            // Start check
+            long now_seconds = System.currentTimeMillis() / 1000;//timestamp::now_seconds();
+            //assert!(now_seconds >= farming_asset.start_time, error::invalid_state(ERR_FARMING_NOT_READY));
+            if (!(now_seconds >= farmingAsset.getStartTime())) {
+                throw new IllegalArgumentException();//todo is this ok?
+            }
+            YieldFarmingHarvestCapability cap = syrupStakeOnChain.getHarvestCap();
+            // Calculate from latest timestamp to deadline timestamp if deadline valid
+            now_seconds = now_seconds > cap.getDeadline() ? now_seconds : cap.getDeadline();
+            /*
+            let farming_asset_extend = borrow_global<FarmingAssetExtend<PoolType, AssetT>>(broker_addr);
+            // Calculate new harvest index
+            let new_harvest_index = calculate_harvest_index_with_asset_v2<PoolType, AssetT>(
+                farming_asset,
+                farming_asset_extend,
+                now_seconds
+            );
+            let new_gain = calculate_withdraw_amount_v2(new_harvest_index, stake.last_harvest_index, stake.asset_weight);
+             */
+            BigInteger new_harvest_index = calculateHarvestIndexWithAssetV2(farmingAsset, farmingAssetExtend,
+                    now_seconds, globalPoolInfo);
+            BigInteger new_gain = calculateWithdrawAmountV2(new_harvest_index,
+                    new BigInteger(s.getLastHarvestIndex()), new BigInteger(s.getAssetWeight()));
+            BigInteger expectedGain = new BigInteger(s.getGain()).add(new_gain);
+            t.setExpectedGain(expectedGain);
+            // -----------------
+            stakeVOList.add(t);
+        }
+        return stakeVOList;
     }
 
+    /// calculate pool harvest index
+    /// harvest_index = (current_timestamp - last_timestamp) * pool_release_per_second * (alloc_point/total_alloc_point)  / (asset_total_weight );
+    /// if farm:   asset_total_weight = Sigma (per user lp_amount *  user boost_factor)
+    /// if stake:  asset_total_weight = Sigma (per user lp_amount *  stepwise_multiplier)
+    private BigInteger calculateHarvestIndexWithAssetV2(
+            FarmingAsset farming_asset,
+            FarmingAssetExtend farming_asset_extend,
+            Long now_seconds,
+            YieldFarmingGlobalPoolInfo global_pool_info) {
+/*
+     fun calculate_harvest_index_with_asset_v2<PoolType: store, AssetT: store>(
+        farming_asset: &FarmingAsset<PoolType, AssetT>,
+        farming_asset_extend: &FarmingAssetExtend<PoolType, AssetT>,
+        now_seconds: u64): u128  acquires YieldFarmingGlobalPoolInfo {
+    }
+ */
+//        assert!(farming_asset.last_update_timestamp <= now_seconds, error::invalid_argument(ERR_FARMING_TIMESTAMP_INVALID));
+        if (!(farming_asset.getLastUpdateTimestamp() <= now_seconds))
+            throw new IllegalArgumentException("ERR_FARMING_TIMESTAMP_INVALID");
+//        let golbal_pool_info = borrow_global<YieldFarmingGlobalPoolInfo<PoolType>>(@SwapAdmin);
+//        let time_period = now_seconds - farming_asset.last_update_timestamp;
+        Long time_period = now_seconds - farming_asset.getLastUpdateTimestamp();
+//        let global_pool_reward = golbal_pool_info.pool_release_per_second * (time_period as u128);
+        BigInteger global_pool_reward = global_pool_info.getPoolReleasePerSecond().multiply(BigInteger.valueOf(time_period));
+//        let pool_reward = BigExponential::exp(global_pool_reward * farming_asset_extend.alloc_point, golbal_pool_info.total_alloc_point);
+        BigInteger pool_reward = global_pool_reward.multiply(EXP_SCALE)
+                .multiply(new BigInteger(farming_asset_extend.getAllocPoint())).divide(global_pool_info.getTotalAllocPoint());
+//        // calculate period harvest index and global pool info when asset_total_weight is zero
+//        let harvest_index_period = if (farming_asset.asset_total_weight <= 0) {
+//            BigExponential::mantissa(pool_reward)
+//        } else {
+//            BigExponential::mantissa(BigExponential::div_exp(pool_reward, BigExponential::exp_direct(farming_asset.asset_total_weight)))
+//        };
+        BigInteger harvest_index_period;
+        if (new BigInteger(farming_asset.getAssetTotalWeight()).compareTo(BigInteger.ZERO) <= 0) {
+            harvest_index_period = pool_reward;
+        } else {
+            harvest_index_period = pool_reward.divide(new BigInteger(farming_asset.getAssetTotalWeight()));
+        }
+//        let index_accumulated = u256::add(
+//                u256::from_u128(farming_asset.harvest_index),
+//                harvest_index_period
+//        );
+//        BigExponential::to_safe_u128(index_accumulated)
+        return new BigInteger(farming_asset.getHarvestIndex()).add(harvest_index_period);
+    }
 
-    private SyrupStakeList getSyrupStakeList(String accountAddress, String token) throws IOException {
+    /// calculate user gain index
+    /// if farm:  gain = (current_index - last_index) * user_asset_weight; user_asset_weight = user_amount * boost_factor;
+    /// if stake: gain = (current_index - last_index) * user_asset_weight; user_asset_weight = user_amount * stepwise_multiplier;
+    private BigInteger calculateWithdrawAmountV2(BigInteger harvest_index,
+                                                 BigInteger last_harvest_index,
+                                                 BigInteger user_asset_weight) {
+        //assert!(harvest_index >= last_harvest_index, error::invalid_argument(ERR_FARMING_CALC_LAST_IDX_BIGGER_THAN_NOW));
+        if (!(harvest_index.compareTo(last_harvest_index) >= 0))
+            throw new IllegalArgumentException("ERR_FARMING_CALC_LAST_IDX_BIGGER_THAN_NOW");
+        BigInteger amount_u256 = user_asset_weight.multiply(harvest_index.subtract(last_harvest_index));
+        //BigExponential::truncate(BigExponential::exp_from_u256(amount_u256))
+        return amount_u256.divide(EXP_SCALE);
+    }
+
+    private SyrupStakeList getSyrupStakeList(String accountAddress, String token) {
         String syrupStakesResourceType = contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + getAptosCoinStructTag(token) + ">";
-        AccountResource<SyrupStakeList> syrupStakesResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                accountAddress, syrupStakesResourceType, SyrupStakeList.class, null);
+        AccountResource<SyrupStakeList> syrupStakesResource = null;
+        try {
+            syrupStakesResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, syrupStakesResourceType, SyrupStakeList.class, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         SyrupStakeList syrupStakes = syrupStakesResource.getData();
         return syrupStakes;
     }
