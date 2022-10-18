@@ -102,7 +102,7 @@ class StarswapApiApplicationTests {
 
         Triple<?, ?, ?> allMultiplierPools = contractApiClient.syrupPoolQueryAllMultiplierPools(aptosContractAddress, tokenSTAROnAptos);
         System.out.println(allMultiplierPools);
-        if (true) return;
+        //if (true) return;
 
         BigInteger vestarAmount_1 = contractApiClient.getAccountVestarAmount(aptosContractAddress);
         System.out.println("getAccountVestarAmount: " + vestarAmount_1);
@@ -189,16 +189,20 @@ class StarswapApiApplicationTests {
 
         BigInteger amountOut = this.contractApiClient.tokenSwapRouterGetAmountOut(
                 aptosContractAddress,
-                tokenXUSDTOnAptos, tokenSTAROnAptos, BigInteger.valueOf(1),
+                tokenXUSDTOnAptos, // USDT(in)
+                tokenSTAROnAptos, // STAR(out)
+                BigInteger.valueOf(1), // amount in
                 OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR, OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
         System.out.println("USDT / STAR: " + reserves_1.getItem2().divide(reserves_1.getItem1()));
         System.out.println("--------------- 1 USDT in, STAR amount out ----------------: " + amountOut);
         BigInteger amountIn = this.contractApiClient.tokenSwapRouterGetAmountIn(
                 aptosContractAddress,
-                tokenSTAROnAptos, tokenXUSDTOnAptos, BigInteger.valueOf(1),
+                tokenSTAROnAptos, // STAR(in)
+                tokenXUSDTOnAptos, // USDT(out)
+                BigInteger.valueOf(1), // amount out
                 OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR, OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
-        System.out.println("--------------- 1000000 USDT out, need STAR mount in ----------------: " + amountIn);
-        //if (true) return;
+        System.out.println("--------------- 1 USDT out, need STAR mount in ----------------: " + amountIn);
+        // if (true) return;
 //        BigInteger scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenXUSDTOnAptos);
 //        System.out.println(tokenXUSDTOnAptos + " scalingFactor: " + scalingFactor);
 //        scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenSTAROnAptos);

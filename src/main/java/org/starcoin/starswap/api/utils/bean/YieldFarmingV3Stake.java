@@ -2,7 +2,7 @@ package org.starcoin.starswap.api.utils.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Stake {
+public class YieldFarmingV3Stake {
     /*
         /// YieldFarmingV3
         /// To store user's asset token

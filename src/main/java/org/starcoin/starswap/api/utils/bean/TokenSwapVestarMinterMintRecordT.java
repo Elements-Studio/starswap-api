@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigInteger;
 
-public class MintRecordT {
+public class TokenSwapVestarMinterMintRecordT {
     /*
         struct MintRecordT<phantom StakeCoinT> has key, store, copy, drop {
         }

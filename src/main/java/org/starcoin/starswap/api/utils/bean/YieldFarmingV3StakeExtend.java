@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigInteger;
 
-public class StakeExtend {
+public class YieldFarmingV3StakeExtend {
     /*
 
-        //:YieldFarmingV3:
+        //YieldFarmingV3:
         struct StakeExtend<phantom PoolType, phantom AssetT> has key, store {
             id: u64,
             //option, Option<u64>

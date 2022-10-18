@@ -11,13 +11,13 @@ public class MintRecordListT {
         }
      */
     @JsonProperty("items")
-    private List<MintRecordT> items;
+    private List<TokenSwapVestarMinterMintRecordT> items;
 
-    public List<MintRecordT> getItems() {
+    public List<TokenSwapVestarMinterMintRecordT> getItems() {
         return items;
     }
 
-    public void setItems(List<MintRecordT> items) {
+    public void setItems(List<TokenSwapVestarMinterMintRecordT> items) {
         this.items = items;
     }
 

@@ -2,7 +2,7 @@ package org.starcoin.starswap.api.utils.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Treasury {
+public class TokenSwapVestarMinterTreasury {
     /*
         struct Treasury has key, store {
             vtoken: VToken::VToken<VESTAR::VESTAR>,

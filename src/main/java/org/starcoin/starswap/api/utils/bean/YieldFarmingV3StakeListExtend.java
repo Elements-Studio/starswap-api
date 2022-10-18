@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class StakeListExtend {
+public class YieldFarmingV3StakeListExtend {
     /*
         //YieldFarmingV3::
         struct StakeListExtend<phantom PoolType, phantom AssetT> has key, store {
@@ -15,7 +15,7 @@ public class StakeListExtend {
     @JsonProperty("next_id")
     private Long nextId;
     @JsonProperty("items")
-    private List<StakeExtend> items;
+    private List<YieldFarmingV3StakeExtend> items;
 
     public Long getNextId() {
         return nextId;
@@ -25,11 +25,11 @@ public class StakeListExtend {
         this.nextId = nextId;
     }
 
-    public List<StakeExtend> getItems() {
+    public List<YieldFarmingV3StakeExtend> getItems() {
         return items;
     }
 
-    public void setItems(List<StakeExtend> items) {
+    public void setItems(List<YieldFarmingV3StakeExtend> items) {
         this.items = items;
     }
 

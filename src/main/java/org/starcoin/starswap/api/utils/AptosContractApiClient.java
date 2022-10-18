@@ -171,9 +171,9 @@ public class AptosContractApiClient implements ContractApiClient {
                     contractAddress + "::TokenSwapGovPoolType::PoolTypeFarmPool, " +
                     getLiquidityTokenStructTag(tp) +
                     ">";
-            AccountResource<StakeListExtend> stakeListExtRes = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    accountAddress, stakeListExtResType, StakeListExtend.class, null);
-            StakeExtend stakeExtend = stakeListExtRes.getData().getItems().stream()
+            AccountResource<YieldFarmingV3StakeListExtend> stakeListExtRes = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, stakeListExtResType, YieldFarmingV3StakeListExtend.class, null);
+            YieldFarmingV3StakeExtend stakeExtend = stakeListExtRes.getData().getItems().stream()
                     .filter(i -> stakeId.equals(i.getId())).findFirst().orElse(null);
             return stakeExtend != null ? stakeExtend.getAssetAmount() : BigInteger.ZERO;
         } catch (NodeApiException nodeApiException) {
@@ -285,10 +285,10 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public List<SyrupStakeVO> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
         String poolType = "PoolTypeSyrup";
-        StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
+        YieldFarmingV3StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
         SyrupStakeList syrupStakeList = getSyrupStakeList(accountAddress, token);
         List<SyrupStakeVO> stakeVOList = new ArrayList<>();
-        for (Stake s : farmingStakeList.getItems()) {
+        for (YieldFarmingV3Stake s : farmingStakeList.getItems()) {
             SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakeList.getItems().stream()
                     .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
             if (syrupStakeOnChain == null) {
@@ -305,13 +305,13 @@ public class AptosContractApiClient implements ContractApiClient {
     public List<SyrupStakeVO> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
         //TokenSwapSyrup::query_expect_gain
         String poolType = "PoolTypeSyrup";
-        StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
+        YieldFarmingV3StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
         SyrupStakeList syrupStakeList = getSyrupStakeList(accountAddress, token);
         FarmingAsset farmingAsset = getFarmingAsset(poolType, token);
         FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend(poolType, token);
         YieldFarmingGlobalPoolInfo globalPoolInfo = getYieldFarmingGlobalPoolInfo(poolType);
         List<SyrupStakeVO> stakeVOList = new ArrayList<>();
-        for (Stake s : farmingStakeList.getItems()) {
+        for (YieldFarmingV3Stake s : farmingStakeList.getItems()) {
             SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakeList.getItems().stream()
                     .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
             if (syrupStakeOnChain == null) {
@@ -437,16 +437,16 @@ public class AptosContractApiClient implements ContractApiClient {
         return syrupStakes;
     }
 
-    private StakeList getYieldFarmingStakeList(String accountAddress, String poolType, String token) {
+    private YieldFarmingV3StakeList getYieldFarmingStakeList(String accountAddress, String poolType, String token) {
         String listResourceType = contractAddress + "::YieldFarmingV3::StakeList<" +
                 contractAddress + "::TokenSwapGovPoolType::" + poolType + ", " + getAptosCoinStructTag(token) + ">";
-        AccountResource<StakeList> stakeListResource;
+        AccountResource<YieldFarmingV3StakeList> stakeListResource;
         try {
             stakeListResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    accountAddress, listResourceType, StakeList.class, null);
+                    accountAddress, listResourceType, YieldFarmingV3StakeList.class, null);
         } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
-                StakeList emptyStakeList = new StakeList();
+                YieldFarmingV3StakeList emptyStakeList = new YieldFarmingV3StakeList();
                 emptyStakeList.setItems(Collections.emptyList());
                 return emptyStakeList;
             } else {
@@ -455,7 +455,7 @@ public class AptosContractApiClient implements ContractApiClient {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        StakeList oStakeList = stakeListResource.getData();
+        YieldFarmingV3StakeList oStakeList = stakeListResource.getData();
         return oStakeList;
     }
 
@@ -496,8 +496,8 @@ public class AptosContractApiClient implements ContractApiClient {
         //query_vestar_amount
         String resourceType = contractAddress + "::TokenSwapVestarMinter::Treasury";
         try {
-            AccountResource<Treasury> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    accountAddress, resourceType, Treasury.class, null);
+            AccountResource<TokenSwapVestarMinterTreasury> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, resourceType, TokenSwapVestarMinterTreasury.class, null);
             return resource.getData().getVtoken().getToken().getValue();
         } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
@@ -518,7 +518,7 @@ public class AptosContractApiClient implements ContractApiClient {
         try {
             AccountResource<MintRecordListT> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, resourceType, MintRecordListT.class, null);
-            MintRecordT recordT = resource.getData().getItems().stream()
+            TokenSwapVestarMinterMintRecordT recordT = resource.getData().getItems().stream()
                     .filter(i -> i.getId().equals(stakeId))
                     .findFirst().orElse(null);
             return recordT != null ? recordT.getMintedAmount() : BigInteger.ZERO;
