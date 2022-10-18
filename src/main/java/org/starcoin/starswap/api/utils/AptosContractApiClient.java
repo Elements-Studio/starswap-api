@@ -16,10 +16,7 @@ import org.starcoin.starswap.api.vo.SyrupStakeVO;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AptosContractApiClient implements ContractApiClient {
 
@@ -74,16 +71,16 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress,String lpTokenAddress, String tokenX, String tokenY) {
+    public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         //TokenSwapFarmScript::query_total_stake
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
         String lpToken = getLiquidityTokenStructTag(tp);
         FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend("PoolTypeFarmPool", lpToken);
-        return new BigInteger(farmingAssetExtend.getAssetTotalAmount());
+        return farmingAssetExtend != null ? new BigInteger(farmingAssetExtend.getAssetTotalAmount()) : BigInteger.ZERO;
     }
 
     @Override
-    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress,String lpTokenAddress, String tokenX, String tokenY) {
+    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         //v1:
         //TokenSwapFarmScript::query_release_per_second
 /*
@@ -131,12 +128,18 @@ public class AptosContractApiClient implements ContractApiClient {
         //TokenSwapFarmScript::query_stake
         String farmPoolInfoResType = contractAddress + "::TokenSwapFarm::FarmPoolInfo<" + tp.getItem1() +
                 ", " + tp.getItem2() + ">";
-        AccountResource<FarmPoolInfo> farmPoolInfoResource = null;
+        AccountResource<FarmPoolInfo> farmPoolInfoResource;
         try {
             farmPoolInfoResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     contractAddress, farmPoolInfoResType, FarmPoolInfo.class, null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);//todo ?
+        }  catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return 0L;//???
+            } else {
+                throw nodeApiException;
+            }
+        }  catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return new BigInteger(farmPoolInfoResource.getData().getAllocPoint()).longValue();
     }
@@ -169,7 +172,13 @@ public class AptosContractApiClient implements ContractApiClient {
             StakeExtend stakeExtend = stakeListExtRes.getData().getItems().stream()
                     .filter(i -> stakeId.equals(i.getId())).findFirst().orElse(null);
             return stakeExtend != null ? stakeExtend.getAssetAmount() : BigInteger.ZERO;
-        } catch (IOException e) {
+        } catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return BigInteger.ZERO;
+            } else {
+                throw nodeApiException;
+            }
+        }  catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -218,6 +227,12 @@ public class AptosContractApiClient implements ContractApiClient {
         try {
             assetExtResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     contractAddress, extResourceType, FarmingAssetExtend.class, null);
+//        } catch (NodeApiException nodeApiException) {
+//            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+//                return null;
+//            } else {
+//                throw nodeApiException;
+//            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -237,7 +252,7 @@ public class AptosContractApiClient implements ContractApiClient {
         }
     }
 
-    public FarmingAsset getFarmingAsset(String poolType, String token) {
+    private FarmingAsset getFarmingAsset(String poolType, String token) {
 //        /*
 //         * return (alloc_point, asset_total_amount, asset_total_weight, harvest_index).
 //         */
@@ -273,7 +288,7 @@ public class AptosContractApiClient implements ContractApiClient {
             SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakeList.getItems().stream()
                     .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
             if (syrupStakeOnChain == null) {
-                throw new IllegalArgumentException();//todo ?
+                throw new IllegalArgumentException("SyrupStakeList.SyrupStake not found in syrupStakeList.");
             }
             SyrupStakeVO t = toSyrupStakeVO(syrupStakeOnChain);
             t.setTokenTypeTag(token);
@@ -296,7 +311,7 @@ public class AptosContractApiClient implements ContractApiClient {
             SyrupStakeList.SyrupStake syrupStakeOnChain = syrupStakeList.getItems().stream()
                     .filter(i -> i.getId().equals(s.getId())).findFirst().orElse(null);
             if (syrupStakeOnChain == null) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("SyrupStakeList.SyrupStake not found in syrupStakeList.");
             }
             SyrupStakeVO t = toSyrupStakeVO(syrupStakeOnChain);
             t.setTokenTypeTag(token);
@@ -396,11 +411,21 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     private SyrupStakeList getSyrupStakeList(String accountAddress, String token) {
-        String syrupStakesResourceType = contractAddress + "::TokenSwapSyrup::SyrupStakeList<" + getAptosCoinStructTag(token) + ">";
+        String syrupStakesResourceType = contractAddress + "::TokenSwapSyrup::SyrupStakeList<"
+                + token //getAptosCoinStructTag(token)
+                + ">";
         AccountResource<SyrupStakeList> syrupStakesResource = null;
         try {
             syrupStakesResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, syrupStakesResourceType, SyrupStakeList.class, null);
+        }  catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                SyrupStakeList emptySyrupStakeList = new SyrupStakeList();
+                emptySyrupStakeList.setItems(Collections.emptyList());
+                return emptySyrupStakeList;
+            } else {
+                throw nodeApiException;
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -411,10 +436,18 @@ public class AptosContractApiClient implements ContractApiClient {
     private StakeList getYieldFarmingStakeList(String accountAddress, String poolType, String token) {
         String listResourceType = contractAddress + "::YieldFarmingV3::StakeList<" +
                 contractAddress + "::TokenSwapGovPoolType::" + poolType + ", " + getAptosCoinStructTag(token) + ">";
-        AccountResource<StakeList> stakeListResource = null;
+        AccountResource<StakeList> stakeListResource;
         try {
             stakeListResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, listResourceType, StakeList.class, null);
+        }  catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                StakeList emptyStakeList = new StakeList();
+                emptyStakeList.setItems(Collections.emptyList());
+                return emptyStakeList;
+            } else {
+                throw nodeApiException;
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -451,7 +484,13 @@ public class AptosContractApiClient implements ContractApiClient {
             AccountResource<Treasury> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, resourceType, Treasury.class, null);
             return resource.getData().getVtoken().getToken().getValue();
-        } catch (IOException e) {
+        }  catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return BigInteger.ZERO;
+            } else {
+                throw nodeApiException;
+            }
+        }  catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -460,7 +499,7 @@ public class AptosContractApiClient implements ContractApiClient {
     public BigInteger getVestarAmountByTokenTypeAndStakeId(String accountAddress, String token, Long stakeId) {
         //query_vestar_amount_by_staked_id
         //query_vestar_amount_by_staked_id_tokentype
-        String resourceType = contractAddress + "::TokenSwapVestarMinter::MintRecordListT<" + token + ">"; //todo not aptos Coin??
+        String resourceType = contractAddress + "::TokenSwapVestarMinter::MintRecordListT<" + token + ">"; // not aptos Coin!
         try {
             AccountResource<MintRecordListT> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, resourceType, MintRecordListT.class, null);
@@ -468,6 +507,12 @@ public class AptosContractApiClient implements ContractApiClient {
                     .filter(i -> i.getId().equals(stakeId))
                     .findFirst().orElse(null);
             return recordT != null ? recordT.getMintedAmount() : BigInteger.ZERO;
+        }  catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return BigInteger.ZERO;
+            } else {
+                throw nodeApiException;
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -506,7 +551,13 @@ public class AptosContractApiClient implements ContractApiClient {
             BigInteger v1 = new BigInteger(r1.get("value").toString());
             BigInteger v2 = new BigInteger(r2.get("value").toString());
             return tokenX.equals(tp.getItem1()) ? new Pair<>(v1, v2) : new Pair<>(v2, v1);
-        } catch (IOException e) {
+        }  catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return new Pair<>(BigInteger.ZERO, BigInteger.ZERO);
+            } else {
+                throw nodeApiException;
+            }
+        }  catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -632,6 +683,9 @@ public class AptosContractApiClient implements ContractApiClient {
         return userInfo != null ? userInfo.getLockedVetoken().getToken().getValue() : BigInteger.ZERO;
     }
 
+    /**
+     * @return Return null if UserInfo resource is not found in accountAddress.
+     */
     private FarmBoostUserInfo getFarmBoostUserInfo(String tokenX, String tokenY, String accountAddress) {
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
         String resourceType = contractAddress + "::TokenSwapFarmBoost::UserInfo<" + tp.getItem1() + "," + tp.getItem2() + " >";

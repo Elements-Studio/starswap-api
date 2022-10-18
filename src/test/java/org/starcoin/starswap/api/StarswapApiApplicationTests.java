@@ -8,6 +8,7 @@ import org.starcoin.starswap.api.data.repo.*;
 import org.starcoin.starswap.api.service.*;
 import org.starcoin.starswap.api.utils.ContractApiClient;
 import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -79,9 +80,44 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
-        String aptosContractAddress = "0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049";
+        String aptosContractAddress = "0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602";
+        String testAccountAddress = "0xe7c0aa6d4b9e9f484b48cc2602cef1de6bb6bac0c4fff7cbd2eb1f6b23f96c3b";
         String tokenXUSDTOnAptos = aptosContractAddress + "::XUSDT::XUSDT";
         String tokenSTAROnAptos = aptosContractAddress + "::STAR::STAR";
+
+        BigInteger vestarAmount_1 = contractApiClient.getAccountVestarAmount(aptosContractAddress);
+        System.out.println("getAccountVestarAmount: " + vestarAmount_1);
+//        BigInteger vestarAmount_2 = contractApiClient.getAccountVestarAmount(testAccountAddress);
+//        System.out.println("getAccountVestarAmount: " + vestarAmount_2);
+        BigInteger vestarAmountTokenTypeAndStakeId = contractApiClient.getVestarAmountByTokenTypeAndStakeId(
+                testAccountAddress,
+                tokenSTAROnAptos,
+                1L);
+        System.out.println("getVestarAmountByTokenTypeAndStakeId: " + vestarAmountTokenTypeAndStakeId);
+        //if (true) return;
+        BigDecimal exchangeRate_1 = contractApiClient.getExchangeRate(aptosContractAddress, tokenSTAROnAptos, tokenXUSDTOnAptos,
+                new BigInteger("1000000000"), new BigInteger("1000000"));
+        System.out.println("getExchangeRate: " + exchangeRate_1);
+        BigDecimal exchangeRate_2 = contractApiClient.getExchangeRate(aptosContractAddress, tokenXUSDTOnAptos, tokenSTAROnAptos,
+                new BigInteger("1000000"), new BigInteger("1000000000"));
+        System.out.println("getExchangeRate: " + exchangeRate_2);
+        //if (true) return;
+
+        BigInteger syrupPoolTotalStake = contractApiClient.syrupPoolQueryTotalStake(aptosContractAddress, tokenSTAROnAptos);
+        System.out.println("syrupPoolQueryTotalStake: " + syrupPoolTotalStake);
+        BigInteger syrupPoolReleasePerSecond =  contractApiClient.syrupPoolQueryReleasePerSecondV2(aptosContractAddress, tokenSTAROnAptos);
+        System.out.println("syrupPoolQueryReleasePerSecondV2: " + syrupPoolReleasePerSecond);
+        List<SyrupStakeVO> syrupStakeList = contractApiClient.syrupPoolQueryStakeList(aptosContractAddress,
+                tokenSTAROnAptos,
+                testAccountAddress //"0x0000000003c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0601"
+        );
+        System.out.println("syrupPoolQueryStakeList: " + syrupStakeList);
+        List<SyrupStakeVO> syrupStakeList_2 = contractApiClient.syrupPoolQueryStakeWithExpectedGainList(aptosContractAddress,
+                tokenSTAROnAptos,
+                testAccountAddress);
+        System.out.println(syrupStakeList_2);
+        //if (true) return;
+
         BigInteger farmTotalStake_1 = contractApiClient.tokenSwapFarmQueryTotalStake(aptosContractAddress,
                 aptosContractAddress, tokenXUSDTOnAptos, tokenSTAROnAptos);
         System.out.println("tokenSwapFarmQueryTotalStake: " + farmTotalStake_1);
@@ -123,7 +159,7 @@ class StarswapApiApplicationTests {
         Pair<BigInteger, BigInteger> tokenSwapFarmStakedReserves_1 = contractApiClient.getTokenSwapFarmStakedReserves(
                 aptosContractAddress, aptosContractAddress, tokenXUSDTOnAptos, tokenSTAROnAptos);
         System.out.println(tokenSwapFarmStakedReserves_1);
-        String testAccountAddress_1 = aptosContractAddress;
+        String testAccountAddress_1 = testAccountAddress;
         //String testAccountAddress_1 = "0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07041"; //a error address
         Long swapFarmBoostFactor_1 = contractApiClient.tokenSwapFarmGetBoostFactor(
                 aptosContractAddress, aptosContractAddress,
@@ -150,10 +186,11 @@ class StarswapApiApplicationTests {
 //        System.out.println(tokenSTAROnAptos + " scalingFactor: " + scalingFactor);
         if (true) return;
 
+        // ////////////////////////////////////
 
         try {
-            ContractApiClient contractApiClient = new StarcoinContractApiClient("https://barnard-seed.starcoin.org", null);
-            Triple<List<Long>, List<Long>, List<BigInteger>> pools = contractApiClient.syrupPoolQueryAllMultiplierPools(
+            ContractApiClient starcoinContractApiClient = new StarcoinContractApiClient("https://barnard-seed.starcoin.org", null);
+            Triple<List<Long>, List<Long>, List<BigInteger>> pools = starcoinContractApiClient.syrupPoolQueryAllMultiplierPools(
                     "0x8c109349c6bd91411d6bc962e080c4a3", "0x8c109349c6bd91411d6bc962e080c4a3::STAR::STAR");
             System.out.println(pools);
         } catch (MalformedURLException e) {

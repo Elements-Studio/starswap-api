@@ -183,25 +183,25 @@ false,
 -- then RESTART starswap API service --
 
 -- --------------------- update addresses ------------------
-UPDATE `token` SET `token_struct_address` = '0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049'
+UPDATE `token` SET `token_struct_address` = '0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602'
   WHERE (`token_id` = 'STAR');
-UPDATE `token` SET `token_struct_address` = '0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049'
+UPDATE `token` SET `token_struct_address` = '0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602'
   WHERE (`token_id` = 'XUSDT');
 
-UPDATE `liquidity_token` SET `liquidity_token_address` = '0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049'
+UPDATE `liquidity_token` SET `liquidity_token_address` = '0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602'
   WHERE (`liquidity_token_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee')
     and (`token_x_id` = 'STAR') and (`token_y_id` = 'XUSDT');
 
 UPDATE `liquidity_pool`
-  SET `liquidity_token_address` = '0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049',
-    `pool_address` = '0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049'
+  SET `liquidity_token_address` = '0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602',
+    `pool_address` = '0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602'
   WHERE (`liquidity_token_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee')
     and (`token_x_id` = 'STAR') and (`token_y_id` = 'XUSDT')
     and (`pool_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee');
 
 UPDATE `liquidity_token_farm`
-  SET `farm_address` = '0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049',
-    `liquidity_token_address` = '0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049'
+  SET `farm_address` = '0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602',
+    `liquidity_token_address` = '0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602'
   WHERE (`farm_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee')
     and (`liquidity_token_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee')
     and (`token_x_id` = 'STAR') and (`token_y_id` = 'XUSDT');
@@ -227,7 +227,7 @@ INSERT INTO `syrup_pool`
 `daily_reward`)
 VALUES
 (
-'0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049',
+'0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602',
 'STAR',
 '1643030987000',
 'admin',

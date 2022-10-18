@@ -88,7 +88,7 @@ public interface ContractApiClient {
                                        BigInteger tokenXScalingFactor, BigInteger tokenYScalingFactor) {
         // use tokenSwapRouterGetReserves and tokenSwapRouterGetAmountOut to calculate exchange rate:
         Pair<BigInteger, BigInteger> reserves = tokenSwapRouterGetReserves(lpTokenAddress, tokenX, tokenY);
-        BigInteger amountX = reserves.getItem1().divide(BigInteger.valueOf(100L));//try to swap tokenX of 1 percent reserve
+        BigInteger amountX = reserves.getItem1().divide(BigInteger.valueOf(1000L));//try to swap tokenX of 0.1 percent reserve
         BigInteger amountY = tokenSwapRouterGetAmountOut(lpTokenAddress,
                 reserves.getItem1(), reserves.getItem2(), amountX,
                 OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR,

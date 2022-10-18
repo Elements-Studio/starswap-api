@@ -71,5 +71,5 @@ public interface OnChainService {
 
     BigInteger getAccountVestarAmount(String accountAddress);
 
-    BigInteger getAccountVestarAmountByStakeId(String accountAddress, Long stakeId, String tokenTypeTag);
+    BigInteger getAccountVestarAmountByTokenTypeAndStakeId(String accountAddress, String tokenTypeTag, Long stakeId);
 }
