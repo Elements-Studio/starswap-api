@@ -16,7 +16,11 @@ import org.starcoin.starswap.api.vo.SyrupStakeVO;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AptosContractApiClient implements ContractApiClient {
 
@@ -132,13 +136,13 @@ public class AptosContractApiClient implements ContractApiClient {
         try {
             farmPoolInfoResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     contractAddress, farmPoolInfoResType, FarmPoolInfo.class, null);
-        }  catch (NodeApiException nodeApiException) {
+        } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
                 return 0L;//???
             } else {
                 throw nodeApiException;
             }
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return new BigInteger(farmPoolInfoResource.getData().getAllocPoint()).longValue();
@@ -178,7 +182,7 @@ public class AptosContractApiClient implements ContractApiClient {
             } else {
                 throw nodeApiException;
             }
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -418,7 +422,7 @@ public class AptosContractApiClient implements ContractApiClient {
         try {
             syrupStakesResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, syrupStakesResourceType, SyrupStakeList.class, null);
-        }  catch (NodeApiException nodeApiException) {
+        } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
                 SyrupStakeList emptySyrupStakeList = new SyrupStakeList();
                 emptySyrupStakeList.setItems(Collections.emptyList());
@@ -440,7 +444,7 @@ public class AptosContractApiClient implements ContractApiClient {
         try {
             stakeListResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, listResourceType, StakeList.class, null);
-        }  catch (NodeApiException nodeApiException) {
+        } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
                 StakeList emptyStakeList = new StakeList();
                 emptyStakeList.setItems(Collections.emptyList());
@@ -458,22 +462,33 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress, String token) {
         //TokenSwapSyrup::query_all_multiplier_pools
-        /*
-        https://swap-api.starswap.xyz/main/v1/syrupPools?embedSyrupMultiplierPools=true
-         */
-        // return estimated values...
-        Long[] secs = new Long[]{604800L, 1209600L, 2592000L, 5184000L, 7776000L};
-        Long[] multipliers = new Long[]{2L, 3L, 4L, 6L, 8L};
+
         BigInteger totalStake = syrupPoolQueryTotalStake(poolAddress, token);
-        BigInteger[] amounts = new BigInteger[]{
-                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
-                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
-                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
-                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
-                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(96L)),
-        };
-        return new Triple<>(Arrays.asList(secs), Arrays.asList(multipliers), Arrays.asList(amounts));
-        //todo waiting on-chain contract impl.
+//        Long[] secs = new Long[]{604800L, 1209600L, 2592000L, 5184000L, 7776000L};
+//        Long[] multipliers = new Long[]{2L, 3L, 4L, 6L, 8L};
+//        BigInteger[] amounts = new BigInteger[]{
+//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(96L)),
+//        };
+        //return new Triple<>(Arrays.asList(secs), Arrays.asList(multipliers), Arrays.asList(amounts));
+        // todo just return estimated values now... waiting on-chain contract impl.
+        SwapStepwiseMultiplierConfig config = getSwapStepwiseMultiplierConfig();
+        List<Long> secs = config.getList().stream().map(i -> i.getIntervalSec()).collect(Collectors.toList());
+        List<Long> multipliers = config.getList().stream().map(i -> i.getMultiplier()).collect(Collectors.toList());
+        Long maxMultiplier = multipliers.stream().max(Long::compareTo).orElse(1L);
+        List<BigInteger> amounts = new ArrayList<>();
+        for (int i = 0; i < multipliers.size(); i++) {
+            int p = 1;
+            if (maxMultiplier == multipliers.get(i)) {
+                p = 100 - multipliers.size() + 1;
+            }
+            amounts.add(totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(p)));
+        }
+        return new Triple<>(secs, multipliers, amounts);
+
     }
 
     @Override
@@ -484,13 +499,13 @@ public class AptosContractApiClient implements ContractApiClient {
             AccountResource<Treasury> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, resourceType, Treasury.class, null);
             return resource.getData().getVtoken().getToken().getValue();
-        }  catch (NodeApiException nodeApiException) {
+        } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
                 return BigInteger.ZERO;
             } else {
                 throw nodeApiException;
             }
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -507,7 +522,7 @@ public class AptosContractApiClient implements ContractApiClient {
                     .filter(i -> i.getId().equals(stakeId))
                     .findFirst().orElse(null);
             return recordT != null ? recordT.getMintedAmount() : BigInteger.ZERO;
-        }  catch (NodeApiException nodeApiException) {
+        } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
                 return BigInteger.ZERO;
             } else {
@@ -551,13 +566,13 @@ public class AptosContractApiClient implements ContractApiClient {
             BigInteger v1 = new BigInteger(r1.get("value").toString());
             BigInteger v2 = new BigInteger(r2.get("value").toString());
             return tokenX.equals(tp.getItem1()) ? new Pair<>(v1, v2) : new Pair<>(v2, v1);
-        }  catch (NodeApiException nodeApiException) {
+        } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
                 return new Pair<>(BigInteger.ZERO, BigInteger.ZERO);
             } else {
                 throw nodeApiException;
             }
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -735,5 +750,18 @@ public class AptosContractApiClient implements ContractApiClient {
         return null;
     }
 
+    public SwapStepwiseMultiplierConfig getSwapStepwiseMultiplierConfig() {
+        String resourceType = contractAddress + "::Config::Config<"
+                + contractAddress + "::TokenSwapConfig::SwapStepwiseMultiplierConfig" +
+                ">";
+        AccountResource<SwapAdminConfig.SwapStepwiseMultiplierConfig> resource = null;
+        try {
+            resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    contractAddress, resourceType, SwapAdminConfig.SwapStepwiseMultiplierConfig.class, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return resource.getData().getPayload();
+    }
 
 }

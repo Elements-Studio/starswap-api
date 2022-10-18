@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.starcoin.starswap.api.data.model.*;
 import org.starcoin.starswap.api.data.repo.*;
 import org.starcoin.starswap.api.service.*;
+import org.starcoin.starswap.api.utils.AptosContractApiClient;
 import org.starcoin.starswap.api.utils.ContractApiClient;
 import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
 import org.starcoin.starswap.api.vo.SyrupStakeVO;
@@ -78,12 +79,30 @@ class StarswapApiApplicationTests {
         nodeHeartbeatRepository.save(b7);
     }
 
+    private AptosContractApiClient getAptosContractApiClient() {
+        return (AptosContractApiClient) contractApiClient;
+    }
+
     @Test
     void contextLoads() {
         String aptosContractAddress = "0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602";
         String testAccountAddress = "0xe7c0aa6d4b9e9f484b48cc2602cef1de6bb6bac0c4fff7cbd2eb1f6b23f96c3b";
         String tokenXUSDTOnAptos = aptosContractAddress + "::XUSDT::XUSDT";
         String tokenSTAROnAptos = aptosContractAddress + "::STAR::STAR";
+
+        BigInteger coinSupply_1 = getAptosContractApiClient().getCoinSupply(tokenSTAROnAptos);
+        System.out.println("getCoinSupply: " + coinSupply_1);
+        BigInteger lockedVestarAmount = getAptosContractApiClient().getBoostLockedVestarAmount(tokenSTAROnAptos, tokenXUSDTOnAptos, testAccountAddress);
+        System.out.println("getBoostLockedVestarAmount: " + lockedVestarAmount);
+        BigInteger boostFactor = getAptosContractApiClient().computeBoostFactor(BigInteger.valueOf(100000L), BigInteger.valueOf(1000L), BigInteger.valueOf(10000000L));
+        System.out.println("computeBoostFactor: " + boostFactor);
+        BigInteger vestarAmount_2 = getAptosContractApiClient().getVestarAmountByTokenTypeAndStakeId(testAccountAddress, tokenSTAROnAptos, 1L);
+        System.out.println("getVestarAmountByTokenTypeAndStakeId: " + vestarAmount_2);
+        //if (true) return;
+
+        Triple<?, ?, ?> allMultiplierPools = contractApiClient.syrupPoolQueryAllMultiplierPools(aptosContractAddress, tokenSTAROnAptos);
+        System.out.println(allMultiplierPools);
+        if (true) return;
 
         BigInteger vestarAmount_1 = contractApiClient.getAccountVestarAmount(aptosContractAddress);
         System.out.println("getAccountVestarAmount: " + vestarAmount_1);
@@ -105,7 +124,7 @@ class StarswapApiApplicationTests {
 
         BigInteger syrupPoolTotalStake = contractApiClient.syrupPoolQueryTotalStake(aptosContractAddress, tokenSTAROnAptos);
         System.out.println("syrupPoolQueryTotalStake: " + syrupPoolTotalStake);
-        BigInteger syrupPoolReleasePerSecond =  contractApiClient.syrupPoolQueryReleasePerSecondV2(aptosContractAddress, tokenSTAROnAptos);
+        BigInteger syrupPoolReleasePerSecond = contractApiClient.syrupPoolQueryReleasePerSecondV2(aptosContractAddress, tokenSTAROnAptos);
         System.out.println("syrupPoolQueryReleasePerSecondV2: " + syrupPoolReleasePerSecond);
         List<SyrupStakeVO> syrupStakeList = contractApiClient.syrupPoolQueryStakeList(aptosContractAddress,
                 tokenSTAROnAptos,
