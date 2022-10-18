@@ -95,7 +95,9 @@ public class OnChainServiceImpl implements OnChainService {
         Token tokenX = tokenService.getTokenOrElseThrow(tokenIdPair.tokenXId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenXId()));
         Token tokenY = tokenService.getTokenOrElseThrow(tokenIdPair.tokenYId(), () -> new RuntimeException("Cannot find Token by Id: " + tokenIdPair.tokenYId()));
         LiquidityTokenFarm liquidityTokenFarm = liquidityTokenFarmService.findOneByTokenIdPair(tokenX.getTokenId(), tokenY.getTokenId());
-        return this.contractApiClient.tokenSwapFarmGetBoostFactor(liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+        return this.contractApiClient.tokenSwapFarmGetBoostFactor(
+                liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress(),
+                liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress(),
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString(),
                 accountAddress);
@@ -241,7 +243,9 @@ public class OnChainServiceImpl implements OnChainService {
         String tokenY = tokenService.getTokenOrElseThrow(tokenYId, () -> {
             throw new RuntimeException("Cannot find token by Id: " + tokenYId);
         }).getTokenStructType().toTypeTagString();
-        BigInteger stakeAmount = contractApiClient.tokenSwapFarmQueryTotalStake(farmAddress, tokenX, tokenY);
+        BigInteger stakeAmount = contractApiClient.tokenSwapFarmQueryTotalStake(farmAddress,
+                farm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress(),
+                tokenX, tokenY);
         return stakeAmount;
     }
 
@@ -320,6 +324,7 @@ public class OnChainServiceImpl implements OnChainService {
         Token tokenX = tokenService.getTokenOrElseThrow(liquidityTokenFarmId.getLiquidityTokenId().getTokenXId(), () -> new RuntimeException("Cannot find Token by Id"));
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarmId.getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
         return contractApiClient.tokenSwapFarmGetRewardMultiplier(liquidityTokenFarmId.getFarmAddress(),
+                liquidityTokenFarmId.getLiquidityTokenId().getLiquidityTokenAddress(),
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString());
     }
@@ -479,6 +484,7 @@ public class OnChainServiceImpl implements OnChainService {
 
         Pair<BigInteger, BigInteger> p = contractApiClient.tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(
                 farmAddress,
+                liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress(),
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString()
         );
@@ -519,6 +525,7 @@ public class OnChainServiceImpl implements OnChainService {
         Token tokenY = tokenService.getTokenOrElseThrow(liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getTokenYId(), () -> new RuntimeException("Cannot find Token by Id"));
         String farmAddress = liquidityTokenFarm.getLiquidityTokenFarmId().getFarmAddress();
         BigInteger rewardReleasePerSecond = contractApiClient.tokenSwapFarmQueryReleasePerSecondV2(farmAddress,
+                liquidityTokenFarm.getLiquidityTokenFarmId().getLiquidityTokenId().getLiquidityTokenAddress(),
                 tokenX.getTokenStructType().toTypeTagString(),
                 tokenY.getTokenStructType().toTypeTagString());
         BigInteger rewardPerDay = rewardReleasePerSecond.multiply(BigInteger.valueOf(ONE_DAY_SECONDS));

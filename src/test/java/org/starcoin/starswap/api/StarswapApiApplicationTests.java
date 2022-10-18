@@ -8,7 +8,6 @@ import org.starcoin.starswap.api.data.repo.*;
 import org.starcoin.starswap.api.service.*;
 import org.starcoin.starswap.api.utils.ContractApiClient;
 import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
-import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -80,34 +79,76 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
-        String tokenXUSDTOnAptos = "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee::XUSDT::XUSDT";
-        String tokenSTAROnAptos = "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee::STAR::STAR";
-        Pair<BigInteger, BigInteger> p = this.contractApiClient.tokenSwapRouterGetReserves(
-                "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
+        String aptosContractAddress = "0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049";
+        String tokenXUSDTOnAptos = aptosContractAddress + "::XUSDT::XUSDT";
+        String tokenSTAROnAptos = aptosContractAddress + "::STAR::STAR";
+        BigInteger farmTotalStake_1 = contractApiClient.tokenSwapFarmQueryTotalStake(aptosContractAddress,
+                aptosContractAddress, tokenXUSDTOnAptos, tokenSTAROnAptos);
+        System.out.println("tokenSwapFarmQueryTotalStake: " + farmTotalStake_1);
+        BigInteger farmTotalStake_2 = contractApiClient.tokenSwapFarmQueryTotalStake(aptosContractAddress,
+                aptosContractAddress, tokenSTAROnAptos, tokenXUSDTOnAptos);
+        System.out.println("tokenSwapFarmQueryTotalStake: " + farmTotalStake_2);
+        BigInteger syrupPoolTotalStake_1 = contractApiClient.syrupPoolQueryTotalStake(aptosContractAddress, tokenSTAROnAptos);
+        System.out.println("syrupPoolQueryTotalStake:" + syrupPoolTotalStake_1);
+        //if (true) return;
+
+        Pair<BigInteger, BigInteger> reserves_1 = this.contractApiClient.tokenSwapRouterGetReserves(
+                aptosContractAddress,
                 tokenXUSDTOnAptos, tokenSTAROnAptos);
-        System.out.println(p);
-        Pair<BigInteger, BigInteger> p2 = this.contractApiClient.tokenSwapRouterGetReserves(
-                "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
+        System.out.println(reserves_1);
+        Pair<BigInteger, BigInteger> reserves_2 = this.contractApiClient.tokenSwapRouterGetReserves(
+                aptosContractAddress,
                 tokenSTAROnAptos, tokenXUSDTOnAptos);
-        System.out.println(p2);
+        System.out.println(reserves_2);
+
+        BigInteger totalLiquidity_1 = contractApiClient.tokenSwapRouterGetTotalLiquidity(aptosContractAddress, tokenXUSDTOnAptos, tokenSTAROnAptos);
+        BigInteger testLiquidity_1 = totalLiquidity_1.divide(BigInteger.TEN);
+        Pair<BigInteger, BigInteger> reservesByLiquidity = contractApiClient.getReservesByLiquidity(
+                aptosContractAddress, tokenSTAROnAptos, tokenXUSDTOnAptos,
+                testLiquidity_1);
+        System.out.println("getReservesByLiquidity: " + reservesByLiquidity);
+
+        Long swapFarmRewardMultiplier_1 = contractApiClient.tokenSwapFarmGetRewardMultiplier(aptosContractAddress,
+                aptosContractAddress, tokenXUSDTOnAptos, tokenSTAROnAptos);
+        System.out.println("tokenSwapFarmGetRewardMultiplier: " + swapFarmRewardMultiplier_1);
+        BigInteger releasePerSecondV2_1 = contractApiClient.tokenSwapFarmQueryReleasePerSecondV2(aptosContractAddress,
+                aptosContractAddress, tokenXUSDTOnAptos, tokenSTAROnAptos);
+        System.out.println("tokenSwapFarmQueryReleasePerSecondV2:" + releasePerSecondV2_1);
+        Pair<BigInteger, BigInteger> releasePerSecondV2AndAssetTotalWeight_1
+                = contractApiClient.tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(aptosContractAddress,
+                aptosContractAddress, tokenSTAROnAptos, tokenXUSDTOnAptos);
+        System.out.println("tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight: " + releasePerSecondV2AndAssetTotalWeight_1);
+//        Pair<BigInteger, BigInteger> tokenSwapFarmStakedReserves_1
+//                = contractApiClient.getTokenSwapFarmStakedReserves(aptosContractAddress, aptosContractAddress, tokenSTAROnAptos, tokenXUSDTOnAptos);
+        Pair<BigInteger, BigInteger> tokenSwapFarmStakedReserves_1 = contractApiClient.getTokenSwapFarmStakedReserves(
+                aptosContractAddress, aptosContractAddress, tokenXUSDTOnAptos, tokenSTAROnAptos);
+        System.out.println(tokenSwapFarmStakedReserves_1);
+        String testAccountAddress_1 = aptosContractAddress;
+        //String testAccountAddress_1 = "0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07041"; //a error address
+        Long swapFarmBoostFactor_1 = contractApiClient.tokenSwapFarmGetBoostFactor(
+                aptosContractAddress, aptosContractAddress,
+                tokenXUSDTOnAptos, tokenSTAROnAptos,
+                testAccountAddress_1);
+        System.out.println("tokenSwapFarmGetBoostFactor: " + swapFarmBoostFactor_1);
+        //if (true) return;
 
         BigInteger amountOut = this.contractApiClient.tokenSwapRouterGetAmountOut(
-                "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
+                aptosContractAddress,
                 tokenXUSDTOnAptos, tokenSTAROnAptos, BigInteger.valueOf(1),
                 OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR, OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
-        System.out.println("USDT / STAR: " + p.getItem2().divide(p.getItem1()));
+        System.out.println("USDT / STAR: " + reserves_1.getItem2().divide(reserves_1.getItem1()));
         System.out.println("--------------- 1 USDT in, STAR amount out ----------------: " + amountOut);
         BigInteger amountIn = this.contractApiClient.tokenSwapRouterGetAmountIn(
-                "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee",
+                aptosContractAddress,
                 tokenSTAROnAptos, tokenXUSDTOnAptos, BigInteger.valueOf(1),
                 OnChainServiceImpl.DEFAULT_SWAP_FEE_NUMERATOR, OnChainServiceImpl.DEFAULT_SWAP_FEE_DENUMERATOR);
         System.out.println("--------------- 1000000 USDT out, need STAR mount in ----------------: " + amountIn);
-        if (true) return;
+        //if (true) return;
 //        BigInteger scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenXUSDTOnAptos);
 //        System.out.println(tokenXUSDTOnAptos + " scalingFactor: " + scalingFactor);
 //        scalingFactor = this.contractApiClient.tokenGetScalingFactor(tokenSTAROnAptos);
 //        System.out.println(tokenSTAROnAptos + " scalingFactor: " + scalingFactor);
-//        if (true) return;
+        if (true) return;
 
 
         try {

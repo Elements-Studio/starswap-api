@@ -6,8 +6,8 @@ import org.starcoin.bean.Event;
 import org.starcoin.bean.RpcStateWithProof;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.starswap.api.data.model.Pair;
-import org.starcoin.starswap.api.vo.SyrupStakeVO;
 import org.starcoin.starswap.api.data.model.Triple;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 import org.starcoin.utils.JsonRpcClientUtils;
 
 import java.math.BigInteger;
@@ -46,16 +46,16 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY) {
+    public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapFarmQueryTotalStake(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 
     @Override
-    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String tokenX, String tokenY) {
+    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         // v1:
         //return JsonRpcUtils.tokenSwapFarmQueryReleasePerSecond(this.jsonRpcSession, farmAddress, tokenX, tokenY);
         Pair<BigInteger, BigInteger> pair
-                = tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(farmAddress, tokenX, tokenY);
+                = tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(farmAddress, lpTokenAddress, tokenX, tokenY);
         return pair.getItem1();
     }
 
@@ -66,7 +66,10 @@ public class StarcoinContractApiClient implements ContractApiClient {
      * @return return farm ReleasePerSecond and asset_total_weight which is a "boosted" virtual LP amount.
      */
     @Override
-    public Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress, String tokenX, String tokenY) {
+    public Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress,
+                                                                                                String lpTokenAddress,
+                                                                                                String tokenX,
+                                                                                                String tokenY) {
         List<BigInteger> farmInfoV2 = JsonRpcUtils.tokenSwapFarmQueryInfoV2(this.jsonRpcSession, farmAddress, tokenX, tokenY);
         BigInteger alloc_point = farmInfoV2.get(0);
         //BigInteger asset_total_amount = farmInfoV2.get(1);
@@ -79,12 +82,13 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public Long tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
+    public Long tokenSwapFarmGetRewardMultiplier(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapFarmGetRewardMultiplier(this.jsonRpcSession, farmAddress, tokenX, tokenY);
     }
 
     @Override
-    public Long tokenSwapFarmGetBoostFactor(String farmAddress, String tokenX, String tokenY, String accountAddress) {
+    public Long tokenSwapFarmGetBoostFactor(String farmAddress, String lpTokenAddress,
+                                            String tokenX, String tokenY, String accountAddress) {
         return JsonRpcUtils.tokenSwapFarmGetBoostFactor(this.jsonRpcSession, farmAddress, tokenX, tokenY, accountAddress);
     }
 

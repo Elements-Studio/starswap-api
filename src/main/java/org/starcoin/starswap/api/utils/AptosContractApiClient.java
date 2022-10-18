@@ -6,6 +6,7 @@ import dev.aptos.bean.CoinInfo;
 import dev.aptos.bean.Option;
 import dev.aptos.bean.OptionalAggregator;
 import dev.aptos.types.TypeInfo;
+import dev.aptos.utils.NodeApiException;
 import dev.aptos.utils.NodeApiUtils;
 import dev.aptos.utils.StructTagUtils;
 import org.starcoin.starswap.api.data.model.Pair;
@@ -26,6 +27,7 @@ public class AptosContractApiClient implements ContractApiClient {
     private static final long DEFAULT_OPERATION_DENUMERATOR = 60;
     private static final long DEFAULT_POUNDAGE_NUMERATOR = 3;
     private static final long DEFAULT_POUNDAGE_DENUMERATOR = 1000;
+    private static final Integer HTTP_STATUS_NOT_FOUND = 404;
     private static BigInteger EXP_SCALE = new BigInteger("1000000000000000000"); //e18
     private final String nodeApiBaseUrl;
     private final String contractAddress;
@@ -72,7 +74,7 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress, String tokenX, String tokenY) {
+    public BigInteger tokenSwapFarmQueryTotalStake(String farmAddress,String lpTokenAddress, String tokenX, String tokenY) {
         //TokenSwapFarmScript::query_total_stake
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
         String lpToken = getLiquidityTokenStructTag(tp);
@@ -81,7 +83,7 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress, String tokenX, String tokenY) {
+    public BigInteger tokenSwapFarmQueryReleasePerSecondV2(String farmAddress,String lpTokenAddress, String tokenX, String tokenY) {
         //v1:
         //TokenSwapFarmScript::query_release_per_second
 /*
@@ -107,7 +109,10 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress, String tokenX, String tokenY) {
+    public Pair<BigInteger, BigInteger> tokenSwapFarmQueryReleasePerSecondV2AndAssetTotalWeight(String farmAddress,
+                                                                                                String lpTokenAddress,
+                                                                                                String tokenX,
+                                                                                                String tokenY) {
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
         String lpToken = getLiquidityTokenStructTag(tp);
         BigInteger rps = tokenSwapFarmQueryReleasePerSecondV2(lpToken);
@@ -117,7 +122,8 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public Long tokenSwapFarmGetRewardMultiplier(String farmAddress, String tokenX, String tokenY) {
+    public Long tokenSwapFarmGetRewardMultiplier(String farmAddress, String lpTokenAddress,
+                                                 String tokenX, String tokenY) {
         //TokenSwapFarmScript::get_farm_multiplier
 //        let farm_pool_info = borrow_global<FarmPoolInfo<X, Y>>(STAR::token_address());
 //        (farm_pool_info.alloc_point as u64)
@@ -136,7 +142,8 @@ public class AptosContractApiClient implements ContractApiClient {
     }
 
     @Override
-    public Long tokenSwapFarmGetBoostFactor(String farmAddress, String tokenX, String tokenY, String accountAddress) {
+    public Long tokenSwapFarmGetBoostFactor(String farmAddress, String lpTokenAddress,
+                                            String tokenX, String tokenY, String accountAddress) {
         //TokenSwapFarmRouter::get_boost_factor
         FarmBoostUserInfo userInfo = getFarmBoostUserInfo(tokenX, tokenY, accountAddress);
         return userInfo != null ? userInfo.getBoostFactor() : 0L;
@@ -185,14 +192,14 @@ public class AptosContractApiClient implements ContractApiClient {
         return new BigInteger(farmingAssetExtend.getAssetTotalAmount());
     }
 
+//    private YieldFarmingGlobalPoolInfo syrupPoolQueryGlobalPoolInfo() {
+//        return getYieldFarmingGlobalPoolInfo("PoolTypeSyrup");
+//    }
+
     @Override
     public BigInteger syrupPoolQueryReleasePerSecondV2(String poolAddress, String token) {
         return getPoolReleasePerSecondV2("PoolTypeSyrup", token);
     }
-
-//    private YieldFarmingGlobalPoolInfo syrupPoolQueryGlobalPoolInfo() {
-//        return getYieldFarmingGlobalPoolInfo("PoolTypeSyrup");
-//    }
 
     private BigInteger getPoolReleasePerSecondV2(String poolType, String token) {
         YieldFarmingGlobalPoolInfo syrupGlobalInfo = getYieldFarmingGlobalPoolInfo(poolType);
@@ -300,7 +307,7 @@ public class AptosContractApiClient implements ContractApiClient {
             long now_seconds = System.currentTimeMillis() / 1000;//timestamp::now_seconds();
             //assert!(now_seconds >= farming_asset.start_time, error::invalid_state(ERR_FARMING_NOT_READY));
             if (!(now_seconds >= farmingAsset.getStartTime())) {
-                throw new IllegalArgumentException();//todo is this ok?
+                throw new IllegalArgumentException("ERR_FARMING_NOT_READY");//todo is this ok?
             }
             YieldFarmingHarvestCapability cap = syrupStakeOnChain.getHarvestCap();
             // Calculate from latest timestamp to deadline timestamp if deadline valid
@@ -612,7 +619,6 @@ public class AptosContractApiClient implements ContractApiClient {
         return boost_factor.divide(factor.divide(BigInteger.valueOf(100)));
     }
 
-
     public BigInteger getBoostLockedVestarAmount(String tokenX, String tokenY, String accountAddress) {
 //    public fun get_boost_locked_vestar_amount<X: copy + drop + store, Y: copy + drop + store>(account: address): u128 acquires UserInfo {
 //        if (exists<UserInfo<X, Y>>(account)) {
@@ -634,11 +640,16 @@ public class AptosContractApiClient implements ContractApiClient {
             AccountResource<FarmBoostUserInfo> resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
                     accountAddress, resourceType, FarmBoostUserInfo.class, null);
             userInfo = resource.getData();
+            return userInfo;
+        } catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return null;
+            } else {
+                throw nodeApiException;
+            }
         } catch (IOException e) {
-            //return BigInteger.ZERO;
-            throw new RuntimeException(e);//todo throw error or return null?
+            throw new RuntimeException(e);
         }
-        return userInfo;
     }
 
     public BigInteger getCoinSupply(String token) {

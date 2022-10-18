@@ -23,7 +23,7 @@ starswap:
   pulling-event-task-auto-create:
     fixed-delay: 300000
   invisible-token-pairs: '["BX_USDT,STC"]'
-  aptos-contract-address: "0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee"
+  aptos-contract-address: "0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049"
 
 starcoin:
   enabled: false
