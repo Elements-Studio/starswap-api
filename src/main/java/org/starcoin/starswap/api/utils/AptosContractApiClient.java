@@ -482,7 +482,7 @@ public class AptosContractApiClient implements ContractApiClient {
         List<BigInteger> amounts = new ArrayList<>();
         for (int i = 0; i < multipliers.size(); i++) {
             int p = 1;
-            if (maxMultiplier == multipliers.get(i)) {
+            if (maxMultiplier.equals(multipliers.get(i))) {
                 p = 100 - multipliers.size() + 1;
             }
             amounts.add(totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(p)));
