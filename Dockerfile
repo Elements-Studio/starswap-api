@@ -4,8 +4,8 @@ WORKDIR /workspace/app
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
-COPY settings.xml .
 COPY src src
+COPY settings.xml .
 
 RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
 

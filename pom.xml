@@ -133,8 +133,8 @@
 
     <repositories>
         <repository>
-            <id>wubuku-github</id>
-            <url>https://public:&#103;hp_HmhmblcuU1m0b9wh6asNnEJo7IpF5N2GDogS@maven.pkg.github.com/wubuku/*</url>
+            <id>aptos-java-sdk-github</id>
+            <url>https://maven.pkg.github.com/wubuku/aptos-java-sdk</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
