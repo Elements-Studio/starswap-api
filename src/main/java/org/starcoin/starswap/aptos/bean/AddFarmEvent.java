@@ -1,7 +1,7 @@
 package org.starcoin.starswap.aptos.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dev.aptos.bean.TypeInfo;
+import com.github.wubuku.aptos.bean.TypeInfo;
 
 public class AddFarmEvent {
     /*
