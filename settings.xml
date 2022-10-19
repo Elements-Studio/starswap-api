@@ -6,7 +6,7 @@
     <servers>
         <server>
             <id>aptos-java-sdk-github</id>
-            <username>wubuku</username>
+            <username>aptos-java-sdk-bot</username>
             <!-- Public token with `read:packages` scope -->
             <password>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</password>
         </server>
