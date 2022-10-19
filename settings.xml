@@ -1,0 +1,14 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <servers>
+        <server>
+            <id>aptos-java-sdk-github</id>
+            <username>wubuku</username>
+            <!-- Public token with `read:packages` scope -->
+            <password>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</password>
+        </server>
+    </servers>
+</settings>
