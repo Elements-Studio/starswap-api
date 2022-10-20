@@ -85,8 +85,8 @@ class StarswapApiApplicationTests {
 
     @Test
     void contextLoads() {
-        String aptosContractAddress = "0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602";
-        String testAccountAddress = "0xe7c0aa6d4b9e9f484b48cc2602cef1de6bb6bac0c4fff7cbd2eb1f6b23f96c3b";
+        String aptosContractAddress = "0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716";
+        String testAccountAddress = "0x347ed61aaecb6280ed55954df5e1f1274e8ac42eca4827d99153744552df61f6";
         String tokenXUSDTOnAptos = aptosContractAddress + "::XUSDT::XUSDT";
         String tokenSTAROnAptos = aptosContractAddress + "::STAR::STAR";
 
@@ -100,8 +100,8 @@ class StarswapApiApplicationTests {
         System.out.println("getVestarAmountByTokenTypeAndStakeId: " + vestarAmount_2);
         //if (true) return;
 
-        Triple<?, ?, ?> allMultiplierPools = contractApiClient.syrupPoolQueryAllMultiplierPools(aptosContractAddress, tokenSTAROnAptos);
-        System.out.println(allMultiplierPools);
+        Triple<?, ?, ?> syrupPoolAllMultiplierPools = contractApiClient.syrupPoolQueryAllMultiplierPools(aptosContractAddress, tokenSTAROnAptos);
+        System.out.println("syrupPoolQueryAllMultiplierPools: " + syrupPoolAllMultiplierPools);
         //if (true) return;
 
         BigInteger vestarAmount_1 = contractApiClient.getAccountVestarAmount(aptosContractAddress);

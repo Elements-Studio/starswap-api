@@ -1,6 +1,5 @@
 package org.starcoin.starswap.api.utils;
 
-import com.novi.serde.SerializationError;
 import com.github.wubuku.aptos.bean.AccountResource;
 import com.github.wubuku.aptos.bean.CoinInfo;
 import com.github.wubuku.aptos.bean.Option;
@@ -9,10 +8,14 @@ import com.github.wubuku.aptos.types.TypeInfo;
 import com.github.wubuku.aptos.utils.NodeApiException;
 import com.github.wubuku.aptos.utils.NodeApiUtils;
 import com.github.wubuku.aptos.utils.StructTagUtils;
+import com.novi.bcs.BcsDeserializer;
+import com.novi.serde.DeserializationError;
+import com.novi.serde.SerializationError;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.utils.bean.*;
 import org.starcoin.starswap.api.vo.SyrupStakeVO;
+import org.starcoin.utils.HexUtils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -20,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class AptosContractApiClient implements ContractApiClient {
 
@@ -462,32 +464,49 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress, String token) {
         //TokenSwapSyrup::query_all_multiplier_pools
-
-        BigInteger totalStake = syrupPoolQueryTotalStake(poolAddress, token);
-//        Long[] secs = new Long[]{604800L, 1209600L, 2592000L, 5184000L, 7776000L};
-//        Long[] multipliers = new Long[]{2L, 3L, 4L, 6L, 8L};
-//        BigInteger[] amounts = new BigInteger[]{
-//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
-//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
-//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
-//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
-//                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(96L)),
-//        };
-        //return new Triple<>(Arrays.asList(secs), Arrays.asList(multipliers), Arrays.asList(amounts));
-        // todo just return estimated values now... waiting on-chain contract impl.
-        SwapStepwiseMultiplierConfig config = getSwapStepwiseMultiplierConfig();
-        List<Long> secs = config.getList().stream().map(i -> i.getIntervalSec()).collect(Collectors.toList());
-        List<Long> multipliers = config.getList().stream().map(i -> i.getMultiplier()).collect(Collectors.toList());
-        Long maxMultiplier = multipliers.stream().max(Long::compareTo).orElse(1L);
+        String poolType = "PoolTypeSyrup";
+        List<Long> secs = new ArrayList<>();
+        List<Long> multipliers = new ArrayList<>();
         List<BigInteger> amounts = new ArrayList<>();
-        for (int i = 0; i < multipliers.size(); i++) {
-            int p = 1;
-            if (maxMultiplier.equals(multipliers.get(i))) {
-                p = 100 - multipliers.size() + 1;
+        MultiplierPoolsGlobalInfo multiplierPoolsGlobalInfo = getMultiplierPoolsGlobalInfo(poolType, token);
+        for (MultiplierPoolsGlobalInfo.MultiplierPool p : multiplierPoolsGlobalInfo.getItems()) {
+            // Convert key to seconds
+            BcsDeserializer deserializer = new BcsDeserializer(HexUtils.hexToByteArray(p.getKey()));
+            try {
+                secs.add(deserializer.deserialize_u64());
+            } catch (DeserializationError e) {
+                throw new RuntimeException(e);
             }
-            amounts.add(totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(p)));
+            multipliers.add(p.getMultiplier());
+            amounts.add(new BigInteger(p.getAssetAmount()));
         }
         return new Triple<>(secs, multipliers, amounts);
+//        BigInteger totalStake = syrupPoolQueryTotalStake(poolAddress, token);
+////        Long[] secs = new Long[]{604800L, 1209600L, 2592000L, 5184000L, 7776000L};
+////        Long[] multipliers = new Long[]{2L, 3L, 4L, 6L, 8L};
+////        BigInteger[] amounts = new BigInteger[]{
+////                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+////                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+////                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+////                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(1L)),
+////                totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(96L)),
+////        };
+//        //return new Triple<>(Arrays.asList(secs), Arrays.asList(multipliers), Arrays.asList(amounts));
+//        // -------------- just return estimated values ... -----------------
+//        SwapStepwiseMultiplierConfig config = getSwapStepwiseMultiplierConfig();
+//        List<Long> secs = config.getList().stream().map(i -> i.getIntervalSec()).collect(Collectors.toList());
+//        List<Long> multipliers = config.getList().stream().map(i -> i.getMultiplier()).collect(Collectors.toList());
+//        Long maxMultiplier = multipliers.stream().max(Long::compareTo).orElse(1L);
+//        List<BigInteger> amounts = new ArrayList<>();
+//        for (int i = 0; i < multipliers.size(); i++) {
+//            int p = 1;
+//            if (maxMultiplier.equals(multipliers.get(i))) {
+//                p = 100 - multipliers.size() + 1;
+//            }
+//            amounts.add(totalStake.divide(BigInteger.valueOf(100)).multiply(BigInteger.valueOf(p)));
+//        }
+//        // ----------------------------------------------------------------
+//        return new Triple<>(secs, multipliers, amounts);
 
     }
 
@@ -560,7 +579,9 @@ public class AptosContractApiClient implements ContractApiClient {
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
         String resourceType = lpTokenAddress + "::TokenSwap::TokenSwapPair<" + tp.getItem1() + ", " + tp.getItem2() + ">";
         try {
-            AccountResource<Map> resource = NodeApiUtils.getAccountResource(nodeApiBaseUrl, lpTokenAddress, resourceType, Map.class, null);
+            AccountResource<Map> resource = NodeApiUtils.getAccountResource(nodeApiBaseUrl,
+                    lpTokenAddress,
+                    resourceType, Map.class, null);
             Map r1 = (Map) resource.getData().get("token_x_reserve");
             Map r2 = (Map) resource.getData().get("token_y_reserve");
             BigInteger v1 = new BigInteger(r1.get("value").toString());
@@ -570,6 +591,7 @@ public class AptosContractApiClient implements ContractApiClient {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
                 return new Pair<>(BigInteger.ZERO, BigInteger.ZERO);
             } else {
+                //0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwap::TokenSwapPair<0x1::aptos_coin::AptosCoin, 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::STAR::STAR>
                 throw nodeApiException;
             }
         } catch (IOException e) {
@@ -750,18 +772,31 @@ public class AptosContractApiClient implements ContractApiClient {
         return null;
     }
 
-    public SwapStepwiseMultiplierConfig getSwapStepwiseMultiplierConfig() {
-        String resourceType = contractAddress + "::Config::Config<"
-                + contractAddress + "::TokenSwapConfig::SwapStepwiseMultiplierConfig" +
-                ">";
-        AccountResource<SwapAdminConfig.SwapStepwiseMultiplierConfig> resource = null;
+    private MultiplierPoolsGlobalInfo getMultiplierPoolsGlobalInfo(String poolType, String token) {
+        String resourceType = contractAddress + "::TokenSwapSyrupMultiplierPool::MultiplierPoolsGlobalInfo<"
+                + contractAddress + "::TokenSwapGovPoolType::" + poolType + ", " + getAptosCoinStructTag(token) + ">";
+        AccountResource<MultiplierPoolsGlobalInfo> resource = null;
         try {
             resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    contractAddress, resourceType, SwapAdminConfig.SwapStepwiseMultiplierConfig.class, null);
+                    contractAddress, resourceType, MultiplierPoolsGlobalInfo.class, null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return resource.getData().getPayload();
+        return resource.getData();
     }
+
+//    private SwapStepwiseMultiplierConfig getSwapStepwiseMultiplierConfig() {
+//        String resourceType = contractAddress + "::Config::Config<"
+//                + contractAddress + "::TokenSwapConfig::SwapStepwiseMultiplierConfig" +
+//                ">";
+//        AccountResource<SwapAdminConfig.SwapStepwiseMultiplierConfig> resource = null;
+//        try {
+//            resource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+//                    contractAddress, resourceType, SwapAdminConfig.SwapStepwiseMultiplierConfig.class, null);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return resource.getData().getPayload();
+//    }
 
 }
