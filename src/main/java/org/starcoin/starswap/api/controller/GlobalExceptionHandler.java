@@ -1,6 +1,7 @@
 package org.starcoin.starswap.api.controller;
 
 
+import com.github.wubuku.aptos.utils.NodeApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -11,14 +12,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.UUID;
 
 @ControllerAdvice
-public class GlobalExceptionHandler{
+public class GlobalExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 
     @ExceptionHandler(value = IllegalArgumentException.class)
-    public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException e)
-    {
+    public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException e) {
         ApiError error = new ApiError();
         error.setException("Illegal argument exception: " + e.getMessage());
         LOGGER.error(error.getException(), e);
@@ -26,9 +26,20 @@ public class GlobalExceptionHandler{
         return new ResponseEntity<ApiError>(error, status);
     }
 
+    @ExceptionHandler(value = NodeApiException.class)
+    public ResponseEntity<ApiError> handleAptosNodeApiException(NodeApiException e) {
+        ApiError error = new ApiError();
+        error.setException("Aptos Node API error: " + e.getMessage());
+        LOGGER.error(error.getException(), e);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        if (e.getHttpStatusCode() != null && HttpStatus.SERVICE_UNAVAILABLE.value() == e.getHttpStatusCode()) {
+            status = HttpStatus.SERVICE_UNAVAILABLE;
+        }
+        return new ResponseEntity<ApiError>(error, status);
+    }
+
     @ExceptionHandler(value = ArithmeticException.class)
-    public ResponseEntity<ApiError> handleArithmeticException(ArithmeticException e)
-    {
+    public ResponseEntity<ApiError> handleArithmeticException(ArithmeticException e) {
         ApiError error = new ApiError();
         String uuid = UUID.randomUUID().toString();
         error.setException("Arithmetic exception: " + uuid);
@@ -38,8 +49,7 @@ public class GlobalExceptionHandler{
     }
 
     @ExceptionHandler(value = NullPointerException.class)
-    public ResponseEntity<ApiError> handleNullPointerException(NullPointerException e)
-    {
+    public ResponseEntity<ApiError> handleNullPointerException(NullPointerException e) {
         ApiError error = new ApiError();
         String uuid = UUID.randomUUID().toString();
         error.setException("Null pointer exception: " + uuid);
@@ -49,8 +59,7 @@ public class GlobalExceptionHandler{
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ApiError> handleException(Exception e)
-    {
+    public ResponseEntity<ApiError> handleException(Exception e) {
         ApiError error = new ApiError();
         String uuid = UUID.randomUUID().toString();
         error.setException("Exception: " + uuid);

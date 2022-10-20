@@ -23,7 +23,7 @@ false,
 'STAR',
 '',
 10,
-'0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee',
+'0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
 'STAR',
 'STAR',
 unix_timestamp()*1000,
@@ -58,7 +58,7 @@ false,
 'XUSDT',
 '',
 10,
-'0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee',
+'0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
 'XUSDT',
 'XUSDT',
 unix_timestamp()*1000,
@@ -67,7 +67,7 @@ unix_timestamp()*1000,
 null,
 null);
 
-
+--
 -- add token XUSDT, and make sure it is a stable coin.
 --
 -- select * from token_to_usd_price_pair_mapping where is_usd_equivalent_token = true;
@@ -87,7 +87,7 @@ INSERT INTO `liquidity_token`
 `updated_by`,
 `version`)
 VALUES
-('0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee',
+('0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
 'STAR',
 'XUSDT',
 UNIX_TIMESTAMP() * 1000,
@@ -120,10 +120,10 @@ INSERT INTO `liquidity_pool`
 `swap_fee_op_rate_v2_denominator`,
 `swap_fee_op_rate_v2_numerator`)
 VALUES
-('0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee',
+('0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
 'STAR',
 'XUSDT',
-'0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee',
+'0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
 UNIX_TIMESTAMP() * 1000,
 'admin',
 false,
@@ -160,8 +160,8 @@ INSERT INTO `liquidity_token_farm`
 `daily_reward`)
 VALUES
 (
-'0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee',
-'0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee',
+'0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
+'0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
 'STAR',
 'XUSDT',
 1639737823000,
@@ -181,31 +181,6 @@ false,
 );
 
 -- then RESTART starswap API service --
-
--- --------------------- update addresses ------------------
-UPDATE `token` SET `token_struct_address` = '0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716'
-  WHERE (`token_id` = 'STAR');
-UPDATE `token` SET `token_struct_address` = '0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716'
-  WHERE (`token_id` = 'XUSDT');
-
-UPDATE `liquidity_token` SET `liquidity_token_address` = '0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716'
-  WHERE (`liquidity_token_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee')
-    and (`token_x_id` = 'STAR') and (`token_y_id` = 'XUSDT');
-
-UPDATE `liquidity_pool`
-  SET `liquidity_token_address` = '0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
-    `pool_address` = '0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716'
-  WHERE (`liquidity_token_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee')
-    and (`token_x_id` = 'STAR') and (`token_y_id` = 'XUSDT')
-    and (`pool_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee');
-
-UPDATE `liquidity_token_farm`
-  SET `farm_address` = '0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716',
-    `liquidity_token_address` = '0x0c3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716'
-  WHERE (`farm_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee')
-    and (`liquidity_token_address` = '0x41422f5825e00c009a86ad42bc104228ac5f841313d8417ce69287e36776d1ee')
-    and (`token_x_id` = 'STAR') and (`token_y_id` = 'XUSDT');
-
 
 -- ------------- add syrup pool record ----------------
 INSERT INTO `syrup_pool`
@@ -242,9 +217,6 @@ false,
 'admin',
 '19568', '1987200000000'
 );
-
-DELETE FROM `syrup_pool` WHERE (`pool_address` = '0xbda17e76b3c4d6c2c004a4dfdf5046e384facedab3e65134a5e1439373df0602') and (`token_id` = 'STAR');
-DELETE FROM `syrup_pool` WHERE (`pool_address` = '0xee1f1439e9423f2c537e775d4cb92ea2cacdf0886165b7945db8262702c07049') and (`token_id` = 'STAR');
 
 -- ---------- insert token APT -----------
 INSERT INTO `token`
@@ -387,7 +359,9 @@ false,
 1
 );
 
+
 -- trim addresses --
+
 UPDATE `token` SET `token_struct_address` = '0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716' WHERE (`token_id` = 'STAR');
 UPDATE `token` SET `token_struct_address` = '0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716' WHERE (`token_id` = 'XUSDT');
 
