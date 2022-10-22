@@ -39,5 +39,5 @@ spec:
               servicePort: 80
           - path: /aptos-devnet/*
             backend:
-              serviceName: "starswap-api-aptos-testnet"
+              serviceName: "starswap-api-aptos-devnet"
               servicePort: 80
