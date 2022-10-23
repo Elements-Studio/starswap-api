@@ -1,14 +1,18 @@
-package org.starcoin.utils;
+package org.starcoin.starswap.api.utils;
 
 import org.starcoin.types.AccountAddress;
 import org.starcoin.types.Identifier;
 import org.starcoin.types.StructTag;
 import org.starcoin.types.TypeTag;
+import org.starcoin.utils.HexUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * This a utility class for test.
+ */
 public class StructTagUtils {
     private static final String COLON_COLON = "::";
     private static final String LT = "<";

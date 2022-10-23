@@ -11,7 +11,7 @@ import org.starcoin.bean.StateProof;
 import org.starcoin.smt.*;
 import org.starcoin.starswap.api.utils.StarcoinContractApiClient;
 import org.starcoin.types.*;
-import org.starcoin.utils.StructTagUtils;
+import org.starcoin.starswap.api.utils.StructTagUtils;
 import org.starcoin.utils.StarcoinProofUtils;
 
 import java.net.MalformedURLException;
