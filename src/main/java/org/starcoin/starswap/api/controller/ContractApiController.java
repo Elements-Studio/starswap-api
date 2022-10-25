@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.utils.AptosContractApiClient;
 import org.starcoin.starswap.api.utils.ContractApiClient;
 
@@ -47,6 +48,12 @@ public class ContractApiController {
                                                  @RequestParam("tokenY") String tokenY,
                                                  @RequestParam("accountAddress") String accountAddress) {
         return getAptosContractApiClient().getBoostLockedVestarAmount(tokenX, tokenY, accountAddress);
+    }
+
+    @GetMapping(path = "getPoolReserves")
+    public Pair<BigInteger, BigInteger> getPoolReserves(@RequestParam("tokenX") String tokenX,
+                                                        @RequestParam("tokenY") String tokenY) {
+        return getAptosContractApiClient().tokenSwapRouterGetReserves(tokenX, tokenY);
     }
 
     @GetMapping(path = "getTotalLiquidity")

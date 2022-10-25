@@ -578,6 +578,10 @@ public class AptosContractApiClient implements ContractApiClient {
         }
     }
 
+    public Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String tokenX, String tokenY) {
+        return tokenSwapRouterGetReserves(contractAddress, tokenX, tokenY);
+    }
+
     @Override
     public Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY) {
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
