@@ -49,6 +49,12 @@ public class ContractApiController {
         return getAptosContractApiClient().getBoostLockedVestarAmount(tokenX, tokenY, accountAddress);
     }
 
+    @GetMapping(path = "getTotalLiquidity")
+    public BigInteger getTotalLiquidity(@RequestParam("tokenX") String tokenX,
+                                        @RequestParam("tokenY") String tokenY) {
+        return getAptosContractApiClient().tokenSwapRouterGetTotalLiquidity(tokenX, tokenY);
+    }
+
     @GetMapping(path = "getCoinSupply")
     public BigInteger getCoinSupply(@RequestParam("token") String token) {
         return getAptosContractApiClient().getCoinSupply(token);

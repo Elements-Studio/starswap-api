@@ -552,6 +552,10 @@ public class AptosContractApiClient implements ContractApiClient {
         }
     }
 
+    public BigInteger tokenSwapRouterGetTotalLiquidity(String tokenX, String tokenY) {
+        return tokenSwapRouterGetTotalLiquidity(contractAddress, tokenX, tokenY);
+    }
+
     @Override
     public BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY) {
         //TokenSwapRouter::total_liquidity
