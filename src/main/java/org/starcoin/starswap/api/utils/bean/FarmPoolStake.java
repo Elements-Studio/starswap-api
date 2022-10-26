@@ -22,7 +22,7 @@ public class FarmPoolStake {
     private Long id;
 
     @JsonProperty("cap")
-    private Object cap;
+    private YieldFarmingHarvestCapability cap;
 
     public Long getId() {
         return id;
@@ -32,11 +32,11 @@ public class FarmPoolStake {
         this.id = id;
     }
 
-    public Object getCap() {
+    public YieldFarmingHarvestCapability getCap() {
         return cap;
     }
 
-    public void setCap(Object cap) {
+    public void setCap(YieldFarmingHarvestCapability cap) {
         this.cap = cap;
     }
 

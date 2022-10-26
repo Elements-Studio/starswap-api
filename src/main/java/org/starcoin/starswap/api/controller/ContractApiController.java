@@ -62,6 +62,20 @@ public class ContractApiController {
         return getAptosContractApiClient().tokenSwapRouterGetTotalLiquidity(tokenX, tokenY);
     }
 
+    @GetMapping(path = "getFarmStakedLiquidity")
+    public BigInteger getFarmStakedLiquidity(@RequestParam("tokenX") String tokenX,
+                                             @RequestParam("tokenY") String tokenY,
+                                             @RequestParam("accountAddress") String accountAddress) {
+        return getAptosContractApiClient().tokenSwapFarmGetAccountStakedLiquidity(tokenX, tokenY, accountAddress);
+    }
+
+    @GetMapping(path = "lookupFarmGain")
+    public BigInteger lookupFarmGain(@RequestParam("tokenX") String tokenX,
+                                     @RequestParam("tokenY") String tokenY,
+                                     @RequestParam("accountAddress") String accountAddress) {
+        return getAptosContractApiClient().tokenSwapFarmLookupGain(tokenX, tokenY, accountAddress);
+    }
+
     @GetMapping(path = "getCoinSupply")
     public BigInteger getCoinSupply(@RequestParam("token") String token) {
         return getAptosContractApiClient().getCoinSupply(token);

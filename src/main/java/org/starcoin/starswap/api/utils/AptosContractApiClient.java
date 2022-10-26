@@ -158,17 +158,19 @@ public class AptosContractApiClient implements ContractApiClient {
         return userInfo != null ? userInfo.getBoostFactor() : 0L;
     }
 
+    public BigInteger tokenSwapFarmGetAccountStakedLiquidity(String tokenX, String tokenY, String accountAddress) {
+        return tokenSwapFarmGetAccountStakedLiquidity(contractAddress, tokenX, tokenY, accountAddress);
+    }
+
     @Override
     public BigInteger tokenSwapFarmGetAccountStakedLiquidity(String farmAddress, String tokenX, String tokenY, String accountAddress) {
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
         //TokenSwapFarmScript::query_stake
-        String farmPoolStakeResType = contractAddress + "::TokenSwapFarm::FarmPoolStake<" + tp.getItem1() +
-                ", " + tp.getItem2() + ">";
         try {
-            AccountResource<FarmPoolStake> farmPoolStakeResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
-                    accountAddress, farmPoolStakeResType, FarmPoolStake.class, null);
-            Long stakeId = farmPoolStakeResource.getData().getId();
-
+            //AccountResource<FarmPoolStake> farmPoolStakeResource = getFarmPoolStake(accountAddress, tp);
+            FarmPoolStake farmPoolStake = getFarmPoolStake(accountAddress, tp);
+            Long stakeId = farmPoolStake.getId();
+            //
             String stakeListExtResType = contractAddress + "::YieldFarmingV3::StakeListExtend<" +
                     contractAddress + "::TokenSwapGovPoolType::PoolTypeFarmPool, " +
                     getLiquidityTokenStructTag(tp) +
@@ -187,6 +189,46 @@ public class AptosContractApiClient implements ContractApiClient {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public BigInteger tokenSwapFarmLookupGain(String tokenX, String tokenY, String accountAddress) {
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        try {
+            //AccountResource<FarmPoolStake> farmPoolStakeResource = getFarmPoolStake(accountAddress, tp);
+            FarmPoolStake farmPoolStake = getFarmPoolStake(accountAddress, tp);
+            Long stakeId = farmPoolStake.getId();
+            String token = getLiquidityTokenStructTag(tp);
+            String poolType = "PoolTypeFarmPool";
+            YieldFarmingV3StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
+            YieldFarmingV3Stake yieldFarmingV3Stake = farmingStakeList.getItems().stream()
+                    .filter(i -> stakeId.equals(i.getId())).findFirst().orElse(null);
+            if (yieldFarmingV3Stake == null) {
+                return BigInteger.ZERO;
+            }
+            FarmingAsset farmingAsset = getFarmingAsset(poolType, token);
+            FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend(poolType, token);
+            YieldFarmingGlobalPoolInfo globalPoolInfo = getYieldFarmingGlobalPoolInfo(poolType);
+            // -----------------
+            YieldFarmingHarvestCapability cap = farmPoolStake.getCap();
+            BigInteger expectedGain = queryExpectGain(farmingAsset, farmingAssetExtend, globalPoolInfo, yieldFarmingV3Stake, cap);
+            return expectedGain;
+        } catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return BigInteger.ZERO;
+            } else {
+                throw nodeApiException;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private FarmPoolStake getFarmPoolStake(String accountAddress, Pair<String, String> tp) throws IOException {
+        String farmPoolStakeResType = contractAddress + "::TokenSwapFarm::FarmPoolStake<" + tp.getItem1() +
+                ", " + tp.getItem2() + ">";
+        AccountResource<FarmPoolStake> farmPoolStakeResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                accountAddress, farmPoolStakeResType, FarmPoolStake.class, null);
+        return farmPoolStakeResource.getData();
     }
 
     private String getLiquidityTokenStructTag(Pair<String, String> tp) {
@@ -306,9 +348,9 @@ public class AptosContractApiClient implements ContractApiClient {
     @Override
     public List<SyrupStakeVO> syrupPoolQueryStakeWithExpectedGainList(String poolAddress, String token, String accountAddress) {
         //TokenSwapSyrup::query_expect_gain
+        SyrupStakeList syrupStakeList = getSyrupStakeList(accountAddress, token);
         String poolType = "PoolTypeSyrup";
         YieldFarmingV3StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
-        SyrupStakeList syrupStakeList = getSyrupStakeList(accountAddress, token);
         FarmingAsset farmingAsset = getFarmingAsset(poolType, token);
         FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend(poolType, token);
         YieldFarmingGlobalPoolInfo globalPoolInfo = getYieldFarmingGlobalPoolInfo(poolType);
@@ -321,18 +363,45 @@ public class AptosContractApiClient implements ContractApiClient {
             }
             SyrupStakeVO t = toSyrupStakeVO(syrupStakeOnChain);
             t.setTokenTypeTag(token);
-
-            // ---------------------------------------
-            // get gain info.
-            // Start check
-            long now_seconds = System.currentTimeMillis() / 1000;//timestamp::now_seconds();
-            //assert!(now_seconds >= farming_asset.start_time, error::invalid_state(ERR_FARMING_NOT_READY));
-            if (!(now_seconds >= farmingAsset.getStartTime())) {
-                throw new IllegalArgumentException("ERR_FARMING_NOT_READY");//todo is this ok?
-            }
+            // -----------------
             YieldFarmingHarvestCapability cap = syrupStakeOnChain.getHarvestCap();
-            // Calculate from latest timestamp to deadline timestamp if deadline valid
-            now_seconds = now_seconds > cap.getDeadline() ? now_seconds : cap.getDeadline();
+            BigInteger expectedGain = queryExpectGain(farmingAsset, farmingAssetExtend, globalPoolInfo, s, cap);
+            t.setExpectedGain(expectedGain);
+            // -----------------
+            stakeVOList.add(t);
+        }
+        return stakeVOList;
+    }
+
+    /*
+    public fun query_expect_gain<PoolType: store, RewardCoinT, AssetT: store>(
+        user_addr: address,
+        broker_addr: address,
+        cap: &HarvestCapability<PoolType, AssetT>
+    ): u128 acquires FarmingAsset, StakeList, FarmingAssetExtend, YieldFarmingGlobalPoolInfo {
+        let farming_asset = borrow_global_mut<FarmingAsset<PoolType, AssetT>>(broker_addr);
+        let stake_list = borrow_global_mut<StakeList<PoolType, AssetT>>(user_addr);
+        // Start check
+        let now_seconds = timestamp::now_seconds();
+        assert!(now_seconds >= farming_asset.start_time, error::invalid_state(ERR_FARMING_NOT_READY));
+     */
+
+    private BigInteger queryExpectGain(FarmingAsset farmingAsset,
+                                       FarmingAssetExtend farmingAssetExtend,
+                                       YieldFarmingGlobalPoolInfo globalPoolInfo,
+                                       YieldFarmingV3Stake yieldFarmingV3Stake,
+                                       YieldFarmingHarvestCapability cap) {
+        // ---------------------------------------
+        // get gain info.
+        // Start check
+        long now_seconds = System.currentTimeMillis() / 1000;//timestamp::now_seconds();
+        //assert!(now_seconds >= farming_asset.start_time, error::invalid_state(ERR_FARMING_NOT_READY));
+        if (!(now_seconds >= farmingAsset.getStartTime())) {
+            throw new IllegalArgumentException("ERR_FARMING_NOT_READY");//todo is this ok?
+        }
+
+        // Calculate from latest timestamp to deadline timestamp if deadline valid
+        now_seconds = now_seconds > cap.getDeadline() ? now_seconds : cap.getDeadline();
             /*
             let farming_asset_extend = borrow_global<FarmingAssetExtend<PoolType, AssetT>>(broker_addr);
             // Calculate new harvest index
@@ -343,17 +412,14 @@ public class AptosContractApiClient implements ContractApiClient {
             );
             let new_gain = calculate_withdraw_amount_v2(new_harvest_index, stake.last_harvest_index, stake.asset_weight);
              */
-            BigInteger new_harvest_index = calculateHarvestIndexWithAssetV2(farmingAsset, farmingAssetExtend,
-                    now_seconds, globalPoolInfo);
-            BigInteger new_gain = calculateWithdrawAmountV2(new_harvest_index,
-                    new BigInteger(s.getLastHarvestIndex()), new BigInteger(s.getAssetWeight()));
-            BigInteger expectedGain = new BigInteger(s.getGain()).add(new_gain);
-            t.setExpectedGain(expectedGain);
-            // -----------------
-            stakeVOList.add(t);
-        }
-        return stakeVOList;
+        BigInteger new_harvest_index = calculateHarvestIndexWithAssetV2(farmingAsset, farmingAssetExtend,
+                now_seconds, globalPoolInfo);
+        BigInteger new_gain = calculateWithdrawAmountV2(new_harvest_index,
+                new BigInteger(yieldFarmingV3Stake.getLastHarvestIndex()), new BigInteger(yieldFarmingV3Stake.getAssetWeight()));
+        BigInteger expectedGain = new BigInteger(yieldFarmingV3Stake.getGain()).add(new_gain);
+        return expectedGain;
     }
+
 
     /// calculate pool harvest index
     /// harvest_index = (current_timestamp - last_timestamp) * pool_release_per_second * (alloc_point/total_alloc_point)  / (asset_total_weight );
