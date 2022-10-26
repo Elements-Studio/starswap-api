@@ -170,11 +170,12 @@ public class AptosContractApiClient implements ContractApiClient {
             //AccountResource<FarmPoolStake> farmPoolStakeResource = getFarmPoolStake(accountAddress, tp);
             FarmPoolStake farmPoolStake = getFarmPoolStake(accountAddress, tp);
             Long stakeId = farmPoolStake.getId();
-            //
-            /*
-0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::YieldFarmingV3::StakeListExtend<0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwapGovPoolType::PoolTypeFarmPool, 0x1::coin::Coin<0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwap::LiquidityToken<0x1::aptos_coin::AptosCoin, 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::STAR::STAR>>>
-0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::YieldFarmingV3::StakeListExtend<0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwapGovPoolType::PoolTypeFarmPool, 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwap::LiquidityToken<0x1::aptos_coin::AptosCoin, 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::STAR::STAR>>) and Ledger version(306046547)', errorCode='resource_not_found', vmErrorCode=null}, requestUrl=https://testnet.aptoslabs.com/v1/accounts/0x07968dab936c1bad187c60ce4082f307d030d780e91e694ae03aef16aba73f30/resource/0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::YieldFarmingV3::StakeListExtend%3C0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwapGovPoolType::PoolTypeFarmPool,%200xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwap::LiquidityToken%3C0x1::aptos_coin::AptosCoin,%200xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::STAR::STAR>>
-             */
+            // 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::YieldFarmingV3::StakeListExtend<
+            // 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwapGovPoolType::PoolTypeFarmPool,
+            // 0x1::coin::Coin<
+            // 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwap::LiquidityToken<
+            // 0x1::aptos_coin::AptosCoin, 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::STAR::STAR
+            // >>>
             String stakeListExtResType = contractAddress + "::YieldFarmingV3::StakeListExtend<" +
                     contractAddress + "::TokenSwapGovPoolType::PoolTypeFarmPool, " +
                     getAptosCoinStructTag(getLiquidityTokenStructTag(tp)) +
@@ -201,16 +202,16 @@ public class AptosContractApiClient implements ContractApiClient {
             //AccountResource<FarmPoolStake> farmPoolStakeResource = getFarmPoolStake(accountAddress, tp);
             FarmPoolStake farmPoolStake = getFarmPoolStake(accountAddress, tp);
             Long stakeId = farmPoolStake.getId();
-            String token = getLiquidityTokenStructTag(tp);
+            String lpToken = getLiquidityTokenStructTag(tp);
             String poolType = "PoolTypeFarmPool";
-            YieldFarmingV3StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, token);
+            YieldFarmingV3StakeList farmingStakeList = getYieldFarmingStakeList(accountAddress, poolType, lpToken);
             YieldFarmingV3Stake yieldFarmingV3Stake = farmingStakeList.getItems().stream()
                     .filter(i -> stakeId.equals(i.getId())).findFirst().orElse(null);
             if (yieldFarmingV3Stake == null) {
                 return BigInteger.ZERO;
             }
-            FarmingAsset farmingAsset = getFarmingAsset(poolType, token);
-            FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend(poolType, token);
+            FarmingAsset farmingAsset = getFarmingAsset(poolType, lpToken);
+            FarmingAssetExtend farmingAssetExtend = getFarmingAssetExtend(poolType, lpToken);
             YieldFarmingGlobalPoolInfo globalPoolInfo = getYieldFarmingGlobalPoolInfo(poolType);
             // -----------------
             YieldFarmingHarvestCapability cap = farmPoolStake.getCap();
