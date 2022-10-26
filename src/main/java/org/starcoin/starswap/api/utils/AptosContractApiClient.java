@@ -326,6 +326,10 @@ public class AptosContractApiClient implements ContractApiClient {
 //        return resultFields;
     }
 
+    public List<SyrupStakeVO> syrupPoolQueryStakeList(String token, String accountAddress) {
+        return syrupPoolQueryStakeList(contractAddress, token, accountAddress);
+    }
+
     @Override
     public List<SyrupStakeVO> syrupPoolQueryStakeList(String poolAddress, String token, String accountAddress) {
         String poolType = "PoolTypeSyrup";

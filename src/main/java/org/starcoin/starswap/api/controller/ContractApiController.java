@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.utils.AptosContractApiClient;
 import org.starcoin.starswap.api.utils.ContractApiClient;
+import org.starcoin.starswap.api.vo.SyrupStakeVO;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.util.List;
 
 @Api(tags = {"Starswap RESTful API"})
 @RestController
@@ -74,6 +76,12 @@ public class ContractApiController {
                                      @RequestParam("tokenY") String tokenY,
                                      @RequestParam("accountAddress") String accountAddress) {
         return getAptosContractApiClient().tokenSwapFarmLookupGain(tokenX, tokenY, accountAddress);
+    }
+
+    @GetMapping("getSyrupPoolStakeList")
+    public List<SyrupStakeVO> getSyrupPoolStakeList(@RequestParam("token") String token,
+                                                    @RequestParam("accountAddress") String accountAddress) {
+        return getAptosContractApiClient().syrupPoolQueryStakeList(token, accountAddress);
     }
 
     @GetMapping(path = "getCoinSupply")
