@@ -89,6 +89,13 @@ public class ContractApiController {
         return getAptosContractApiClient().getCoinSupply(token);
     }
 
+    @GetMapping(path = "getLiquidityBalance")
+    public BigInteger getLiquidityBalance(@RequestParam("tokenX") String tokenX,
+                                          @RequestParam("tokenY") String tokenY,
+                                          @RequestParam("accountAddress") String accountAddress) {
+        return getAptosContractApiClient().getLiquidityBalance(tokenX, tokenY, accountAddress);
+    }
+
     @GetMapping(path = "getVestarAmountByTokenTypeAndStakeId")
     public BigInteger getVestarAmountByTokenTypeAndStakeId(@RequestParam("accountAddress") String accountAddress,
                                                            @RequestParam("token") String token,

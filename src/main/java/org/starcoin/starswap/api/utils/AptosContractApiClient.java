@@ -599,6 +599,25 @@ public class AptosContractApiClient implements ContractApiClient {
         }
     }
 
+    public BigInteger getLiquidityBalance(String tokenX, String tokenY, String accountAddress) {
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        String resourceType = "0x1::coin::CoinStore<" + getLiquidityTokenStructTag(tp) + " >";
+        AccountResource<Map> accountResource;
+        try {
+            accountResource = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl,
+                    accountAddress, resourceType, Map.class, null);
+        } catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return BigInteger.ZERO;
+            } else {
+                throw nodeApiException;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new BigInteger(((Map) accountResource.getData().get("coin")).get("value").toString());
+    }
+
     @Override
     public BigInteger getVestarAmountByTokenTypeAndStakeId(String accountAddress, String token, Long stakeId) {
         //query_vestar_amount_by_staked_id
