@@ -60,7 +60,9 @@ public class CacheConfig {
     }
 
     @CacheEvict(allEntries = true, cacheNames = {
-            "tokenSwapRouterGetReservesCache"
+            "tokenSwapRouterGetReservesCache",
+            "syrupPoolQueryAllMultiplierPoolsCache",
+            "tokenScalingFactorCache"
     })
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     public void evictCachesVeryFast() {

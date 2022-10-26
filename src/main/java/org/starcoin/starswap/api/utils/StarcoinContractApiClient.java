@@ -1,7 +1,6 @@
 package org.starcoin.starswap.api.utils;
 
 
-import org.springframework.cache.annotation.Cacheable;
 import org.starcoin.bean.Event;
 import org.starcoin.bean.RpcStateWithProof;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
@@ -133,8 +132,8 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
-    @Cacheable(cacheNames = "syrupPoolQueryAllMultiplierPoolsCache",
-            key = "#poolAddress + ',' + #token", unless = "#result == null")
+//    @Cacheable(cacheNames = "syrupPoolQueryAllMultiplierPoolsCache",
+//            key = "#poolAddress + ',' + #token", unless = "#result == null")
     public Triple<List<Long>, List<Long>, List<BigInteger>> syrupPoolQueryAllMultiplierPools(String poolAddress,
                                                                                              String token) {
         return JsonRpcUtils.syrupPoolQueryAllMultiplierPools(this.jsonRpcSession, poolAddress, token);
@@ -164,14 +163,14 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
-    @Cacheable(cacheNames = "tokenScalingFactorCache", key = "#token", unless = "#result == null")
+//    @Cacheable(cacheNames = "tokenScalingFactorCache", key = "#token", unless = "#result == null")
     public BigInteger getTokenScalingFactor(String token) {
         return JsonRpcClientUtils.tokenGetScalingFactor(jsonRpcSession, token);
     }
 
     @Override
-    @Cacheable(cacheNames = "tokenSwapRouterGetReservesCache",
-            key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY", unless = "#result == null")
+//    @Cacheable(cacheNames = "tokenSwapRouterGetReservesCache",
+//            key = "#lpTokenAddress + ',' + #tokenX + '/' + #tokenY", unless = "#result == null")
     public Pair<BigInteger, BigInteger> tokenSwapRouterGetReserves(String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapRouterGetReserves(jsonRpcSession, lpTokenAddress, tokenX, tokenY);
     }

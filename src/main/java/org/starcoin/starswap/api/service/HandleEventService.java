@@ -120,7 +120,7 @@ public class HandleEventService {
             }
             eventHandled = true;
         } catch (org.springframework.dao.DataIntegrityViolationException
-                | org.springframework.orm.ObjectOptimisticLockingFailureException e) {
+                 | org.springframework.orm.ObjectOptimisticLockingFailureException e) {
             LOG.info("Handle event encountered known exception.", e);
             eventHandled = true;
         } catch (RuntimeException runtimeException) {

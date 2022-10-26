@@ -1,6 +1,9 @@
 package org.starcoin.starswap.api.service;
 
-import org.starcoin.starswap.api.data.model.*;
+import org.starcoin.starswap.api.data.model.LiquidityTokenFarm;
+import org.starcoin.starswap.api.data.model.Pair;
+import org.starcoin.starswap.api.data.model.SyrupPool;
+import org.starcoin.starswap.api.data.model.Token;
 import org.starcoin.starswap.api.vo.AccountFarmStakeInfo;
 import org.starcoin.starswap.api.vo.SyrupMultiplierPoolInfo;
 import org.starcoin.starswap.api.vo.SyrupStakeVO;
