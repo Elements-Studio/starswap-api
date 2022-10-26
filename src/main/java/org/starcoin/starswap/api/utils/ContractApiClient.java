@@ -36,7 +36,9 @@ public interface ContractApiClient {
     default AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress) {
         BigInteger stakedLiquidity = tokenSwapFarmGetAccountStakedLiquidity(farmAddress, tokenX, tokenY, accountAddress);
         BigInteger farmTotalLiquidity = tokenSwapFarmQueryTotalStake(farmAddress, lpTokenAddress, tokenX, tokenY);
-        BigDecimal sharePercentage = new BigDecimal(stakedLiquidity.multiply(BigInteger.valueOf(100))).divide(new BigDecimal(farmTotalLiquidity), 9, RoundingMode.HALF_UP);
+        BigDecimal sharePercentage = farmTotalLiquidity.compareTo(BigInteger.ZERO) == 0
+                ? BigDecimal.ZERO
+                : new BigDecimal(stakedLiquidity.multiply(BigInteger.valueOf(100))).divide(new BigDecimal(farmTotalLiquidity), 9, RoundingMode.HALF_UP);
         Pair<BigInteger, BigInteger> stakedAmountPair = getReservesByLiquidity(lpTokenAddress, tokenX, tokenY, stakedLiquidity);
 
         AccountFarmStakeInfo farmStakeInfo = new AccountFarmStakeInfo();
