@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: starswap-api-aptos-devnet
-          image: ghcr.io/elements-studio/starcoin_starswap:sha-74d2cac
+          image: ghcr.io/elements-studio/starcoin_starswap:sha-dee8379
           ports:
             - containerPort: 8600
           env:

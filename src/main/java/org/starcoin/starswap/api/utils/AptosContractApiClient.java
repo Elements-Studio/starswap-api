@@ -170,12 +170,6 @@ public class AptosContractApiClient implements ContractApiClient {
             //AccountResource<FarmPoolStake> farmPoolStakeResource = getFarmPoolStake(accountAddress, tp);
             FarmPoolStake farmPoolStake = getFarmPoolStake(accountAddress, tp);
             Long stakeId = farmPoolStake.getId();
-            // 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::YieldFarmingV3::StakeListExtend<
-            // 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwapGovPoolType::PoolTypeFarmPool,
-            // 0x1::coin::Coin<
-            // 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwap::LiquidityToken<
-            // 0x1::aptos_coin::AptosCoin, 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::STAR::STAR
-            // >>>
             String stakeListExtResType = contractAddress + "::YieldFarmingV3::StakeListExtend<" +
                     contractAddress + "::TokenSwapGovPoolType::PoolTypeFarmPool, " +
                     getAptosCoinStructTag(getLiquidityTokenStructTag(tp)) +
@@ -693,7 +687,6 @@ public class AptosContractApiClient implements ContractApiClient {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
                 return new Pair<>(BigInteger.ZERO, BigInteger.ZERO);
             } else {
-                //0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::TokenSwap::TokenSwapPair<0x1::aptos_coin::AptosCoin, 0xc3dbe4f07390f05b19ccfc083fc6aa5bc5d75621d131fc49557c8f4bbc11716::STAR::STAR>
                 throw nodeApiException;
             }
         } catch (IOException e) {
