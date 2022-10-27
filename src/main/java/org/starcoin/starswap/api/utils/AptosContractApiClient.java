@@ -783,7 +783,7 @@ public class AptosContractApiClient implements ContractApiClient {
 //        let dividend = SafeMath::mul_div(user_locked_vestar_amount, factor * 3, total_vestar_amount) * factor;
         BigInteger dividend = user_locked_vestar_amount.multiply(factor.multiply(BigInteger.valueOf(3))).divide(total_vestar_amount).multiply(factor);
 //        let divisor  = SafeMath::mul_div(user_locked_farm_amount, factor * 2, total_farm_amount);
-        BigInteger divisor = user_locked_farm_amount.multiply(factor.multiply(BigInteger.valueOf(2))).multiply(total_farm_amount);
+        BigInteger divisor = user_locked_farm_amount.multiply(factor.multiply(BigInteger.valueOf(2))).divide(total_farm_amount);
         if (divisor.compareTo(BigInteger.ZERO) != 0) {
             boost_factor = dividend.divide(divisor).add(boost_factor);
         }
