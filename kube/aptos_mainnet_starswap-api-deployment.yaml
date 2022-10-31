@@ -1,31 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: starswap-api-deployment-aptos-devnet
+  name: starswap-api-deployment-aptos-mainnet
   labels:
-    app: starswap-api-aptos-devnet
+    app: starswap-api-aptos-mainnet
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: starswap-api-aptos-devnet
+      app: starswap-api-aptos-mainnet
   template:
     metadata:
       labels:
-        app: starswap-api-aptos-devnet
+        app: starswap-api-aptos-mainnet
     spec:
       containers:
-        - name: starswap-api-aptos-devnet
+        - name: starswap-api-aptos-mainnet
           image: ghcr.io/elements-studio/starcoin_starswap:sha-f996776
           ports:
             - containerPort: 8600
           env:
             - name: spring_profiles_active
-              value: aptos-devnet
+              value: aptos-mainnet
             - name: FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS
               value: "true"
             - name: STARCOIN_MYSQL_URL
-              value: "jdbc:mysql://starcoin-db-2.c0bz9kehdvnb.ap-northeast-1.rds.amazonaws.com:3306/starswap_aptos_devnet?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC"
+              value: "jdbc:mysql://starcoin-db-2.c0bz9kehdvnb.ap-northeast-1.rds.amazonaws.com:3306/starswap_aptos_mainnet?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC"
             - name: STARCOIN_MYSQL_USER
               value: "starcoin"
             - name: STARCOIN_MYSQL_PWD
@@ -42,4 +42,4 @@ spec:
             - name: FARMING_BOOST_WHITELIST
               value: '{}'
             - name: CHAIN_NETWORK
-              value: "aptos-devnet"
+              value: "aptos-mainnet"

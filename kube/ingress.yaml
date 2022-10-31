@@ -41,3 +41,7 @@ spec:
             backend:
               serviceName: "starswap-api-aptos-devnet"
               servicePort: 80
+          - path: /aptos-mainnet/*
+            backend:
+              serviceName: "starswap-api-aptos-mainnet"
+              servicePort: 80

@@ -1,0 +1,70 @@
+server:
+  servlet:
+    context-path: "/${CHAIN_NETWORK}"
+
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          # auto: create # 开发阶段使用
+          auto: update
+  flyway:
+    enabled: false # 启用或禁用 flyway
+
+starswap:
+  token-price-service:
+    base-url: http://k8s-default-starcoin-cbf39ae390-308376289.ap-northeast-1.elb.amazonaws.com/main/v1
+  farming-boost:
+    whitelist: "${FARMING_BOOST_WHITELIST}"
+  pulling-event-task-execute:
+    fixed-delay: 300000
+  pulling-event-task-auto-create:
+    fixed-delay: 300000
+  invisible-token-pairs: '["BX_USDT,STC"]'
+  aptos-contract-address: "0xf0b07b5181ce76e447632cdff90525c0411fd15eb61df7da4e835cf88dc05f5b"
+  lp-token-farming:
+    default-reward-token-id: "STAR"
+  default-usd-equivalent-token-id: "USDT"
+  lp-token-farm-refresh-task-service:
+    fixed-delay: 60000
+  liquidity-pool-refresh-task-service:
+    fixed-delay: 75000
+  syrup-pool-refresh-task-service:
+    fixed-delay: 90000
+
+starcoin:
+  enabled: false
+  event-subscription-enabled: false
+
+aptos:
+  enabled: true
+  event-handle:
+    fixed-delay: 5000
+  node-api:
+    base-url: "https://mainnet.aptoslabs.com/v1"
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+        #cache: TRACE
+        cache: INFO
+      hibernate:
+        tool:
+          hbm2ddl: INFO
+          # 输出数据库模型（开发阶段）
+
+      starcoin:
+        starswap:
+          api:
+            config:
+              CacheConfig: INFO
+          subscribe:
+            handler: INFO
+          taskservice: INFO
+

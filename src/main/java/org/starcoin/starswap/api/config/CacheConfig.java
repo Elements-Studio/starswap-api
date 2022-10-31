@@ -50,7 +50,9 @@ public class CacheConfig {
             "allLiquidityTokenFarmsCache",
             "allSyrupPoolsCache",
             "tokenExchangeRateCache",
-            "sumReservesGroupByTokenCache"
+            "sumReservesGroupByTokenCache",
+            "syrupPoolQueryAllMultiplierPoolsCache",
+            "tokenScalingFactorCache"
     })
     @Scheduled(fixedDelay = 10000, initialDelay = 10000)
     public void evictCachesFast() {
@@ -60,10 +62,8 @@ public class CacheConfig {
     }
 
     @CacheEvict(allEntries = true, cacheNames = {
-            "tokenSwapRouterGetReservesCache",
-            "syrupPoolQueryAllMultiplierPoolsCache",
-            "tokenScalingFactorCache"
-    })
+            "tokenSwapRouterGetReservesCache"
+     })
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     public void evictCachesVeryFast() {
         if (LOGGER.isDebugEnabled()) {
