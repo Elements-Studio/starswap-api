@@ -419,8 +419,7 @@ public class AptosContractApiClient implements ContractApiClient {
                 now_seconds, globalPoolInfo);
         BigInteger new_gain = calculateWithdrawAmountV2(new_harvest_index,
                 new BigInteger(yieldFarmingV3Stake.getLastHarvestIndex()), new BigInteger(yieldFarmingV3Stake.getAssetWeight()));
-        BigInteger expectedGain = new BigInteger(yieldFarmingV3Stake.getGain()).add(new_gain);
-        return expectedGain;
+        return new BigInteger(yieldFarmingV3Stake.getGain()).add(new_gain);
     }
 
 

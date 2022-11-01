@@ -23,7 +23,7 @@ starswap:
   pulling-event-task-auto-create:
     fixed-delay: 300000
   invisible-token-pairs: '["BX_USDT,STC"]'
-  aptos-contract-address: "0xf0b07b5181ce76e447632cdff90525c0411fd15eb61df7da4e835cf88dc05f5b"
+  aptos-contract-address: "0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca"
   lp-token-farming:
     default-reward-token-id: "STAR"
   default-usd-equivalent-token-id: "XUSDT"
