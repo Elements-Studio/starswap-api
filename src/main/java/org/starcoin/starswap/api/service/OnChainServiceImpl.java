@@ -874,6 +874,16 @@ public class OnChainServiceImpl implements OnChainService {
                     );
                 }
             }
+            // ----------- fix ZERO EstimatedApr -------------
+            pools.stream().filter(p -> p.getEstimatedApr().compareTo(BigDecimal.ZERO) > 0).findFirst()
+                    .ifPresent(gtZeroAprPool -> pools.forEach(p -> {
+                        if (BigDecimal.ZERO.compareTo(p.getEstimatedApr()) == 0) {
+                            p.setEstimatedApr(gtZeroAprPool.getEstimatedApr()
+                                    .divide(BigDecimal.valueOf(gtZeroAprPool.getMultiplier()), 9, RoundingMode.HALF_UP)
+                                    .multiply(BigDecimal.valueOf(p.getMultiplier())));
+                        }
+                    }));
+            // -----------------------------------------------
         }
 
         return pools;
