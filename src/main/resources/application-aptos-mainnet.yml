@@ -26,7 +26,7 @@ starswap:
   aptos-contract-address: "0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca"
   lp-token-farming:
     default-reward-token-id: "STAR"
-  default-usd-equivalent-token-id: "USDT"
+  default-usd-equivalent-token-id: "USDC"
   lp-token-farm-refresh-task-service:
     fixed-delay: 60000
   liquidity-pool-refresh-task-service:

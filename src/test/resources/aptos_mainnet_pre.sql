@@ -453,3 +453,60 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2022-10-31 17:46:21
+
+-- use USDC, remove USDT
+
+DELETE FROM `token` WHERE (`token_id` = 'USDT');
+INSERT INTO `token` VALUES
+('USDC',1665313200000,'admin',_binary '\0','USDC','',10,
+  '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa','asset','USDC',
+  1665501405574,'admin',6,1000000,NULL
+);
+
+UPDATE `liquidity_token` SET
+  `token_y_id` = 'USDC',
+  `description` = 'APT / USDC'
+  WHERE (
+    `liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+      and (`token_x_id` = 'APT')
+      and (`token_y_id` = 'USDT')
+;
+
+UPDATE `liquidity_pool` SET
+  `token_y_id` = 'USDC', `description` = 'APT / USDC'
+  WHERE (
+    `liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+       and (`token_x_id` = 'APT')
+       and (`token_y_id` = 'USDT')
+       and (`pool_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+;
+
+UPDATE `liquidity_token_farm` SET
+  `token_y_id` = 'USDC', `description` = 'APT / USDC'
+  WHERE (
+    `liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+       and (`token_x_id` = 'APT')
+       and (`token_y_id` = 'USDT')
+;
+
+INSERT INTO `token_to_usd_price_pair_mapping` (
+  `token_id`,
+  `created_at`,
+  `created_by`,
+  `is_usd_equivalent_token`,
+  `pair_id`,
+  `updated_at`,
+  `updated_by`,
+  `version`
+) VALUES (
+  'USDC', 1632567783987, 'admin',
+  true,
+  'USDC_USD',
+  1632567783987,
+  'admin',
+  0
+);
+
+UPDATE `token` SET `to_usd_exchange_rate_path` = 'USDC' WHERE (`token_id` = 'APT');
+UPDATE `token` SET `to_usd_exchange_rate_path` = 'APT,USDC' WHERE (`token_id` = 'STAR');
+
