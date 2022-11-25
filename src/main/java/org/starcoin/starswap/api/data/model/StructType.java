@@ -70,7 +70,7 @@ public class StructType {
     public static StructType parse(String s) {
         String[] fs = s.split("::");
         if (fs.length != 3) {
-            throw new RuntimeException("Illegal string format.");
+            throw new RuntimeException("Illegal string format: " + s);
         }
         return new StructType(fs[0], fs[1], fs[2]);
     }
