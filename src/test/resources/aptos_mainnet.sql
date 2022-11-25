@@ -510,3 +510,45 @@ INSERT INTO `token_to_usd_price_pair_mapping` (
 UPDATE `token` SET `to_usd_exchange_rate_path` = 'USDC' WHERE (`token_id` = 'APT');
 UPDATE `token` SET `to_usd_exchange_rate_path` = 'APT,USDC' WHERE (`token_id` = 'STAR');
 
+-- --------------------- update addresses ------------------
+
+UPDATE `token` SET `token_struct_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9'
+  WHERE (`token_id` = 'STAR');
+
+UPDATE `liquidity_token` SET `liquidity_token_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9'
+  WHERE (`liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+    and (`token_x_id` = 'APT') and (`token_y_id` = 'STAR');
+UPDATE `liquidity_token` SET `liquidity_token_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9'
+  WHERE (`liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+    and (`token_x_id` = 'APT') and (`token_y_id` = 'USDC');
+
+UPDATE `liquidity_pool` SET `liquidity_token_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9',
+  `pool_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9'
+     WHERE (`liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+       and (`token_x_id` = 'APT') and (`token_y_id` = 'STAR')
+       and (`pool_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca');
+
+UPDATE `liquidity_pool` SET `liquidity_token_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9',
+  `pool_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9'
+     WHERE (`liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+       and (`token_x_id` = 'APT') and (`token_y_id` = 'USDC')
+       and (`pool_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca');
+
+UPDATE `liquidity_token_farm` SET `farm_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9',
+  `liquidity_token_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9'
+    WHERE (`farm_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+      and (`liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+      and (`token_x_id` = 'APT') and (`token_y_id` = 'STAR');
+
+UPDATE `liquidity_token_farm` SET `farm_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9',
+  `liquidity_token_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9'
+    WHERE (`farm_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+      and (`liquidity_token_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+      and (`token_x_id` = 'APT') and (`token_y_id` = 'USDC');
+
+UPDATE `syrup_pool` SET `pool_address` = '0xc755e4c8d7a6ab6d56f9289d97c43c1c94bde75ec09147c90d35cd1be61c8fb9'
+  WHERE (`pool_address` = '0x9bf32e42c442ae2adbc87bc7923610621469bf183266364503a7a434fe9d50ca')
+    and (`token_id` = 'STAR');
+
+
+
