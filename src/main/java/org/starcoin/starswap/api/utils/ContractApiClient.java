@@ -109,6 +109,9 @@ public interface ContractApiClient {
         //System.out.println("totalReservesPair: " + totalReservesPair);
         BigInteger totalLiquidity = tokenSwapRouterGetTotalLiquidity(lpTokenAddress, tokenX, tokenY);
         //System.out.println("totalLiquidity: " + totalLiquidity);
+        if (BigInteger.ZERO.compareTo(totalLiquidity) == 0) {
+            return new Pair<>(BigInteger.ZERO, BigInteger.ZERO);
+        }
         return new Pair<>(
                 totalReservesPair.getItem1().multiply(liquidity).divide(totalLiquidity),
                 totalReservesPair.getItem2().multiply(liquidity).divide(totalLiquidity)
