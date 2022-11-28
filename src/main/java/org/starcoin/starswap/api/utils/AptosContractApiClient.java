@@ -11,6 +11,8 @@ import com.github.wubuku.aptos.utils.StructTagUtils;
 import com.novi.bcs.BcsDeserializer;
 import com.novi.serde.DeserializationError;
 import com.novi.serde.SerializationError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.starcoin.starswap.api.data.model.Pair;
 import org.starcoin.starswap.api.data.model.Triple;
 import org.starcoin.starswap.api.utils.bean.*;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AptosContractApiClient implements ContractApiClient {
+    private static final Logger LOG = LoggerFactory.getLogger(AptosContractApiClient.class);
 
     private static final long DEFAULT_OPERATION_NUMERATOR = 10;
     private static final long DEFAULT_OPERATION_DENUMERATOR = 60;
@@ -684,6 +687,7 @@ public class AptosContractApiClient implements ContractApiClient {
             return tokenX.equals(tp.getItem1()) ? new Pair<>(v1, v2) : new Pair<>(v2, v1);
         } catch (NodeApiException nodeApiException) {
             if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                LOG.info("tokenSwapRouterGetReserves, resource not found: " + resourceType);
                 return new Pair<>(BigInteger.ZERO, BigInteger.ZERO);
             } else {
                 throw nodeApiException;

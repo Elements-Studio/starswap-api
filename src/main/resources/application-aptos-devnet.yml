@@ -43,8 +43,8 @@ aptos:
   event-handle:
     fixed-delay: 5000
   node-api:
-#    base-url: "https://fullnode.devnet.aptoslabs.com/v1"
-    base-url: "http://13.231.56.12:8080/v1"
+    base-url: "https://fullnode.devnet.aptoslabs.com/v1"
+#    base-url: "http://13.231.56.12:8080/v1"
 
 logging:
   level:
