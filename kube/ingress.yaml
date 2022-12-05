@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: "starswap-api-ingress"
@@ -14,13 +14,19 @@ spec:
     - http:
         paths:
           - path: /main/*
+            pathType: ImplementationSpecific
             backend:
-              serviceName: "starswap-api"
-              servicePort: 80
+              service:
+                name: "starswap-api"
+                port:
+                  number: 80
           - path: /barnard/*
+            pathType: ImplementationSpecific
             backend:
-              serviceName: "starswap-api-barnard"
-              servicePort: 80
+              service:
+                name: "starswap-api-barnard"
+                port:
+                  number: 80
 #          - path: /proxima/*
 #            backend:
 #              serviceName: "starswap-api-proxima"
@@ -34,14 +40,23 @@ spec:
 #              serviceName: "starswap-api-barnard-new"
 #              servicePort: 80
           - path: /aptos-testnet/*
+            pathType: ImplementationSpecific
             backend:
-              serviceName: "starswap-api-aptos-testnet"
-              servicePort: 80
+              service:
+                name: "starswap-api-aptos-testnet"
+                port:
+                  number: 80
           - path: /aptos-devnet/*
+            pathType: ImplementationSpecific
             backend:
-              serviceName: "starswap-api-aptos-devnet"
-              servicePort: 80
+              service:
+                name: "starswap-api-aptos-devnet"
+                port:
+                  number: 80
           - path: /aptos-mainnet/*
+            pathType: ImplementationSpecific
             backend:
-              serviceName: "starswap-api-aptos-mainnet"
-              servicePort: 80
+              service:
+                name: "starswap-api-aptos-mainnet"
+                port:
+                  number: 80
