@@ -15,7 +15,7 @@ spring:
 
 starswap:
   token-price-service:
-    base-url: http://k8s-default-starcoin-cbf39ae390-308376289.ap-northeast-1.elb.amazonaws.com/barnard/v1
+    base-url: http://k8s-default-starcoin-fc0cd30093-1855071595.ap-northeast-1.elb.amazonaws.com/barnard/v1
   farming-boost:
     whitelist: "${FARMING_BOOST_WHITELIST}"
   pulling-event-task-execute:
