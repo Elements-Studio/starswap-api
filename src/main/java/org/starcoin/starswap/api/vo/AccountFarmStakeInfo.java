@@ -15,9 +15,24 @@ public class AccountFarmStakeInfo {
     private BigInteger farmTotalLiquidity;
 
     /**
+     * Account staked liquidity weight
+     */
+    private BigInteger stakedLiquidityWeight;
+
+    /**
+     * Total liquidity stake weight in farm
+     */
+    private BigInteger farmTotalLiquidityWeight;
+
+    /**
      * Account staked liquidity share in farm.
      */
     private BigDecimal sharePercentage;
+
+    /**
+     * Account staked liquidity share in farm.
+     */
+    private BigDecimal shareWeightPercentage;
 
     /**
      * Account staked liquidity amount in USD.
@@ -85,12 +100,41 @@ public class AccountFarmStakeInfo {
         this.sharePercentage = sharePercentage;
     }
 
+
+    public BigInteger getStakedLiquidityWeight() {
+        return stakedLiquidityWeight;
+    }
+
+    public void setStakedLiquidityWeight(BigInteger stakedLiquidityWeight) {
+        this.stakedLiquidityWeight = stakedLiquidityWeight;
+    }
+
+    public BigInteger getFarmTotalLiquidityWeight() {
+        return farmTotalLiquidityWeight;
+    }
+
+    public void setFarmTotalLiquidityWeight(BigInteger farmTotalLiquidityWeight) {
+        this.farmTotalLiquidityWeight = farmTotalLiquidityWeight;
+    }
+
+    public BigDecimal getShareWeightPercentage() {
+        return shareWeightPercentage;
+    }
+
+    public void setShareWeightPercentage(BigDecimal shareWeightPercentage) {
+        this.shareWeightPercentage = shareWeightPercentage;
+    }
+
+
     @Override
     public String toString() {
         return "AccountFarmStakeInfo{" +
                 "stakedLiquidity=" + stakedLiquidity +
+                ", stakedLiquidityWeight=" + stakedLiquidityWeight +
                 ", farmTotalLiquidity=" + farmTotalLiquidity +
+                ", farmTotalLiquidityWeight=" + farmTotalLiquidityWeight +
                 ", sharePercentage=" + sharePercentage +
+                ", shareWeightPercentage=" + shareWeightPercentage +
                 ", stakedAmountInUsd=" + stakedAmountInUsd +
                 ", tokenXAmount=" + tokenXAmount +
                 ", tokenYAmount=" + tokenYAmount +

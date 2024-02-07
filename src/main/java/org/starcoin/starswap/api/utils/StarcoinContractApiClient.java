@@ -158,6 +158,16 @@ public class StarcoinContractApiClient implements ContractApiClient {
     }
 
     @Override
+    public BigInteger tokenSwapFarmGetAccountStakedLiquidityWeight(String farmAddress, String tokenX, String tokenY, String accountAddress) {
+        return JsonRpcUtils.tokenSwapFarmGetAccountStakedLiquidityWeight(this.jsonRpcSession, farmAddress, tokenX, tokenY, accountAddress);
+    }
+
+    @Override
+    public BigInteger tokenSwapFarmQueryTotalStakeWeight(String farmAddress, String tokenX, String tokenY) {
+        return JsonRpcUtils.tokenSwapFarmQueryTotalStakeWeight(this.jsonRpcSession, farmAddress, tokenX, tokenY);
+    }
+
+    @Override
     public BigInteger tokenSwapRouterGetTotalLiquidity(String lpTokenAddress, String tokenX, String tokenY) {
         return JsonRpcUtils.tokenSwapRouterTotalLiquidity(this.jsonRpcSession, lpTokenAddress, tokenX, tokenY);
     }

@@ -193,6 +193,33 @@ public class AptosContractApiClient implements ContractApiClient {
         }
     }
 
+    @Override
+    public BigInteger tokenSwapFarmGetAccountStakedLiquidityWeight(String farmAddress, String tokenX, String tokenY, String accountAddress) {
+        Pair<String, String> tp = sortTokens(tokenX, tokenY);
+        try {
+            String assetType = getAptosCoinStructTag(getLiquidityTokenStructTag(tp));
+            String stakeListExtResType = contractAddress + "::YieldFarmingV3::StakeList<" + contractAddress + "::TokenSwapGovPoolType::PoolTypeFarmPool, " + assetType + ">";
+            AccountResource<YieldFarmingV3StakeList> stakeListExtRes = NodeApiUtils.getAccountResource(this.nodeApiBaseUrl, accountAddress, stakeListExtResType, YieldFarmingV3StakeList.class, null);
+            return BigInteger.valueOf(stakeListExtRes.getData().getItems().stream().mapToLong(iter -> Long.parseLong(iter.getAssetWeight())).sum());
+        } catch (NodeApiException nodeApiException) {
+            if (HTTP_STATUS_NOT_FOUND.equals(nodeApiException.getHttpStatusCode())) {
+                return BigInteger.ZERO;
+            } else {
+                throw nodeApiException;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public BigInteger tokenSwapFarmQueryTotalStakeWeight(String farmAddress, String tokenX, String tokenY) {
+        Pair<String, String> sortedTokenPairs = sortTokens(tokenX, tokenY);
+        String lpToken = getLiquidityTokenStructTag(sortedTokenPairs);
+        FarmingAsset farmingAsset = getFarmingAsset("PoolTypeFarmPool", lpToken);
+        return farmingAsset != null ? new BigInteger(farmingAsset.getAssetTotalWeight()) : BigInteger.ZERO;
+    }
+
     public BigInteger tokenSwapFarmLookupGain(String tokenX, String tokenY, String accountAddress) {
         Pair<String, String> tp = sortTokens(tokenX, tokenY);
         try {
