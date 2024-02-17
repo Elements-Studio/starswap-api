@@ -36,7 +36,6 @@ public class JsonRpcUtils {
     private static final String TOKEN_SWAP_FARM_ROUTER_MODULE_NAME = "TokenSwapFarmRouter";
     //private static final String TOKEN_SWAP_SCRIPTS_MODULE_NAME = "TokenSwapScripts";
     private static final String TOKEN_SWAP_SYRUP_SCRIPT_MODULE_NAME = "TokenSwapSyrupScript";
-    private static final String TOKEN_SWAP_FARM_MODULE_NAME = "TokenSwapFarm";
 
 
     private static final Logger LOG = LoggerFactory.getLogger(LiquidityPoolService.class);
@@ -171,7 +170,7 @@ public class JsonRpcUtils {
      * @return
      */
     public static BigInteger tokenSwapFarmGetAccountStakedLiquidityWeight(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY, String accountAddress) {
-        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::" + TOKEN_SWAP_FARM_MODULE_NAME + "::query_total_stake_weight",
+        List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::" + TOKEN_SWAP_FARM_SCRIPT_MODULE_NAME + "::query_stake_weight",
                 Arrays.asList(tokenX, tokenY), Collections.singletonList(accountAddress), new TypeReference<List<Object>>() {
                 });
         return new BigInteger(resultFields.get(0).toString());
@@ -179,7 +178,7 @@ public class JsonRpcUtils {
 
     /**
      * Query total stake weight
-     * TokenSwapFarm::query_info_v2 -> (alloc_point, asset_total_amount, asset_total_weight, harvest_index)
+     * TokenSwapFarmRouter::query_info_v2 -> (alloc_point, asset_total_amount, asset_total_weight, harvest_index)
      *
      * @param jsonRpcSession
      * @param farmAddress
@@ -189,7 +188,7 @@ public class JsonRpcUtils {
      */
     public static BigInteger tokenSwapFarmQueryTotalStakeWeight(JSONRPC2Session jsonRpcSession, String farmAddress, String tokenX, String tokenY) {
         List<Object> resultFields = contractCallV2(jsonRpcSession, farmAddress + "::"
-                        + TOKEN_SWAP_FARM_MODULE_NAME + "::query_info_v2",//
+                        + TOKEN_SWAP_FARM_ROUTER_MODULE_NAME + "::query_info_v2",//
                 Arrays.asList(tokenX, tokenY), Collections.emptyList(), new TypeReference<List<Object>>() {
                 });
         return new BigInteger(resultFields.get(2).toString());
