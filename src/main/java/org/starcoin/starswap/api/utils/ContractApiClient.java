@@ -28,6 +28,10 @@ public interface ContractApiClient {
 
     BigInteger tokenSwapFarmGetAccountStakedLiquidity(String farmAddress, String tokenX, String tokenY, String accountAddress);
 
+    BigInteger tokenSwapFarmGetAccountStakedLiquidityWeight(String farmAddress, String tokenX, String tokenY, String accountAddress);
+
+    BigInteger tokenSwapFarmQueryTotalStakeWeight(String farmAddress, String tokenX, String tokenY);
+
     default Pair<BigInteger, BigInteger> getTokenSwapFarmStakedReserves(String farmAddress, String lpTokenAddress, String tokenX, String tokenY) {
         BigInteger stakedLiquidity = tokenSwapFarmQueryTotalStake(farmAddress, lpTokenAddress, tokenX, tokenY);
         return getReservesByLiquidity(lpTokenAddress, tokenX, tokenY, stakedLiquidity);
@@ -35,19 +39,31 @@ public interface ContractApiClient {
 
     default AccountFarmStakeInfo getAccountFarmStakeInfo(String farmAddress, String lpTokenAddress, String tokenX, String tokenY, String accountAddress) {
         BigInteger stakedLiquidity = tokenSwapFarmGetAccountStakedLiquidity(farmAddress, tokenX, tokenY, accountAddress);
+        BigInteger stakedLiquidityWeight = tokenSwapFarmGetAccountStakedLiquidityWeight(farmAddress, tokenX, tokenY, accountAddress);
         BigInteger farmTotalLiquidity = tokenSwapFarmQueryTotalStake(farmAddress, lpTokenAddress, tokenX, tokenY);
+        BigInteger farmTotalLiquidityWeight = tokenSwapFarmQueryTotalStakeWeight(farmAddress, tokenX, tokenY);
+
         BigDecimal sharePercentage = farmTotalLiquidity.compareTo(BigInteger.ZERO) == 0
                 ? BigDecimal.ZERO
                 : new BigDecimal(stakedLiquidity.multiply(BigInteger.valueOf(100))).divide(new BigDecimal(farmTotalLiquidity), 9, RoundingMode.HALF_UP);
+        BigDecimal sharePercentageWeight = farmTotalLiquidityWeight.compareTo(BigInteger.ZERO) == 0
+                ? BigDecimal.ZERO
+                : new BigDecimal(stakedLiquidityWeight.multiply(BigInteger.valueOf(100))).divide(new BigDecimal(farmTotalLiquidityWeight), 9, RoundingMode.HALF_UP);
+
         Pair<BigInteger, BigInteger> stakedAmountPair = getReservesByLiquidity(lpTokenAddress, tokenX, tokenY, stakedLiquidity);
 
         AccountFarmStakeInfo farmStakeInfo = new AccountFarmStakeInfo();
         farmStakeInfo.setStakedLiquidity(stakedLiquidity);
+        farmStakeInfo.setStakedLiquidityWeight(stakedLiquidityWeight);
         farmStakeInfo.setFarmTotalLiquidity(farmTotalLiquidity);
+        farmStakeInfo.setFarmTotalLiquidityWeight(farmTotalLiquidityWeight);
+
         farmStakeInfo.setSharePercentage(sharePercentage);
+        farmStakeInfo.setShareWeightPercentage(sharePercentageWeight);
+
         farmStakeInfo.setTokenXAmount(new AccountFarmStakeInfo.TokenAmount(null, tokenX, stakedAmountPair.getItem1()));
         farmStakeInfo.setTokenYAmount(new AccountFarmStakeInfo.TokenAmount(null, tokenY, stakedAmountPair.getItem2()));
-        //farmStakeInfo.setStakedAmountInUsd();
+
         return farmStakeInfo;
     }
 
